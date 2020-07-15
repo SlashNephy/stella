@@ -1,0 +1,60 @@
+body {
+    background-color: hsl(0, 0%, 11%);
+}
+
+.alert-dark, .alert-warning {
+    background-color: hsl(0, 0%, 14%);
+    color: rgba(255, 255, 255, 0.62);
+    border-color: transparent;
+    box-shadow: hsl(0, 0%, 6%) 3px 3px 2px !important;
+}
+
+.alert-dark hr, .alert-warning hr {
+    border-top-color: hsla(0, 0%, 22%, 0.76) !important;
+}
+
+.modal-content {
+    background-color: hsl(0, 0%, 14%);
+    color: rgba(255, 255, 255, 0.88);
+}
+
+input {
+    background-color: hsl(0, 0%, 6.7%) !important;
+    color: rgb(136, 136, 136) !important;
+}
+
+.input-group-text {
+    background-color: hsl(210, 10%, 23%) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    border: 1px solid hsl(204, 4%, 28%) !important;
+}
+
+select {
+    background-color: hsl(0, 0%, 7%) !important;
+    color: rgb(136, 136, 136) !important;
+}
+
+.media-item__image {
+    box-shadow: hsl(0, 0%, 5%) 5px 3px 2px;
+}
+
+.form-control {
+    border: 1px solid hsl(210, 5%, 21%) !important;
+}
+
+.form-control:focus {
+    border: 1px solid hsl(204, 4%, 28%) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid hsl(210, 7%, 23%) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid hsl(210, 7%, 23%) !important;
+}
+
+.close {
+    color: #e0e0e0 !important;
+    text-shadow: 0 0 0 #fff !important;
+}

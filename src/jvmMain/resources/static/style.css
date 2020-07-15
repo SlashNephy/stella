@@ -1,0 +1,439 @@
+@charset "UTF-8";
+
+@font-face {
+    font-family: "Avenir Next LT Pro";
+    unicode-range: U+0-5FF;
+    font-display: swap;
+    src:
+        local(Avenir Next LT Pro),
+        local(AvenirNext LT Pro),
+        url(/static/AvenirNextLTPro-Regular.woff2) format("woff2"),
+        url(/static/AvenirNextLTPro-Regular.woff) format("woff");
+}
+
+@font-face {
+    font-family: "Noto Sans Japanese DemiLight";
+    unicode-range: U+3000-9FFF, U+ff??;
+    font-display: swap;
+    src:
+        local(Noto Sans CJK JP DemiLight),
+        url(/static/NotoSansJP-DemiLight.woff2) format("woff2"),
+        url(/static/NotoSansJP-DemiLight.woff) format("woff");
+}
+
+* {
+    font-family: "Avenir Next LT Pro", optima, Belleza, "Noto Sans Japanese DemiLight", apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", メイリオ, Meiryo, Osaka, Verdana, Roboto, "Helvetica Neue", Arial, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.card {
+    margin-bottom: .75rem;
+}
+
+
+/* Container */
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: center;
+    align-items: center;
+    max-width: 1120px;
+}
+
+.container-wide {
+    max-width: 1370px;
+}
+
+/* Loading Indicator */
+
+.page-load-status {
+    display: none;
+    padding-top: 60px;
+    text-align: center;
+    color: #777777;
+}
+
+.loader-ellips {
+    font-size: 20px;
+    position: relative;
+    width: 4em;
+    height: 1em;
+    margin: 10px auto;
+}
+
+.loader-ellips__dot {
+    display: block;
+    width: 1em;
+    height: 1em;
+    border-radius: 0.5em;
+    background: #555555;
+    position: absolute;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+
+.loader-ellips__dot:nth-child(1), .loader-ellips__dot:nth-child(2) {
+    left: 0;
+}
+
+.loader-ellips__dot:nth-child(3) {
+    left: 1.5em;
+}
+
+.loader-ellips__dot:nth-child(4) {
+    left: 3em;
+}
+
+@keyframes reveal {
+    from {
+        transform: scale(0.001);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes slide {
+    to {
+        transform: translateX(1.5em);
+    }
+}
+
+.loader-ellips__dot:nth-child(1) {
+    animation-name: reveal;
+}
+
+.loader-ellips__dot:nth-child(2), .loader-ellips__dot:nth-child(3) {
+    animation-name: slide;
+}
+
+.loader-ellips__dot:nth-child(4) {
+    animation-name: reveal;
+    animation-direction: reverse;
+}
+
+/* Media Item */
+
+.media-item {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 5px;
+    text-align: center;
+    min-height: 500px;
+}
+@media screen and (min-width: 0px) and (max-width: 512px) {
+    .media-item {
+        width: 100%;
+    }
+}
+@media screen and (min-width: 513px) and (max-width: 1024px) {
+    .media-item {
+        width: 40%;
+    }
+}
+@media screen and (min-width: 1025px) {
+    .media-item {
+        width: 30%;
+    }
+}
+
+.media-item__image {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.controls {
+    right: 20px;
+    position: absolute;
+}
+
+.control-button {
+    color: #fff !important;
+    margin-right: 5px;
+}
+
+.text-form {
+    margin-bottom: 5px;
+}
+
+/* Overlay */
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 20px;
+}
+
+.overlay img.emoji {
+    height: 1em;
+    width: 1em;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -0.1em;
+}
+
+.overlay-title {
+    text-align: left;
+}
+
+.overlay-close-button {
+    position: absolute;
+    right: 20px;
+}
+
+.overlay-author {
+    text-align: right;
+}
+
+.overlay-rate-badge {
+    margin-right: 10px;
+    cursor: default;
+}
+
+.overlay-rate {
+    text-align: left;
+}
+
+.overlay-tags {
+    text-align: left;
+}
+
+.overlay-tag {
+    margin-right: 10px;
+    cursor: pointer;
+    color: rgb(128, 188, 255);
+    text-decoration-line: underline;
+    text-decoration: #7e90b0;
+}
+
+.overlay-badge-tag {
+    font-weight: normal;
+}
+
+.overlay-badge-edit-tag {
+
+}
+
+.overlay-timestamp {
+    text-align: right;
+    padding-right: 1em;
+    font-size: 12px;
+}
+
+.overlay-description {
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.overlay a {
+    color: rgb(140, 194, 255);
+}
+
+.overlay-toolbox {
+    text-align: left;
+    position: absolute;
+    bottom: 5%;
+}
+
+.overlay-button {
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+/* Modal */
+
+#editor .modal-dialog {
+    max-width: 900px;
+}
+
+.tag-random-result, .tag-search-result, .tag-current-result {
+    margin-bottom: 1rem;
+}
+
+.editor-modal-title {
+    text-decoration-line: underline;
+    text-decoration-color: #222222;
+}
+
+.tag-random-refresh-button-wrapper {
+    text-align: right;
+}
+
+.locked-tag {
+    cursor: no-drop;
+}
+
+/* Direction Reveal */
+
+.slide--in-top .direction-reveal__anim--in {
+    animation-name: slide--in-top;
+}
+
+.slide--in-top .direction-reveal__anim--out {
+    animation-name: slide--out-bottom;
+}
+
+.slide--in-bottom .direction-reveal__anim--in {
+    animation-name: slide--in-bottom;
+}
+
+.slide--in-bottom .direction-reveal__anim--out {
+    animation-name: slide--out-top;
+}
+
+.slide--in-left .direction-reveal__anim--in {
+    animation-name: slide--in-left;
+}
+
+.slide--in-left .direction-reveal__anim--out {
+    animation-name: slide--out-right;
+}
+
+.slide--in-right .direction-reveal__anim--in {
+    animation-name: slide--in-right;
+}
+
+.slide--in-right .direction-reveal__anim--out {
+    animation-name: slide--out-left;
+}
+
+.slide--out-top .direction-reveal__anim--in {
+    animation-name: slide--out-top;
+}
+
+.slide--out-top .direction-reveal__anim--out {
+    animation-name: slide--in-bottom;
+}
+
+.slide--out-bottom .direction-reveal__anim--in {
+    animation-name: slide--out-bottom;
+}
+
+.slide--out-bottom .direction-reveal__anim--out {
+    animation-name: slide--in-top;
+}
+
+.slide--out-left .direction-reveal__anim--in {
+    animation-name: slide--out-left;
+}
+
+.slide--out-left .direction-reveal__anim--out {
+    animation-name: slide--in-right;
+}
+
+.slide--out-right .direction-reveal__anim--in {
+    animation-name: slide--out-right;
+}
+
+.slide--out-right .direction-reveal__anim--out {
+    animation-name: slide--in-left;
+}
+
+.direction-reveal [class*=slide--] .direction-reveal__anim--in, .direction-reveal [class*=slide--] .direction-reveal__anim--out {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: cubic-bezier(.25, .46, .45, .94);
+}
+
+@keyframes slide--in-top {
+    0% {
+        transform: translate3d(0, -100%, 0);
+    }
+}
+
+@keyframes slide--out-top {
+    100% {
+        transform: translate3d(0, -100%, 0);
+    }
+}
+
+@keyframes slide--in-bottom {
+    0% {
+        transform: translate3d(0, 100%, 0);
+    }
+}
+
+@keyframes slide--out-bottom {
+    100% {
+        transform: translate3d(0, 100%, 0);
+    }
+}
+
+@keyframes slide--in-left {
+    0% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+@keyframes slide--out-left {
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+@keyframes slide--in-right {
+    0% {
+        transform: translate3d(100%, 0, 0);
+    }
+}
+
+@keyframes slide--out-right {
+    100% {
+        transform: translate3d(100%, 0, 0);
+    }
+}
+
+.direction-reveal__card {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.direction-reveal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    color: #fff;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, .6);
+}
+
+.direction-reveal__anim--in, .direction-reveal__anim--out {
+    animation-duration: .3s;
+    animation-timing-function: cubic-bezier(.25, .46, .45, .94);
+    animation-fill-mode: forwards;
+}
+
+.direction-reveal__anim--in {
+    transform: translate3d(0, -100%, 0);
+}
+
+.direction-reveal__title {
+    margin-top: 0;
+}
+
+.direction-reveal__text {
+    margin-bottom: 0;
+}
+
+.math {
+    font-family: none;
+}
+
+.alert-dark {
+    box-shadow: hsl(0, 0%, 68%) 3px 3px 1px;
+}
