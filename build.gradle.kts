@@ -22,7 +22,11 @@ kotlin {
     }
 
     js {
-        browser()
+        browser {
+            webpackTask {
+                sourceMaps = false
+            }
+        }
     }
 
     sourceSets {
@@ -69,7 +73,7 @@ kotlin {
 }
 
 task<JavaExec>("run") {
-    dependsOn("jvmJar")
+    dependsOn("build")
 
     group = "application"
     main = "io.ktor.server.netty.EngineMain"
