@@ -3,10 +3,6 @@ package blue.starry.stella
 import blue.starry.stella.api.getQuery
 import blue.starry.stella.api.getSummary
 import io.ktor.application.Application
-import io.ktor.http.content.resource
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
-import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import org.bson.Document
@@ -36,16 +32,7 @@ fun Application.main() {
     collection = mongodb.getDatabase(mongodbDatabase).getCollection(mongodbCollection)
 
     routing {
-        resource("/", "index.html")
-
-        route("/api") {
-            getQuery()
-            getSummary()
-        }
-
-        static("/static") {
-            resources("static")
-            resource("stella.js")
-        }
+        getQuery()
+        getSummary()
     }
 }

@@ -89,7 +89,7 @@
     };
 
     const App = {
-        mediaBaseUrl: "https://public.starry.blue/pic/",
+        mediaBaseUrl: "https://stella-api.starry.blue/media/",
         mobileWarningArea: document.getElementById("mobile-warning"),
         isMobile: navigator.userAgent.includes("iPhone OS") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("Mobile"),
         countEntriesArea: document.getElementById("count-entries"),
@@ -104,7 +104,7 @@
                     parameters.count = 10;
                     const query = API.buildParameterString(parameters);
 
-                    return `https://stella.starry.blue/api/query${query !== null ? "?" + query : ""}`;
+                    return `https://stella-api.starry.blue/query${query !== null ? "?" + query : ""}`;
                 },
                 responseType: "text",
                 status: ".page-load-status",
@@ -1215,7 +1215,7 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 const query = API.buildParameterString(params);
-                xhr.open(method, `https://stella.starry.blue/api${path}${query !== null ? "?" + query : ""}`, true);
+                xhr.open(method, `https://stella-api.starry.blue${path}${query !== null ? "?" + query : ""}`, true);
                 xhr.onload = () => {
                     try {
                         const json = JSON.parse(xhr.responseText);
