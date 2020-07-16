@@ -1,8 +1,13 @@
 package blue.starry.stella
 
 import blue.starry.stella.api.getQuery
+import blue.starry.stella.api.getScript
 import blue.starry.stella.api.getSummary
 import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.features.CORS
+import io.ktor.features.ForwardedHeaderSupport
+import io.ktor.http.HttpMethod
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import org.bson.Document
@@ -27,12 +32,28 @@ fun Application.main() {
     val mongodbPort = environment.config.propertyOrNull("database.mongodb.port")?.getString() ?: "27017"
     mongodb = KMongo.createClient("mongodb://$mongodbHost:$mongodbPort").coroutine
 
-    var mongodbDatabase = environment.config.propertyOrNull("database.mongodb.database")?.getString() ?: "bot"
-    var mongodbCollection = environment.config.propertyOrNull("database.mongodb.collection")?.getString() ?: "Pic"
+    val mongodbDatabase = environment.config.propertyOrNull("database.mongodb.database")?.getString() ?: "bot"
+    val mongodbCollection = environment.config.propertyOrNull("database.mongodb.collection")?.getString() ?: "Pic"
     collection = mongodb.getDatabase(mongodbDatabase).getCollection(mongodbCollection)
 
     routing {
+        getScript()
         getQuery()
         getSummary()
+    }
+
+    install(ForwardedHeaderSupport)
+
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        allowNonSimpleContentTypes = true
+        header("x-requested-with")
+
+        host("stella.starry.blue", schemes = listOf("https"))
     }
 }
