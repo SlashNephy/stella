@@ -11,7 +11,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
-import io.ktor.locations.get
+import io.ktor.locations.put
 import io.ktor.routing.Route
 import org.bson.types.ObjectId
 
@@ -21,14 +21,14 @@ data class PutRefresh(val id: String)
 
 @KtorExperimentalLocationsAPI
 fun Route.putRefresh() {
-    get<PutRefresh> { (id) ->
+    put<PutRefresh> { (id) ->
         val entry = collection.findOne(Filters.eq("_id", ObjectId(id)))?.toPic()
         if (entry == null) {
             call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
 
-            return@get
+            return@put
         }
 
         if (!MediaRegister.registerByUrl(entry.url, null, false)) {
