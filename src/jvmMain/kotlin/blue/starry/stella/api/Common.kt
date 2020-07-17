@@ -12,12 +12,24 @@ private val pureJsonWriter = JsonWriterSettings.builder().int64Converter { value
     writer.writeRaw(value.toString())
 }.build()
 
+fun Document.serialize(): JsonObject {
+    return toJson(pureJsonWriter).toJsonObject().copy { map ->
+        map["id"] = (map.remove("_id") as JsonObject)["\$oid"]
+    }
+}
+
 fun List<Document>.serialize(): JsonArray {
     return map {
-        it.toJson(pureJsonWriter).toJsonObject().copy { map ->
-            map["id"] = (map.remove("_id") as JsonObject)["\$oid"]
-        }
+        it.serialize()
     }.toJsonArray()
+}
+
+fun Document.toPic(): PicModel {
+    return serialize().parseObject { PicModel(it) }
+}
+
+fun Document.toTagReplaceTable(): TagReplaceTableModel {
+    return serialize().parseObject { TagReplaceTableModel(it) }
 }
 
 suspend fun ApplicationCall.respondApi(block: suspend () -> JsonElement) {
@@ -32,15 +44,24 @@ suspend fun ApplicationCall.respondApi(block: suspend () -> JsonElement) {
             ).stringify()
         }
     }.onFailure {
-        respondText(contentType = ContentType.Application.Json) {
-            jsonObjectOf(
-                "success" to false,
-                "result" to null,
-                "error" to mapOf(
-                    "code" to HttpStatusCode.InternalServerError.value,
-                    "message" to it.message
-                )
-            ).stringify()
+        respondApiError {
+            it.message ?: "Internal server error."
         }
+    }
+}
+
+suspend fun ApplicationCall.respondApiError(
+    code: HttpStatusCode = HttpStatusCode.InternalServerError,
+    block: () -> String
+) {
+    respondText(contentType = ContentType.Application.Json) {
+        jsonObjectOf(
+            "success" to false,
+            "result" to null,
+            "error" to mapOf(
+                "code" to code,
+                "message" to block()
+            )
+        ).stringify()
     }
 }

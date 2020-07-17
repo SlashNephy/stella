@@ -1,6 +1,7 @@
-package blue.starry.stella.api
+package blue.starry.stella.api.endpoints
 
 import blue.starry.jsonkt.jsonObjectOf
+import blue.starry.stella.api.respondApi
 import blue.starry.stella.collection
 import blue.starry.stella.mediaDirectory
 import io.ktor.application.call

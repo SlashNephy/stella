@@ -1,4 +1,4 @@
-package blue.starry.stella.api
+package blue.starry.stella.api.endpoints
 
 import io.ktor.application.call
 import io.ktor.response.respondFile

@@ -4,6 +4,9 @@ plugins {
 
 object ThirdpartyVersion {
     const val Ktor = "1.3.2"
+    const val Penicillin = "5.0.0"
+    const val KMongo = "4.0.3"
+    const val KotlinLogging = "1.8.3"
     const val Logback = "1.2.3"
 }
 
@@ -45,11 +48,18 @@ kotlin {
         named("jvmMain") {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
+
                 implementation("io.ktor:ktor-server-netty:${ThirdpartyVersion.Ktor}")
-                implementation("ch.qos.logback:logback-classic:${ThirdpartyVersion.Logback}")
-                implementation("blue.starry:penicillin:5.0.0")
-                implementation("org.litote.kmongo:kmongo-coroutine:4.0.3")
+                implementation("io.ktor:ktor-locations:${ThirdpartyVersion.Ktor}")
+                implementation("io.ktor:ktor-client-apache:${ThirdpartyVersion.Ktor}")
+
+                implementation("blue.starry:penicillin:${ThirdpartyVersion.Penicillin}")
+                implementation("org.litote.kmongo:kmongo-coroutine:${ThirdpartyVersion.KMongo}")
+                implementation("org.jsoup:jsoup:1.11.3")
                 implementation("org.apache.commons:commons-lang3:3.8.1")
+
+                implementation("io.github.microutils:kotlin-logging:${ThirdpartyVersion.KotlinLogging}")
+                implementation("ch.qos.logback:logback-classic:${ThirdpartyVersion.Logback}")
             }
         }
         named("jvmTest") {

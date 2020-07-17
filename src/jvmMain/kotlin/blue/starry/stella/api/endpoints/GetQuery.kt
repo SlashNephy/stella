@@ -1,5 +1,6 @@
-package blue.starry.stella.api
+package blue.starry.stella.api.endpoints
 
+import blue.starry.stella.api.*
 import blue.starry.stella.collection
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
@@ -43,17 +44,9 @@ fun Route.getQuery() {
             val author = call.parameters["author"]
             val platform = call.parameters["platform"]?.toImagePlatform()
             if (!author.isNullOrBlank()) {
-                filters += when (platform) {
-                    ImagePlatform.Twitter, null -> {
-                        or(
-                            Filters.regex("author.name", author, "im"), Filters.regex("author.username", author, "im")
-                        )
-                    }
-                    ImagePlatform.Nijie, ImagePlatform.Pixiv -> {
-                        // Nijie, Pixiv には ユーザネーム のページがない
-                        Filters.regex("author.name", author, "im")
-                    }
-                }
+                filters += or(
+                    Filters.regex("author.name", author, "im"), Filters.regex("author.username", author, "im")
+                )
             }
 
             if (platform != null) {

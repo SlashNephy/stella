@@ -1,48 +1,79 @@
 package blue.starry.stella
 
-import blue.starry.stella.api.getQuery
-import blue.starry.stella.api.getScript
-import blue.starry.stella.api.getSummary
+import blue.starry.stella.api.endpoints.*
+import blue.starry.stella.worker.MissingMediaRefetchWorker
+import blue.starry.stella.worker.RefreshWorker
+import blue.starry.stella.worker.platform.NijieSourceProvider
+import blue.starry.stella.worker.platform.PixivSourceProvider
+import blue.starry.stella.worker.platform.TwitterSourceProvider
 import io.ktor.application.Application
 import io.ktor.application.install
+import io.ktor.config.ApplicationConfig
 import io.ktor.features.CORS
-import io.ktor.features.ForwardedHeaderSupport
+import io.ktor.features.XForwardedHeaderSupport
 import io.ktor.http.HttpMethod
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
+import mu.KotlinLogging
 import org.bson.Document
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.time.ExperimentalTime
 
+internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
-internal lateinit var mongodb: CoroutineClient
-internal lateinit var collection: CoroutineCollection<Document>
+internal lateinit var config: ApplicationConfig
 
+internal val mongodb: CoroutineClient by lazy {
+    val mongodbHost = config.propertyOrNull("database.mongodb.host")?.getString() ?: "127.0.0.1"
+    val mongodbPort = config.propertyOrNull("database.mongodb.port")?.getString() ?: "27017"
+
+    KMongo.createClient("mongodb://$mongodbHost:$mongodbPort").coroutine
+}
+internal val database: CoroutineDatabase by lazy {
+    val mongodbDatabase = config.propertyOrNull("database.mongodb.database")?.getString() ?: "bot"
+
+    mongodb.getDatabase(mongodbDatabase)
+}
+internal val collection: CoroutineCollection<Document> by lazy {
+    database.getCollection<Document>("Pic")
+}
+internal val tagReplaceTable: CoroutineCollection<Document> by lazy {
+    database.getCollection<Document>("PicTagReplaceTable")
+}
+
+@Suppress("Unused")
+@ExperimentalTime
+@KtorExperimentalLocationsAPI
 @KtorExperimentalAPI
 fun Application.main() {
+    config = environment.config
+
     if (!Files.exists(mediaDirectory)) {
         Files.createDirectory(mediaDirectory)
     }
 
-    val mongodbHost = environment.config.propertyOrNull("database.mongodb.host")?.getString() ?: "127.0.0.1"
-    val mongodbPort = environment.config.propertyOrNull("database.mongodb.port")?.getString() ?: "27017"
-    mongodb = KMongo.createClient("mongodb://$mongodbHost:$mongodbPort").coroutine
-
-    val mongodbDatabase = environment.config.propertyOrNull("database.mongodb.database")?.getString() ?: "bot"
-    val mongodbCollection = environment.config.propertyOrNull("database.mongodb.collection")?.getString() ?: "Pic"
-    collection = mongodb.getDatabase(mongodbDatabase).getCollection(mongodbCollection)
+    install(Locations)
 
     routing {
         getScript()
         getQuery()
         getSummary()
+        putRefresh()
+        getQueryTags()
+        putEditTag()
+        deleteEditTag()
+        patchSensitiveLevel()
     }
 
-    install(ForwardedHeaderSupport)
+    install(XForwardedHeaderSupport)
 
     install(CORS) {
         method(HttpMethod.Options)
@@ -56,4 +87,11 @@ fun Application.main() {
 
         host("stella.starry.blue", schemes = listOf("https"))
     }
+
+    RefreshWorker.start()
+    MissingMediaRefetchWorker.start()
+
+    TwitterSourceProvider.start()
+    PixivSourceProvider.start()
+    NijieSourceProvider.start()
 }

@@ -1,3 +1,5 @@
+@file:Suppress("Unused")
+
 package blue.starry.stella.api
 
 import blue.starry.jsonkt.JsonObject
