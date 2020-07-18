@@ -8,12 +8,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 import kotlin.time.seconds
 
 object RefreshWorker {
-    @ExperimentalTime
     fun start() {
         GlobalScope.launch {
             while (true) {
@@ -28,7 +26,6 @@ object RefreshWorker {
         }
     }
 
-    @ExperimentalTime
     private suspend fun check() {
         delay(30.seconds)
 

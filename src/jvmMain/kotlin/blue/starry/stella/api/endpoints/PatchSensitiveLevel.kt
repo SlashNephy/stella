@@ -11,7 +11,6 @@ import com.mongodb.client.model.Updates
 import io.ktor.application.call
 import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 import io.ktor.locations.patch
 import io.ktor.request.receiveParameters
@@ -19,11 +18,9 @@ import io.ktor.routing.Route
 import org.bson.types.ObjectId
 import java.util.*
 
-@KtorExperimentalLocationsAPI
 @Location("/edit/{id}/sensitive_level")
 data class EditSensitiveLevel(val id: String)
 
-@KtorExperimentalLocationsAPI
 fun Route.patchSensitiveLevel() {
     patch<EditSensitiveLevel> { (id) ->
         val level = call.receiveParameters()["sensitive_level"]?.toIntOrNull()

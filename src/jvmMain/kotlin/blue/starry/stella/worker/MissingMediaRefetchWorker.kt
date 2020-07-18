@@ -11,11 +11,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.nio.file.Files
-import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
 object MissingMediaRefetchWorker {
-    @ExperimentalTime
     fun start() {
         GlobalScope.launch {
             while (true) {

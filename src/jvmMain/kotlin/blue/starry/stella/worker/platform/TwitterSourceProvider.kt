@@ -26,14 +26,11 @@ import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import io.ktor.client.request.get
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
-@KtorExperimentalAPI
 object TwitterSourceProvider {
     private val client = PenicillinClient {
         account {
@@ -43,7 +40,6 @@ object TwitterSourceProvider {
     }
     private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
 
-    @ExperimentalTime
     fun start() {
         GlobalScope.launch {
             while (true) {

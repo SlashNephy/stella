@@ -4,21 +4,17 @@ import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import io.ktor.client.features.ResponseException
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.time.FastDateFormat
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
 object PixivSourceProvider {
     private val requestedIds = CopyOnWriteArrayList<Int>()
 
-    @KtorExperimentalAPI
-    @ExperimentalTime
     fun start() {
         GlobalScope.launch {
             while (true) {
@@ -45,7 +41,6 @@ object PixivSourceProvider {
         requestedIds += id
     }
 
-    @KtorExperimentalAPI
     private suspend fun fetchBookmark() {
         for (illust in PixivClient.getBookmarks().illusts.reversed()) {
             if (illust.id in requestedIds) {

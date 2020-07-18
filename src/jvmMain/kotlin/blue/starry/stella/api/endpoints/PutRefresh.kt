@@ -9,17 +9,14 @@ import blue.starry.stella.worker.MediaRegister
 import com.mongodb.client.model.Filters
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 import io.ktor.locations.put
 import io.ktor.routing.Route
 import org.bson.types.ObjectId
 
-@KtorExperimentalLocationsAPI
 @Location("/refresh/{id}")
 data class PutRefresh(val id: String)
 
-@KtorExperimentalLocationsAPI
 fun Route.putRefresh() {
     put<PutRefresh> { (id) ->
         val entry = collection.findOne(Filters.eq("_id", ObjectId(id)))?.toPic()

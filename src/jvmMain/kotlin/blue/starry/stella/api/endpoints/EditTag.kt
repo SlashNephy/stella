@@ -11,7 +11,6 @@ import com.mongodb.client.model.Updates
 import io.ktor.application.call
 import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
-import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 import io.ktor.locations.delete
 import io.ktor.locations.put
@@ -20,11 +19,9 @@ import io.ktor.routing.Route
 import org.bson.types.ObjectId
 import java.util.*
 
-@KtorExperimentalLocationsAPI
 @Location("/edit/{id}/tag")
 data class EditTag(val id: String)
 
-@KtorExperimentalLocationsAPI
 fun Route.putEditTag() {
     put<EditTag> { (id) ->
         val tag = call.receiveParameters()["tag"]
@@ -75,7 +72,6 @@ fun Route.putEditTag() {
     }
 }
 
-@KtorExperimentalLocationsAPI
 fun Route.deleteEditTag() {
     delete<EditTag> { (id) ->
         val tag = call.receiveParameters()["tag"]

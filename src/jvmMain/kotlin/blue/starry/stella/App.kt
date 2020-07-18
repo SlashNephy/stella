@@ -12,10 +12,8 @@ import io.ktor.config.ApplicationConfig
 import io.ktor.features.CORS
 import io.ktor.features.XForwardedHeaderSupport
 import io.ktor.http.HttpMethod
-import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import io.ktor.util.KtorExperimentalAPI
 import mu.KotlinLogging
 import org.bson.Document
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -25,7 +23,6 @@ import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import java.nio.file.Files
 import java.nio.file.Paths
-import kotlin.time.ExperimentalTime
 
 internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
@@ -50,9 +47,6 @@ internal val tagReplaceTable: CoroutineCollection<Document> by lazy {
 }
 
 @Suppress("Unused")
-@ExperimentalTime
-@KtorExperimentalLocationsAPI
-@KtorExperimentalAPI
 fun Application.main() {
     config = environment.config
 

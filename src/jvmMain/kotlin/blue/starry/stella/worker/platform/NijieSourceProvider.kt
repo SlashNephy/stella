@@ -5,16 +5,12 @@ import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import io.ktor.client.features.ResponseException
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
 object NijieSourceProvider {
-    @KtorExperimentalAPI
-    @ExperimentalTime
     fun start() {
         GlobalScope.launch {
             while (true) {
@@ -34,7 +30,6 @@ object NijieSourceProvider {
         }
     }
 
-    @KtorExperimentalAPI
     private suspend fun fetchBookmark() {
         if (!NijieClient.isLoggedIn) {
             login()
@@ -48,7 +43,6 @@ object NijieSourceProvider {
         }
     }
 
-    @KtorExperimentalAPI
     private suspend fun login() {
         NijieClient.login(config.property("accounts.nijie.email").getString(), config.property("accounts.nijie.password").getString())
         logger.info { "Nijie にログインしました。" }

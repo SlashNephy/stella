@@ -11,7 +11,6 @@ import io.ktor.client.request.forms.submitForm
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.userAgent
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.apache.commons.lang3.time.FastDateFormat
@@ -47,8 +46,7 @@ object PixivClient {
         }
     }
 
-    @KtorExperimentalAPI
-    suspend fun login() {
+    private suspend fun login() {
         if (isLoggedIn) {
             return
         }

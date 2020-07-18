@@ -9,6 +9,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import java.nio.file.Files
 
+@Suppress("BlockingMethodInNonBlockingContext")
 fun Route.getSummary() {
     get("/summary") {
         call.respondApi {
