@@ -1,6 +1,7 @@
 package blue.starry.stella.api
 
 import blue.starry.jsonkt.*
+import blue.starry.stella.common.PicModel
 import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode

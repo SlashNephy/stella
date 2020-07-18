@@ -1,4 +1,4 @@
-package blue.starry.stella.api
+package blue.starry.stella.common
 
 enum class ImagePlatform {
    Twitter, Nijie, Pixiv

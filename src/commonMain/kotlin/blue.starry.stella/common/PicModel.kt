@@ -1,6 +1,6 @@
 @file:Suppress("Unused")
 
-package blue.starry.stella.api
+package blue.starry.stella.common
 
 import blue.starry.jsonkt.JsonObject
 import blue.starry.jsonkt.delegation.*
