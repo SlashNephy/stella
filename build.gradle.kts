@@ -5,6 +5,7 @@ plugins {
 object ThirdpartyVersion {
     const val Ktor = "1.3.2"
     const val Penicillin = "5.0.0"
+    const val JsonKt = "5.0.0"
     const val KMongo = "4.0.3"
     const val KotlinLogging = "1.8.3"
     const val Logback = "1.2.3"
@@ -25,17 +26,15 @@ kotlin {
     }
 
     js {
-        browser {
-            webpackTask {
-                sourceMaps = false
-            }
-        }
+        browser()
     }
 
     sourceSets {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+
+                implementation("blue.starry:jsonkt-common:${ThirdpartyVersion.JsonKt}")
             }
         }
         commonTest {
@@ -61,6 +60,10 @@ kotlin {
                 implementation("io.github.microutils:kotlin-logging:${ThirdpartyVersion.KotlinLogging}")
                 implementation("ch.qos.logback:logback-classic:${ThirdpartyVersion.Logback}")
             }
+
+            languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
+            languageSettings.useExperimentalAnnotation("io.ktor.util.KtorExperimentalAPI")
+            languageSettings.useExperimentalAnnotation("io.ktor.locations.KtorExperimentalLocationsAPI")
         }
         named("jvmTest") {
             dependencies {
@@ -72,6 +75,14 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(kotlin("stdlib-js"))
+
+                implementation("blue.starry:jsonkt-js:${ThirdpartyVersion.JsonKt}")
+
+                implementation(npm("bootstrap.native", "3.0.9"))
+                implementation(npm("twemoji", "13.0.1"))
+                implementation(npm("infinite-scroll", "3.0.6"))
+                implementation(npm("js-cookie", "2"))
+                implementation(npm("quicklink", "0.1.2"))
             }
         }
         named("jsTest") {
