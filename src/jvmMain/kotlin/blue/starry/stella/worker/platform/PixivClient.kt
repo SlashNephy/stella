@@ -82,13 +82,13 @@ object PixivClient {
         }
     }
 
-    suspend fun getBookmarks(): PixivModel.Bookmark {
+    suspend fun getBookmarks(private: Boolean): PixivModel.Bookmark {
         login()
 
         return httpClient.get<String>("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
             parameter("tag", "未分類")
             parameter("user_id", token?.response?.user?.id)
-            parameter("restrict", "private")
+            parameter("restrict", if (private) "private" else "public")
 
             setHeaders(true)
         }.parseObject {

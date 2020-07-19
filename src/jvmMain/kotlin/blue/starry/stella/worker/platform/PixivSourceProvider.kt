@@ -19,7 +19,8 @@ object PixivSourceProvider {
         GlobalScope.launch {
             while (true) {
                 try {
-                    fetchBookmark()
+                    fetchBookmark(false)
+                    fetchBookmark(true)
                 } catch (e: ResponseException) {
                     PixivClient.logout()
                 } catch (e: Throwable) {
@@ -41,8 +42,8 @@ object PixivSourceProvider {
         requestedIds += id
     }
 
-    private suspend fun fetchBookmark() {
-        for (illust in PixivClient.getBookmarks().illusts.reversed()) {
+    private suspend fun fetchBookmark(private: Boolean) {
+        for (illust in PixivClient.getBookmarks(private).illusts.reversed()) {
             if (illust.id in requestedIds) {
                 register(illust, null, true)
             } else {
