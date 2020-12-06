@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  stella-db:
     container_name: stella_db
     image: mongo
     restart: always
@@ -12,7 +12,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: stella
 
-  app:
+  stella-app:
     container_name: stella_app
     build: .
     restart: always
@@ -24,7 +24,7 @@ services:
       HOST: stella.example.com
       HTTP_HOST: 0.0.0.0
       HTTP_PORT: 8080
-      DB_HOST: 0.0.0.0
+      DB_HOST: stella-db
       DB_PORT: 27017
       DB_USER: root
       DB_PASSWORD: password

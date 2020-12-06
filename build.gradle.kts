@@ -6,7 +6,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
 
     // For testing
-    id("com.adarshr.test-logger") version "2.0.0"
+    id("com.adarshr.test-logger") version "2.1.1"
     id("build-time-tracker") version "0.11.1"
 }
 

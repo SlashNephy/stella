@@ -32,6 +32,7 @@ fun Application.module() {
     install(Locations)
 
     routing {
+        getMedia()
         getScript()
         getQuery()
         getSummary()
