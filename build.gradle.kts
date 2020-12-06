@@ -157,6 +157,12 @@ tasks.named<Test>("jvmTest") {
     }
 }
 
+tasks.shadowJar {
+    manifest {
+        attributes("Main-Class" to "blue.starry.stella.AppKt")
+    }
+}
+
 task<JavaExec>("run") {
     dependsOn("build")
 
