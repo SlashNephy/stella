@@ -129,6 +129,7 @@ kotlin {
             useExperimentalAnnotation("kotlin.time.ExperimentalTime")
             useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
             useExperimentalAnnotation("io.ktor.util.KtorExperimentalAPI")
+            useExperimentalAnnotation("io.ktor.locations.KtorExperimentalLocationsAPI")
         }
     }
 }
