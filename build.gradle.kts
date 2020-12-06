@@ -1,8 +1,9 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     kotlin("multiplatform") version "1.4.20"
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 
     // For testing
     id("com.adarshr.test-logger") version "2.0.0"
@@ -157,7 +158,7 @@ tasks.named<Test>("jvmTest") {
     }
 }
 
-tasks.shadowJar {
+tasks.withType<ShadowJar> {
     manifest {
         attributes("Main-Class" to "blue.starry.stella.AppKt")
     }
