@@ -159,16 +159,26 @@ tasks.named<Test>("jvmTest") {
     }
 }
 
-tasks.withType<ShadowJar> {
-    manifest {
-        attributes("Main-Class" to "blue.starry.stella.AppKt")
-    }
-}
-
 task<JavaExec>("run") {
     dependsOn("build")
 
     group = "application"
     main = "blue.starry.stella.AppKt"
     classpath(configurations["jvmRuntimeClasspath"], tasks["jvmJar"])
+}
+
+// workaround for Kotlin/Multiplatform + Shadow issue
+// Refer https://github.com/johnrengelman/shadow/issues/484#issuecomment-549137315.
+task<ShadowJar>("shadowJar") {
+    group = "shadow"
+    dependsOn("jvmJar")
+
+    manifest {
+        attributes("Main-Class" to "blue.starry.stella.AppKt")
+    }
+    archiveClassifier.set("all")
+
+    val jvmMain = kotlin.jvm().compilations.getByName("main")
+    from(jvmMain.output)
+    configurations.add(jvmMain.compileDependencyFiles as Configuration)
 }
