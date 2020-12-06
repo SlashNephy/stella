@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: stella_db
+    image: mongo
+    restart: always
+    volumes:
+      - ./db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: stella
+
+  app:
+    container_name: stella_app
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    volumes:
+      - ./media:/app/media
+    environment:
+      HOST: stella.example.com
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8080
+      DB_HOST: 0.0.0.0
+      DB_PORT: 27017
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: stella
+      TWITTER_CK: xxx
+      TWITTER_CS: xxx
+      TWITTER_AT: xxx
+      TWITTER_ATS: xxx
+      PIXIV_EMAIL: xxx
+      PIXIV_PASSWORD: xxx
+      NIJIE_EMAIL: xxx
+      NIJIE_PASSWORD: xxx
