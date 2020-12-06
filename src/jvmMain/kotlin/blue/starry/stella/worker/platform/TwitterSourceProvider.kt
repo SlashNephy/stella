@@ -21,21 +21,29 @@ import blue.starry.penicillin.extensions.execute
 import blue.starry.penicillin.extensions.idObj
 import blue.starry.penicillin.extensions.models.text
 import blue.starry.penicillin.models.Status
-import blue.starry.stella.config
+import blue.starry.stella.Config
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
-import io.ktor.client.request.get
+import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.minutes
 
 object TwitterSourceProvider {
-    private val client = PenicillinClient {
-        account {
-            application(config.property("accounts.twitter.consumerKey").getString(), config.property("accounts.twitter.consumerSecret").getString())
-            token(config.property("accounts.twitter.accessToken").getString(), config.property("accounts.twitter.accessTokenSecret").getString())
+    private val client by lazy {
+        PenicillinClient {
+            account {
+                application(
+                    Config.TwitterConsumerKey!!,
+                    Config.TwitterConsumerSecret!!
+                )
+                token(
+                    Config.TwitterAccessToken!!,
+                    Config.TwitterAccessTokenSecret!!
+                )
+            }
         }
     }
     private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
@@ -60,7 +68,7 @@ object TwitterSourceProvider {
         for (status in timeline) {
             if (status.retweetedStatus != null) {
                 // RT を処理
-                register(status.retweetedStatus!!, "Nep", false)
+                register(status.retweetedStatus!!, "User", false)
 
                 client.statuses.unretweet(status.retweetedStatus!!.id).execute()
             } else if (status.entities.urls.isEmpty()) {
@@ -78,9 +86,9 @@ object TwitterSourceProvider {
     }
 
     private suspend fun fetchFavorites() {
-        val favorites = client.favorites.list(options = *arrayOf("tweet_mode" to TweetMode.Extended)).execute()
+        val favorites = client.favorites.list(options = arrayOf("tweet_mode" to TweetMode.Extended)).execute()
         for (status in favorites) {
-            register(status, "Nep", false)
+            register(status, "User", false)
 
             if (!status.user.following) {
                 client.friendships.createByUserId(userId = status.user.id).execute()
@@ -90,7 +98,7 @@ object TwitterSourceProvider {
     }
 
     suspend fun fetch(url: String, user: String?, auto: Boolean) {
-        val status = client.statuses.show(url.split("/").last().split("?").first().toLong(), options = *arrayOf("tweet_mode" to TweetMode.Extended)).execute().result
+        val status = client.statuses.show(url.split("/").last().split("?").first().toLong(), options = arrayOf("tweet_mode" to TweetMode.Extended)).execute().result
 
         register(status, user, auto)
     }

@@ -1,27 +1,26 @@
 package blue.starry.stella.worker.platform
 
-import blue.starry.stella.config
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
-import io.ktor.client.features.ResponseException
+import io.ktor.client.features.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.minutes
 
 object NijieSourceProvider {
-    fun start() {
+    fun start(email: String, password: String) {
         GlobalScope.launch {
             while (true) {
                 try {
-                    fetchBookmark()
+                    fetchBookmark(email, password)
 
                     delay(1.minutes)
                 } catch (e: ResponseException) {
                     // セッション切れ
                     if (NijieClient.isLoggedIn) {
-                        login()
+                        login(email, password)
                     }
                 } catch (e: Throwable) {
                     logger.error(e) { "NijieSource で例外が発生しました。" }
@@ -30,21 +29,21 @@ object NijieSourceProvider {
         }
     }
 
-    private suspend fun fetchBookmark() {
+    private suspend fun fetchBookmark(email: String, password: String) {
         if (!NijieClient.isLoggedIn) {
-            login()
+            login(email, password)
         }
 
         for (bookmark in NijieClient.bookmarks().reversed()) {
             val picture = NijieClient.picture(bookmark.id)
-            register(picture, "Nep", false)
+            register(picture, "User", false)
 
             NijieClient.deleteBookmark(bookmark.id)
         }
     }
 
-    private suspend fun login() {
-        NijieClient.login(config.property("accounts.nijie.email").getString(), config.property("accounts.nijie.password").getString())
+    private suspend fun login(email: String, password: String) {
+        NijieClient.login(email, password)
         logger.info { "Nijie にログインしました。" }
     }
 

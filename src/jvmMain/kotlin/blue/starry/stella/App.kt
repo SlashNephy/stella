@@ -6,50 +6,25 @@ import blue.starry.stella.worker.RefreshWorker
 import blue.starry.stella.worker.platform.NijieSourceProvider
 import blue.starry.stella.worker.platform.PixivSourceProvider
 import blue.starry.stella.worker.platform.TwitterSourceProvider
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.config.ApplicationConfig
-import io.ktor.features.CORS
-import io.ktor.features.XForwardedHeaderSupport
-import io.ktor.http.HttpMethod
-import io.ktor.locations.Locations
-import io.ktor.routing.routing
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.locations.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import mu.KotlinLogging
-import org.bson.Document
-import org.litote.kmongo.coroutine.CoroutineClient
-import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.reactivestreams.KMongo
 import java.nio.file.Files
 import java.nio.file.Paths
 
 internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
-internal lateinit var config: ApplicationConfig
 
-internal val mongodb: CoroutineClient by lazy {
-    val mongodbHost = config.propertyOrNull("database.mongodb.host")?.getString() ?: "127.0.0.1"
-    val mongodbPort = config.propertyOrNull("database.mongodb.port")?.getString() ?: "27017"
-
-    KMongo.createClient("mongodb://$mongodbHost:$mongodbPort").coroutine
-}
-internal val database: CoroutineDatabase by lazy {
-    val mongodbDatabase = config.propertyOrNull("database.mongodb.database")?.getString() ?: "bot"
-
-    mongodb.getDatabase(mongodbDatabase)
-}
-internal val collection: CoroutineCollection<Document> by lazy {
-    database.getCollection<Document>("Pic")
-}
-internal val tagReplaceTable: CoroutineCollection<Document> by lazy {
-    database.getCollection<Document>("PicTagReplaceTable")
+fun main() {
+    embeddedServer(Netty, host = Config.HttpHost, port = Config.HttpPort, module = Application::module).start(wait = true)
 }
 
-@Suppress("Unused")
-fun Application.main() {
-    config = environment.config
-
+fun Application.module() {
     if (!Files.exists(mediaDirectory)) {
         Files.createDirectory(mediaDirectory)
     }
@@ -79,13 +54,23 @@ fun Application.main() {
         allowNonSimpleContentTypes = true
         header("x-requested-with")
 
-        host("stella.starry.blue", schemes = listOf("https"))
+        if (Config.Host != null) {
+            host(Config.Host, schemes = listOf("http", "https"))
+        }
     }
 
     RefreshWorker.start()
     MissingMediaRefetchWorker.start()
 
-    TwitterSourceProvider.start()
-    PixivSourceProvider.start()
-    NijieSourceProvider.start()
+    if (Config.TwitterConsumerKey != null && Config.TwitterConsumerSecret != null && Config.TwitterAccessToken != null && Config.TwitterAccessTokenSecret != null) {
+        TwitterSourceProvider.start()
+    }
+
+    if (Config.PixivEmail != null && Config.PixivPassword != null) {
+        PixivSourceProvider.start()
+    }
+
+    if (Config.NijieEmail != null && Config.NijiePassword != null) {
+        NijieSourceProvider.start(Config.NijieEmail, Config.NijiePassword)
+    }
 }

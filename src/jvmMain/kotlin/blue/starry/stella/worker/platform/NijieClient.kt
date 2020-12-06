@@ -2,18 +2,13 @@ package blue.starry.stella.worker.platform
 
 import blue.starry.jsonkt.parseObject
 import blue.starry.jsonkt.toJsonObject
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.features.cookies.HttpCookies
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.forms.submitForm
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.url
-import io.ktor.client.statement.HttpStatement
-import io.ktor.http.HttpHeaders
-import io.ktor.http.Parameters
-import io.ktor.http.userAgent
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.cookies.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.int
 import org.apache.commons.lang3.time.FastDateFormat
@@ -22,7 +17,7 @@ import java.io.File
 import java.util.*
 
 object NijieClient {
-    private val httpClient = HttpClient(Apache) {
+    private val httpClient = HttpClient(CIO) {
         install(HttpCookies)
     }
     var isLoggedIn = checkSession()

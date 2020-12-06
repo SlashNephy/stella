@@ -3,7 +3,7 @@ package blue.starry.stella.worker.platform
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
-import io.ktor.client.features.ResponseException
+import io.ktor.client.features.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,7 +47,7 @@ object PixivSourceProvider {
             if (illust.id in requestedIds) {
                 register(illust, null, true)
             } else {
-                register(illust, "Nep", false)
+                register(illust, "User", false)
             }
 
             PixivClient.deleteBookmark(illust.id)

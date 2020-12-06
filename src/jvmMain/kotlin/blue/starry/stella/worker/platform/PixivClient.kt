@@ -1,16 +1,14 @@
 package blue.starry.stella.worker.platform
 
 import blue.starry.jsonkt.parseObject
-import blue.starry.stella.config
+import blue.starry.stella.Config
 import blue.starry.stella.logger
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.features.cookies.HttpCookies
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.cookies.*
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.submitForm
-import io.ktor.http.HttpHeaders
-import io.ktor.http.Parameters
-import io.ktor.http.userAgent
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.apache.commons.lang3.time.FastDateFormat
@@ -20,7 +18,7 @@ import java.util.*
 
 object PixivClient {
     private val lock = Mutex()
-    private val httpClient = HttpClient(Apache) {
+    private val httpClient = HttpClient(CIO) {
         install(HttpCookies)
     }
 
@@ -51,8 +49,8 @@ object PixivClient {
             return
         }
 
-        val email = config.property("accounts.pixiv.email").getString()
-        val password = config.property("accounts.pixiv.password").getString()
+        val email = Config.PixivEmail!!
+        val password = Config.PixivPassword!!
 
         val parameters = Parameters.build {
             append("grant_type", "password")
