@@ -1,13 +1,13 @@
 plugins {
-    kotlin("multiplatform") version "1.3.72"
+    kotlin("multiplatform") version "1.4.20"
 }
 
 object ThirdpartyVersion {
-    const val Ktor = "1.3.2"
+    const val Ktor = "1.4.3"
     const val Penicillin = "5.0.0"
     const val JsonKt = "5.0.0"
-    const val KMongo = "4.0.3"
-    const val KotlinLogging = "1.8.3"
+    const val KMongo = "4.2.2"
+    const val KotlinLogging = "2.0.3"
     const val Logback = "1.2.3"
 }
 
@@ -76,6 +76,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
 
+                implementation("io.ktor:ktor-client-js:${ThirdpartyVersion.Ktor}")
                 implementation("blue.starry:jsonkt-js:${ThirdpartyVersion.JsonKt}")
 
                 implementation(npm("bootstrap.native", "3.0.9"))
