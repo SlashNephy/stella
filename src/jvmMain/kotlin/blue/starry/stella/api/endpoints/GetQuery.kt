@@ -1,6 +1,7 @@
 package blue.starry.stella.api.endpoints
 
-import blue.starry.stella.api.*
+import blue.starry.stella.api.respondApi
+import blue.starry.stella.api.serialize
 import blue.starry.stella.collection
 import blue.starry.stella.common.SortOrder
 import blue.starry.stella.common.toFileExtension
@@ -9,9 +10,9 @@ import blue.starry.stella.common.toSortOrder
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import io.ktor.application.call
-import io.ktor.routing.Route
-import io.ktor.routing.get
+import io.ktor.application.*
+import io.ktor.request.*
+import io.ktor.routing.*
 import org.apache.commons.lang3.time.FastDateFormat
 import org.bson.Document
 import org.bson.conversions.Bson
@@ -62,9 +63,14 @@ fun Route.getQuery() {
                 filters += Filters.eq("user", user)
             }
 
-            val levels = call.parameters["sensitive_levels"].orEmpty().split(",").mapNotNull { it.toIntOrNull() }
-            if (levels.isNotEmpty()) {
-                filters += Filters.`in`("sensitive_level", levels)
+            val isLocalAccess = call.request.header("X-Local-Access")?.toIntOrNull() == 1
+            if (isLocalAccess) {
+                val levels = call.parameters["sensitive_levels"].orEmpty().split(",").mapNotNull { it.toIntOrNull() }
+                if (levels.isNotEmpty()) {
+                    filters += Filters.`in`("sensitive_level", levels)
+                }
+            } else {
+                filters += Filters.eq("sensitive_level", 0)
             }
 
             val createdSince = call.parameters["created_since"]
