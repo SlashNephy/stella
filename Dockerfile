@@ -26,4 +26,4 @@ FROM openjdk:8-jre-alpine
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 
 WORKDIR /app
-ENTRYPOINT ["java", "-server", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "/app/stella.jar"]
+ENTRYPOINT ["java", "-jar", "/app/stella.jar"]
