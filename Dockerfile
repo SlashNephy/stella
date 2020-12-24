@@ -1,22 +1,20 @@
-# syntax = docker/dockerfile:experimental
-FROM gradle:6.7.1-jdk8 AS cache
-RUN mkdir -p /home/gradle/cache_home
-ENV GRADLE_USER_HOME /home/gradle/cache_home
-RUN mkdir -p /home/gradle/build_tmp
-COPY build.gradle.kts settings.gradle.kts gradle.properties /home/gradle/build_tmp/
-WORKDIR /home/gradle/build_tmp
-RUN gradle clean build -i --stacktrace
-
-FROM gradle:6.7.1-jdk8 AS build
-COPY --from=cache /home/gradle/cache_home /home/gradle/.gradle
-COPY --chown=gradle:gradle . /home/gradle/build_home
-WORKDIR /home/gradle/build_home
-RUN gradle shadowJar -i --stacktrace
-
-FROM openjdk:8-jre
-RUN mkdir /app
+# Gradle Cache Dependencies Stage
+# This stage caches plugin/project dependencies from *.gradle.kts and gradle.properties.
+# Refer https://qiita.com/tkrplus/items/044790b4054bf644890a
+FROM gradle:6.7.1-jdk8 AS builder
 WORKDIR /app
-COPY --from=build /home/gradle/build_home/build/libs/stella-all.jar /app/stella.jar
+COPY *.gradle.kts gradle.properties /app/
+RUN gradle build --quiet --parallel
 
-USER 1000
-ENTRYPOINT ["java", "-jar", "/app/stella.jar"]
+# Gradle Build Stage
+# This stage builds saya, and generates fat jar.
+COPY src/main/ /app/src/main/
+RUN gradle shadowJar --parallel
+
+# Final Stage
+FROM openjdk:8-jre-alpine
+
+COPY --from=builder /app/build/libs/stella-all.jar /app/stella.jar
+
+WORKDIR /app
+ENTRYPOINT ["java", "-server", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "/app/stella.jar"]

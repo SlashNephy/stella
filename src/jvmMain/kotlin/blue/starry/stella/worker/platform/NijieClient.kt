@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import org.apache.commons.lang3.time.FastDateFormat
 import org.jsoup.Jsoup
 import java.io.File
@@ -131,7 +132,7 @@ object NijieClient {
                 header(HttpHeaders.Referrer, "https://nijie.info/view.php?id=$id")
                 header("X-Requested-With", "XMLHttpRequest")
                 setHeaders()
-            }.toJsonObject()["view_count"]!!.int
+            }.toJsonObject()["view_count"]!!.jsonPrimitive.int
         }.getOrNull() ?: 0
     }
 

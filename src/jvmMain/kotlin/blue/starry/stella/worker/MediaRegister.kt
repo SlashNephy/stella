@@ -1,7 +1,7 @@
 package blue.starry.stella.worker
 
+import blue.starry.jsonkt.encodeToString
 import blue.starry.jsonkt.jsonObjectOf
-import blue.starry.jsonkt.stringify
 import blue.starry.stella.api.toPic
 import blue.starry.stella.api.toTagReplaceTable
 import blue.starry.stella.collection
@@ -132,7 +132,7 @@ object MediaRegister {
                     "retweet" to entry.popularity.retweet,
                     "reply" to entry.popularity.reply
                 )
-            ).stringify()))
+            ).encodeToString()))
 
             logger.info { "${entry.author.name} (${entry.platform}): \"${entry.title}\" (${entry.url}) を追加しました。" }
         }

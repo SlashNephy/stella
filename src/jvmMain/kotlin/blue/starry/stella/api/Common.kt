@@ -2,10 +2,9 @@ package blue.starry.stella.api
 
 import blue.starry.jsonkt.*
 import blue.starry.stella.common.PicModel
-import io.ktor.application.ApplicationCall
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respondText
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
 import org.bson.Document
 import org.bson.json.JsonWriterSettings
 
@@ -42,7 +41,7 @@ suspend fun ApplicationCall.respondApi(block: suspend () -> JsonElement) {
                 "success" to true,
                 "result" to it,
                 "error" to null
-            ).stringify()
+            ).encodeToString()
         }
     }.onFailure {
         respondApiError {
@@ -63,6 +62,6 @@ suspend fun ApplicationCall.respondApiError(
                 "code" to code,
                 "message" to block()
             )
-        ).stringify()
+        ).encodeToString()
     }
 }

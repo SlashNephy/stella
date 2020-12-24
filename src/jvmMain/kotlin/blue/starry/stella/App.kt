@@ -11,8 +11,8 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import mu.KotlinLogging
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -21,7 +21,7 @@ internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
 
 fun main() {
-    embeddedServer(Netty, host = Config.HttpHost, port = Config.HttpPort, module = Application::module).start(wait = true)
+    embeddedServer(CIO, host = Config.HttpHost, port = Config.HttpPort, module = Application::module).start(wait = true)
 }
 
 fun Application.module() {

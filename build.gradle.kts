@@ -2,26 +2,27 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("multiplatform") version "1.4.20"
+    kotlin("multiplatform") version "1.4.21"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 
     // For testing
     id("com.adarshr.test-logger") version "2.1.1"
-    id("build-time-tracker") version "0.11.1"
+    id("net.rdrei.android.buildtimetracker") version "0.11.0"
 }
 
 object ThirdpartyVersion {
-    const val Ktor = "1.4.3"
-    const val Penicillin = "5.0.0"
-    const val JsonKt = "5.0.0"
-    const val KMongo = "4.2.2"
+    const val Ktor = "1.5.0"
+    const val Penicillin = "6.0.1"
+    const val JsonKt = "6.0.0"
+    const val KMongo = "4.2.3"
     const val Jsoup = "1.13.1"
+    const val CommonsLang = "3.8.1"
 
     // For testing
     const val JUnit = "5.7.0"
 
     // For logging
-    const val KotlinLogging = "2.0.3"
+    const val KotlinLogging = "2.0.4"
     const val Logback = "1.2.3"
     const val jansi = "1.18"
 }
@@ -29,8 +30,8 @@ object ThirdpartyVersion {
 repositories {
     mavenCentral()
     jcenter()
-    maven(url = "https://dl.bintray.com/nephyproject/stable")
-    maven(url = "https://dl.bintray.com/nephyproject/dev")
+    maven(url = "https://kotlin.bintray.com/kotlinx")
+    maven(url = "https://dl.bintray.com/starry-blue-sky/stable")
 }
 
 kotlin {
@@ -49,7 +50,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
 
-                implementation("blue.starry:jsonkt-common:${ThirdpartyVersion.JsonKt}")
+                implementation("blue.starry:penicillin:${ThirdpartyVersion.Penicillin}")
+                implementation("blue.starry:jsonkt:${ThirdpartyVersion.JsonKt}")
             }
         }
         commonTest {
@@ -61,16 +63,14 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
-                implementation(kotlin("stdlib-jdk8"))
                 implementation(kotlin("reflect"))
 
-                implementation("io.ktor:ktor-server-netty:${ThirdpartyVersion.Ktor}")
+                implementation("io.ktor:ktor-server-cio:${ThirdpartyVersion.Ktor}")
                 implementation("io.ktor:ktor-locations:${ThirdpartyVersion.Ktor}")
                 implementation("io.ktor:ktor-client-cio:${ThirdpartyVersion.Ktor}")
 
-                implementation("blue.starry:penicillin:${ThirdpartyVersion.Penicillin}")
                 implementation("org.litote.kmongo:kmongo-coroutine:${ThirdpartyVersion.KMongo}")
-                implementation("org.apache.commons:commons-lang3:3.8.1")
+                implementation("org.apache.commons:commons-lang3:${ThirdpartyVersion.CommonsLang}")
 
                 // HTML parsing
                 implementation("org.jsoup:jsoup:${ThirdpartyVersion.Jsoup}")
@@ -95,7 +95,6 @@ kotlin {
                 implementation(kotlin("stdlib-js"))
 
                 implementation("io.ktor:ktor-client-js:${ThirdpartyVersion.Ktor}")
-                implementation("blue.starry:jsonkt-js:${ThirdpartyVersion.JsonKt}")
 
                 implementation(npm("bootstrap.native", "3.0.9"))
                 implementation(npm("twemoji", "13.0.1"))
