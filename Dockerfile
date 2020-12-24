@@ -1,20 +1,29 @@
 # Gradle Cache Dependencies Stage
 # This stage caches plugin/project dependencies from *.gradle.kts and gradle.properties.
-# Refer https://qiita.com/tkrplus/items/044790b4054bf644890a
-FROM gradle:6.7.1-jdk8 AS builder
+# Gradle image erases GRADLE_USER_HOME each layer. So we need COPY GRADLE_USER_HOME.
+# Refer https://stackoverflow.com/a/59022743
+FROM gradle:6.7.1-jdk8 AS cache
 WORKDIR /app
+ENV GRADLE_USER_HOME /app/gradle
 COPY *.gradle.kts gradle.properties /app/
-RUN gradle compileKotlinJvm --quiet --parallel
+# Full build if there are any deps changes
+RUN gradle shadowJar --parallel --no-daemon --quiet
 
 # Gradle Build Stage
 # This stage builds and generates fat jar.
-COPY src/commonMain/ src/jvmMain/ /app/src/main/
-RUN gradle shadowJar --parallel
+FROM gradle:6.7.1-jdk8 AS build
+WORKDIR /app
+COPY --from=cache /app/gradle /home/gradle/.gradle
+COPY *.gradle.kts gradle.properties /app/
+COPY src/commonMain/ /app/src/commonMain/
+COPY src/jvmMain/ /app/src/jvmMain/
+# Stop printing Welcome
+RUN gradle -version > /dev/null \
+    && gradle shadowJar --parallel --no-daemon
 
 # Final Stage
 FROM openjdk:8-jre-alpine
-
-COPY --from=builder /app/build/libs/stella-all.jar /app/stella.jar
+COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 
 WORKDIR /app
 ENTRYPOINT ["java", "-server", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "/app/stella.jar"]
