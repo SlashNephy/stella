@@ -4,11 +4,11 @@
 FROM gradle:6.7.1-jdk8 AS builder
 WORKDIR /app
 COPY *.gradle.kts gradle.properties /app/
-RUN gradle build --quiet --parallel
+RUN gradle compileKotlinJvm --quiet --parallel
 
 # Gradle Build Stage
-# This stage builds saya, and generates fat jar.
-COPY src/main/ /app/src/main/
+# This stage builds and generates fat jar.
+COPY src/commonMain/ src/jvmMain/ /app/src/main/
 RUN gradle shadowJar --parallel
 
 # Final Stage
