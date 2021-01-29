@@ -12,7 +12,7 @@ object Config {
     val DatabasePassword: String? = System.getenv("DB_PASSWORD")
     val DatabaseName = System.getenv("DB_NAME") ?: "stella"
 
-    val AutoRefreshThreshold = System.getenv("AUTO_REFRESH_THRESHOLD")?.toIntOrNull() ?: 6 * 60 * 60 * 1000
+    val AutoRefreshThreshold = System.getenv("AUTO_REFRESH_THRESHOLD")?.toLongOrNull() ?: 6 * 60 * 60 * 1000
     val CheckIntervalMins = System.getenv("CHECK_INTERVAL_MINS")?.toIntOrNull() ?: 1
 
     val TwitterConsumerKey: String? = System.getenv("TWITTER_CK")
