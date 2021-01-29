@@ -1,5 +1,6 @@
 package blue.starry.stella.worker
 
+import blue.starry.stella.Config
 import blue.starry.stella.api.toPic
 import blue.starry.stella.collection
 import blue.starry.stella.logger
@@ -31,7 +32,7 @@ object RefreshWorker {
 
         val filter = Filters.or(
             Filters.eq("timestamp.auto_updated", null),
-            Filters.lte("timestamp.auto_updated", Calendar.getInstance().timeInMillis - 6 * 60 * 60 * 1000)
+            Filters.lte("timestamp.auto_updated", Calendar.getInstance().timeInMillis - Config.AutoRefreshThreshold)
         )
         collection.find(filter).limit(200).toList().forEach { document ->
             val pic = document.toPic()

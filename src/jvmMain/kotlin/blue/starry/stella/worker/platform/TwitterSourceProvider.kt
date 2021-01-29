@@ -54,11 +54,11 @@ object TwitterSourceProvider {
                 try {
                     fetchTimeline()
                     fetchFavorites()
-
-                    delay(1.minutes)
                 } catch (e: Throwable) {
                     logger.error(e) { "TwitterSource で例外が発生しました。" }
                 }
+
+                delay(Config.CheckIntervalMins.minutes)
             }
         }
     }

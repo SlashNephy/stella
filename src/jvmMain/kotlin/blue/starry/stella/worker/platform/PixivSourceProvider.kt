@@ -1,5 +1,6 @@
 package blue.starry.stella.worker.platform
 
+import blue.starry.stella.Config
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
@@ -27,7 +28,7 @@ object PixivSourceProvider {
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
 
-                delay(1.minutes)
+                delay(Config.CheckIntervalMins.minutes)
             }
         }
     }

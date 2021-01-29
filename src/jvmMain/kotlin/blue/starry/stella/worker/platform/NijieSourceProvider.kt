@@ -1,5 +1,6 @@
 package blue.starry.stella.worker.platform
 
+import blue.starry.stella.Config
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
@@ -15,8 +16,6 @@ object NijieSourceProvider {
             while (true) {
                 try {
                     fetchBookmark(email, password)
-
-                    delay(1.minutes)
                 } catch (e: ResponseException) {
                     // セッション切れ
                     if (NijieClient.isLoggedIn) {
@@ -25,6 +24,8 @@ object NijieSourceProvider {
                 } catch (e: Throwable) {
                     logger.error(e) { "NijieSource で例外が発生しました。" }
                 }
+
+                delay(Config.CheckIntervalMins.minutes)
             }
         }
     }

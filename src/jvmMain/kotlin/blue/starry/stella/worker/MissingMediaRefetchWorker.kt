@@ -23,7 +23,7 @@ object MissingMediaRefetchWorker {
                     logger.error(e) { "MissingMediaRefetchWorker で例外が発生しました。" }
                 }
 
-                delay(5.minutes)
+                delay(15.minutes)
             }
         }
     }
