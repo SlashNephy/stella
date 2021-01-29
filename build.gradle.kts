@@ -11,7 +11,7 @@ plugins {
 }
 
 object ThirdpartyVersion {
-    const val Ktor = "1.5.0"
+    const val Ktor = "1.5.1"
     const val Penicillin = "6.0.1"
     const val JsonKt = "6.0.0"
     const val KMongo = "4.2.3"
