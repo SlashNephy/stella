@@ -22,7 +22,7 @@ RUN gradle -version > /dev/null \
     && gradle shadowJar --parallel --no-daemon
 
 # Final Stage
-FROM openjdk:8-jre-alpine
+FROM openjdk:17-jdk-alpine
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 
 WORKDIR /app
