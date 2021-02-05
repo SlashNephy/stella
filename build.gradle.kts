@@ -2,7 +2,7 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("multiplatform") version "1.4.21"
+    kotlin("multiplatform") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 
     // For testing
@@ -12,7 +12,7 @@ plugins {
 
 object ThirdpartyVersion {
     const val Ktor = "1.5.1"
-    const val Penicillin = "6.0.1"
+    const val Penicillin = "6.0.2"
     const val JsonKt = "6.0.0"
     const val KMongo = "4.2.3"
     const val Jsoup = "1.13.1"
