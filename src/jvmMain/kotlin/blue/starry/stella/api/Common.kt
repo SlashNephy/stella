@@ -59,7 +59,7 @@ suspend fun ApplicationCall.respondApiError(
             "success" to false,
             "result" to null,
             "error" to mapOf(
-                "code" to code,
+                "code" to code.value,
                 "message" to block()
             )
         ).encodeToString()
