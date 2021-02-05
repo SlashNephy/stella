@@ -11,13 +11,58 @@ Demo is available on [stella.starry.blue](https://stella.starry.blue).
 - [Nijie](https://nijie.info)
 
 ## Docker
-```bash
-git clone https://github.com/SlashNephy/stella
-curl -O https://raw.githubusercontent.com/SlashNephy/stella/master/docker-compose.yml
+```yaml
+version: '3.8'
 
-vi docker-compose.yml
-# ビルドパスを変更: `build: .` -> `build: stella`
-# 環境変数を調整
+services:
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: stella
+
+  stella:
+    container_name: stella
+    build: app
+    restart: always
+    ports:
+      - 8080:8080/tcp
+    volumes:
+      - media:/app/media
+    environment:
+      HOST: stella.example.com
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 27017
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: stella
+      AUTO_REFRESH_THRESHOLD: 21600000
+      CHECK_INTERVAL_MINS: 1
+      TWITTER_CK: xxx
+      TWITTER_CS: xxx
+      TWITTER_AT: xxx
+      TWITTER_ATS: xxx
+      PIXIV_EMAIL: xxx
+      PIXIV_PASSWORD: xxx
+      NIJIE_EMAIL: xxx
+      NIJIE_PASSWORD: xxx
+
+volumes:
+  db:
+    driver: local
+
+  media:
+    driver: local
+```
+
+```shell
+git clone https://github.com/SlashNephy/stella app
 
 # To start
 docker-compose up -d
