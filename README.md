@@ -23,6 +23,20 @@
 - [Nijie](https://nijie.info)
 
 ## Docker
+
+環境構築が容易なので Docker で導入することをおすすめします。
+
+現在のベースイメージは `openjdk:17-jdk-alpine` です。いくつかフレーバーを用意しています。
+
+- `slashnephy/stella:latest`
+  master ブランチへのプッシュの際にビルドされます。安定しています。
+- `slashnephy/stella:dev`
+  dev ブランチへのプッシュの際にビルドされます。開発版のため, 不安定である可能性があります。
+- `slashnephy/stella:<version>`
+  GitHub 上のリリースに対応します。
+
+`docker-compose.yml`
+
 ```yaml
 version: '3.8'
 
