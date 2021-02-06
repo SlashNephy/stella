@@ -28,11 +28,11 @@
 
 現在のベースイメージは `openjdk:17-jdk-alpine` です。いくつかフレーバーを用意しています。
 
-- `slashnephy/stella:latest`
+- `slashnephy/stella:latest`  
   master ブランチへのプッシュの際にビルドされます。安定しています。
-- `slashnephy/stella:dev`
+- `slashnephy/stella:dev`  
   dev ブランチへのプッシュの際にビルドされます。開発版のため, 不安定である可能性があります。
-- `slashnephy/stella:<version>`
+- `slashnephy/stella:<version>`  
   GitHub 上のリリースに対応します。
 
 `docker-compose.yml`
