@@ -33,7 +33,6 @@ fun Application.module() {
 
     routing {
         getMedia()
-        getScript()
         getQuery()
         getSummary()
         putRefresh()
