@@ -1,5 +1,17 @@
 # stella
-Demo is available on [stella.starry.blue](https://stella.starry.blue).
+
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.4.30-blue)](https://kotlinlang.org)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SlashNephy/stella)](https://github.com/SlashNephy/stella/releases)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/SlashNephy/stella/Docker)](https://hub.docker.com/r/slashnephy/stella)
+[![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/slashnephy/stella)](https://hub.docker.com/r/slashnephy/stella)
+[![Docker Pulls](https://img.shields.io/docker/pulls/slashnephy/stella)](https://hub.docker.com/r/slashnephy/stella)
+[![license](https://img.shields.io/github/license/SlashNephy/stella)](https://github.com/SlashNephy/stella/blob/master/LICENSE)
+[![issues](https://img.shields.io/github/issues/SlashNephy/stella)](https://github.com/SlashNephy/stella/issues)
+[![pull requests](https://img.shields.io/github/issues-pr/SlashNephy/stella)](https://github.com/SlashNephy/stella/pulls)
+
+- [Demo](https://stella.starry.blue)
+
+---
 
 ## これはなに
 各プラットフォームでお気に入り / ブックマークした画像を一元管理できる Web アプリケーションです。  
@@ -27,7 +39,7 @@ services:
 
   stella:
     container_name: stella
-    build: app
+    image: slashnephy/stella:latest
     restart: always
     ports:
       - 8080:8080/tcp
@@ -61,18 +73,23 @@ volumes:
     driver: local
 ```
 
-```shell
-git clone https://github.com/SlashNephy/stella app
+```console
+# イメージ更新
+docker pull slashnephy/stella:latest
 
-# To start
+# 起動
 docker-compose up -d
-# To view logs
+
+# ログ表示
 docker-compose logs -f
-# To stop
-docker-compose stop
-# To destroy
+
+# 停止
 docker-compose down
 ```
+
+## TODO
+
+- Kotlin/JS で書き直す
 
 ## License
 stella is provided under the MIT license.
