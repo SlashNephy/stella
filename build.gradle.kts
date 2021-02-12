@@ -1,58 +1,75 @@
-import com.adarshr.gradle.testlogger.theme.ThemeType
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     kotlin("multiplatform") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 
-    // For testing
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("com.adarshr.test-logger") version "2.1.1"
     id("net.rdrei.android.buildtimetracker") version "0.11.0"
 }
 
-object ThirdpartyVersion {
+object Versions {
     const val Ktor = "1.5.1"
-    const val Penicillin = "6.0.2"
-    const val JsonKt = "6.0.0"
+    const val Penicillin = "6.0.5"
     const val KMongo = "4.2.3"
     const val Jsoup = "1.13.1"
     const val CommonsLang = "3.8.1"
 
-    // For testing
     const val JUnit = "5.7.0"
 
-    // For logging
     const val KotlinLogging = "2.0.4"
     const val Logback = "1.2.3"
-    const val jansi = "1.18"
+    const val Jansi = "1.18"
+}
+
+object Libraries {
+    const val Penicillin = "blue.starry:penicillin:${Versions.Penicillin}"
+
+    const val KtorServerCIO = "io.ktor:ktor-server-cio:${Versions.Ktor}"
+    const val KtorLocations = "io.ktor:ktor-locations:${Versions.Ktor}"
+    const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
+
+    const val KMongoCoroutine = "org.litote.kmongo:kmongo-coroutine:${Versions.KMongo}"
+    const val CommonsLang3 = "org.apache.commons:commons-lang3:${Versions.CommonsLang}"
+
+    const val Jsoup = "org.jsoup:jsoup:${Versions.Jsoup}"
+
+    const val KotlinLogging = "io.github.microutils:kotlin-logging:${Versions.KotlinLogging}"
+    const val LogbackCore = "ch.qos.logback:logback-core:${Versions.Logback}"
+    const val LogbackClassic = "ch.qos.logback:logback-classic:${Versions.Logback}"
+    const val Jansi = "org.fusesource.jansi:jansi:${Versions.Jansi}"
+
+    const val JUnitJupiter = "org.junit.jupiter:junit-jupiter:${Versions.JUnit}"
+
+    const val KtorClientJs = "io.ktor:ktor-client-js:${Versions.Ktor}"
+
+    val ExperimentalAnnotations = setOf(
+        "kotlin.Experimental",
+        "kotlin.ExperimentalStdlibApi",
+        "kotlin.time.ExperimentalTime",
+        "kotlinx.coroutines.ExperimentalCoroutinesApi",
+        "io.ktor.util.KtorExperimentalAPI",
+        "io.ktor.locations.KtorExperimentalLocationsAPI"
+    )
 }
 
 repositories {
     mavenCentral()
-    jcenter()
+    // jcenter()
     maven(url = "https://kotlin.bintray.com/kotlinx")
-    maven(url = "https://dl.bintray.com/starry-blue-sky/stable")
 }
 
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
         }
     }
-
     js {
         browser()
     }
 
     sourceSets {
         commonMain {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-
-                implementation("blue.starry:penicillin:${ThirdpartyVersion.Penicillin}")
-                implementation("blue.starry:jsonkt:${ThirdpartyVersion.JsonKt}")
-            }
         }
         commonTest {
             dependencies {
@@ -65,28 +82,28 @@ kotlin {
             dependencies {
                 implementation(kotlin("reflect"))
 
-                implementation("io.ktor:ktor-server-cio:${ThirdpartyVersion.Ktor}")
-                implementation("io.ktor:ktor-locations:${ThirdpartyVersion.Ktor}")
-                implementation("io.ktor:ktor-client-cio:${ThirdpartyVersion.Ktor}")
+                implementation(Libraries.Penicillin)
 
-                implementation("org.litote.kmongo:kmongo-coroutine:${ThirdpartyVersion.KMongo}")
-                implementation("org.apache.commons:commons-lang3:${ThirdpartyVersion.CommonsLang}")
+                implementation(Libraries.KtorServerCIO)
+                implementation(Libraries.KtorLocations)
+                implementation(Libraries.KtorClientCIO)
 
-                // HTML parsing
-                implementation("org.jsoup:jsoup:${ThirdpartyVersion.Jsoup}")
+                implementation(Libraries.KMongoCoroutine)
+                implementation(Libraries.CommonsLang3)
 
-                // For logging
-                implementation("io.github.microutils:kotlin-logging:${ThirdpartyVersion.KotlinLogging}")
-                implementation("ch.qos.logback:logback-core:${ThirdpartyVersion.Logback}")
-                implementation("ch.qos.logback:logback-classic:${ThirdpartyVersion.Logback}")
-                implementation("org.fusesource.jansi:jansi:${ThirdpartyVersion.jansi}")
+                implementation(Libraries.Jsoup)
+
+                implementation(Libraries.KotlinLogging)
+                implementation(Libraries.LogbackCore)
+                implementation(Libraries.LogbackClassic)
+                implementation(Libraries.Jansi)
             }
         }
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(kotlin("test-junit5"))
-                implementation("org.junit.jupiter:junit-jupiter:${ThirdpartyVersion.JUnit}")
+                implementation(Libraries.JUnitJupiter)
             }
         }
 
@@ -94,7 +111,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
 
-                implementation("io.ktor:ktor-client-js:${ThirdpartyVersion.Ktor}")
+                implementation(Libraries.KtorClientJs)
 
                 implementation(npm("bootstrap.native", "3.0.9"))
                 implementation(npm("twemoji", "13.0.1"))
@@ -115,6 +132,7 @@ kotlin {
             kotlinOptions {
                 apiVersion = "1.4"
                 languageVersion = "1.4"
+                allWarningsAsErrors = true
                 verbose = true
             }
         }
@@ -122,13 +140,9 @@ kotlin {
 
     sourceSets.all {
         languageSettings.progressiveMode = true
-        languageSettings.apply {
-            useExperimentalAnnotation("kotlin.Experimental")
-            useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
-            useExperimentalAnnotation("kotlin.time.ExperimentalTime")
-            useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-            useExperimentalAnnotation("io.ktor.util.KtorExperimentalAPI")
-            useExperimentalAnnotation("io.ktor.locations.KtorExperimentalLocationsAPI")
+
+        Libraries.ExperimentalAnnotations.forEach {
+            languageSettings.useExperimentalAnnotation(it)
         }
     }
 }
@@ -136,6 +150,15 @@ kotlin {
 /*
  * Tests
  */
+
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+    ignoreFailures.set(true)
+}
 
 buildtimetracker {
     reporters {
@@ -147,28 +170,22 @@ buildtimetracker {
     }
 }
 
-testlogger {
-    theme = ThemeType.MOCHA
-}
-
-tasks.named<Test>("jvmTest") {
+tasks.withType<Test> {
     useJUnitPlatform()
+
     testLogging {
-        events("passed", "skipped", "failed")
+        showStandardStreams = true
+        events("passed", "failed")
     }
-}
 
-task<JavaExec>("run") {
-    dependsOn("build")
-
-    group = "application"
-    main = "blue.starry.stella.AppKt"
-    classpath(configurations["jvmRuntimeClasspath"], tasks["jvmJar"])
+    testlogger {
+        theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
+    }
 }
 
 // workaround for Kotlin/Multiplatform + Shadow issue
 // Refer https://github.com/johnrengelman/shadow/issues/484#issuecomment-549137315.
-task<ShadowJar>("shadowJar") {
+task<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
     group = "shadow"
     dependsOn("jvmJar")
 
