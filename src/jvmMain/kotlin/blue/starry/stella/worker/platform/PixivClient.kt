@@ -34,7 +34,7 @@ class PixivClient(private val refreshToken: String) {
             append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
             append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
             append("grant_type", "refresh_token")
-            append("refresh_token", refreshToken)
+            append("refresh_token", token?.response?.refreshToken ?: refreshToken)
         }
 
         token = mutex.withLock {
