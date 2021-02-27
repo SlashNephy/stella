@@ -10,9 +10,11 @@ import io.ktor.routing.*
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
+import org.bson.types.ObjectId
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.aggregate
 import org.litote.kmongo.eq
+import org.litote.kmongo.id.toId
 import org.litote.kmongo.match
 import org.litote.kmongo.toId
 
@@ -28,7 +30,7 @@ data class GetQueryTags(
 fun Route.getQueryTags() {
     get<GetQueryTags> { param ->
         val existingTags = param.id?.let { id ->
-            StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())?.tags
+            StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(id).toId())?.tags
         }?.map {
             it.value
         }.orEmpty()

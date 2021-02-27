@@ -12,7 +12,9 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.Route
 import io.ktor.util.*
+import org.bson.types.ObjectId
 import org.litote.kmongo.*
+import org.litote.kmongo.id.toId
 import java.time.Instant
 import java.util.*
 
@@ -29,21 +31,21 @@ fun Route.patchPicSensitiveLevel() {
             }
         }
 
-        if (StellaMongoDBPicCollection.countDocuments(PicModel::_id eq param.id.toId()) == 0L) {
+        if (StellaMongoDBPicCollection.countDocuments(PicModel::_id eq ObjectId(param.id).toId()) == 0L) {
             return@patch call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
         }
 
         StellaMongoDBPicCollection.updateOne(
-            PicModel::_id eq param.id.toId(),
+            PicModel::_id eq ObjectId(param.id).toId(),
             combine(
                 setValue(PicModel::sensitive_level, sensitiveLevel),
                 setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
             )
         )
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {

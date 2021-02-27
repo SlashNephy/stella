@@ -10,7 +10,9 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.Route
+import org.bson.types.ObjectId
 import org.litote.kmongo.*
+import org.litote.kmongo.id.toId
 import java.time.Instant
 import java.util.*
 
@@ -21,7 +23,7 @@ fun Route.putPicTag() {
     put<EditTag> { param ->
         val tag = call.receiveParameters()["tag"] ?: return@put
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -40,9 +42,9 @@ fun Route.putPicTag() {
             )),
             setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::_id eq param.id.toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq ObjectId(param.id).toId(), updates)
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {
@@ -55,7 +57,7 @@ fun Route.deletePicTag() {
     delete<EditTag> { param ->
         val tag = call.receiveParameters()["tag"] ?: return@delete
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())
             ?: return@delete call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -77,9 +79,9 @@ fun Route.deletePicTag() {
             setValue(PicModel::tags, tags),
             setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::_id eq param.id.toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq ObjectId(param.id).toId(), updates)
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {
