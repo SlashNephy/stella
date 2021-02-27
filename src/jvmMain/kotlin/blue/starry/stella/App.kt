@@ -11,6 +11,7 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.locations.*
+import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
@@ -90,5 +91,16 @@ fun Application.module() {
 
         val host = Env.HOST ?: return@install
         host(host, schemes = listOf("http", "https"))
+    }
+
+    install(CallLogging) {
+        logger = KotlinLogging.logger("stella.web")
+        format { call ->
+            when (val status = call.response.status()) {
+                HttpStatusCode.Found -> "$status: ${call.request.toLogString()} -> ${call.response.headers[HttpHeaders.Location]}"
+                null -> ""
+                else -> "$status: ${call.request.httpMethod.value} ${call.request.uri}"
+            }
+        }
     }
 }
