@@ -142,8 +142,6 @@ class NijieClient(private val email: String, private val password: String) {
             header(HttpHeaders.Referrer, "https://nijie.info/")
         }
 
-        file.outputStream().use {
-            it.write(response)
-        }
+        file.writeBytes(response)
     }
 }

@@ -117,8 +117,7 @@ class PixivClient(private val email: String, private val password: String) {
             header(HttpHeaders.Referrer, "https://app-api.pixiv.net/")
         }
 
-        file.outputStream().use {
-            it.write(response)
-        }
+        file.writeBytes(response)
     }
 }
+
