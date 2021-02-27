@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.4.30"
+    kotlin("plugin.serialization") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
@@ -10,9 +11,8 @@ plugins {
 object Versions {
     const val Ktor = "1.5.2"
     const val Penicillin = "6.0.5"
-    const val KMongo = "4.2.3"
+    const val KMongo = "4.2.4"
     const val Jsoup = "1.13.1"
-    const val CommonsLang = "3.8.1"
 
     const val JUnit = "5.7.0"
 
@@ -22,15 +22,13 @@ object Versions {
 }
 
 object Libraries {
-    const val Penicillin = "blue.starry:penicillin:${Versions.Penicillin}"
-
     const val KtorServerCIO = "io.ktor:ktor-server-cio:${Versions.Ktor}"
     const val KtorLocations = "io.ktor:ktor-locations:${Versions.Ktor}"
+    const val KtorSerialization = "io.ktor:ktor-serialization:${Versions.Ktor}"
     const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
 
     const val KMongoCoroutine = "org.litote.kmongo:kmongo-coroutine:${Versions.KMongo}"
-    const val CommonsLang3 = "org.apache.commons:commons-lang3:${Versions.CommonsLang}"
-
+    const val Penicillin = "blue.starry:penicillin:${Versions.Penicillin}"
     const val Jsoup = "org.jsoup:jsoup:${Versions.Jsoup}"
 
     const val KotlinLogging = "io.github.microutils:kotlin-logging:${Versions.KotlinLogging}"
@@ -48,7 +46,8 @@ object Libraries {
         "kotlin.time.ExperimentalTime",
         "kotlinx.coroutines.ExperimentalCoroutinesApi",
         "io.ktor.util.KtorExperimentalAPI",
-        "io.ktor.locations.KtorExperimentalLocationsAPI"
+        "io.ktor.locations.KtorExperimentalLocationsAPI",
+        "kotlinx.coroutines.FlowPreview"
     )
 }
 
@@ -70,6 +69,10 @@ kotlin {
 
     sourceSets {
         commonMain {
+            dependencies {
+                implementation(Libraries.Penicillin)
+                implementation(Libraries.KotlinLogging)
+            }
         }
         commonTest {
             dependencies {
@@ -82,18 +85,14 @@ kotlin {
             dependencies {
                 implementation(kotlin("reflect"))
 
-                implementation(Libraries.Penicillin)
-
                 implementation(Libraries.KtorServerCIO)
                 implementation(Libraries.KtorLocations)
+                implementation(Libraries.KtorSerialization)
                 implementation(Libraries.KtorClientCIO)
 
                 implementation(Libraries.KMongoCoroutine)
-                implementation(Libraries.CommonsLang3)
-
                 implementation(Libraries.Jsoup)
 
-                implementation(Libraries.KotlinLogging)
                 implementation(Libraries.LogbackCore)
                 implementation(Libraries.LogbackClassic)
                 implementation(Libraries.Jansi)

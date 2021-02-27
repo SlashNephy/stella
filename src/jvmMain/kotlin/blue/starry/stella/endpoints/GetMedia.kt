@@ -1,4 +1,4 @@
-package blue.starry.stella.api.endpoints
+package blue.starry.stella.endpoints
 
 import blue.starry.stella.mediaDirectory
 import io.ktor.application.*
@@ -7,10 +7,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 
 @Location("/media/{filename}")
-data class Media(val filename: String)
+data class GetMedia(val filename: String)
 
 fun Route.getMedia() {
-    get<Media> { (filename) ->
+    get<GetMedia> { (filename) ->
         call.respondFile(mediaDirectory.toFile(), filename)
     }
 }

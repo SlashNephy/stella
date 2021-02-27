@@ -1,11 +1,8 @@
-package blue.starry.stella.api.endpoints
+package blue.starry.stella.endpoints
 
-import blue.starry.stella.api.respondApi
-import blue.starry.stella.api.respondApiError
-import blue.starry.stella.api.serialize
-import blue.starry.stella.api.toPic
-import blue.starry.stella.collection
 import blue.starry.stella.logger
+import blue.starry.stella.models.PicModel
+import blue.starry.stella.worker.StellaMongoDBPicCollection
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import io.ktor.application.*
@@ -15,13 +12,15 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.routing.Route
 import org.bson.types.ObjectId
+import org.litote.kmongo.eq
+import org.litote.kmongo.toId
 import java.util.*
 
 @Location("/edit/{id}/tag")
-data class EditTag(val id: String)
+data class PutEditTag(val id: String)
 
 fun Route.putEditTag() {
-    put<EditTag> { (id) ->
+    put<PutEditTag> { (id) ->
         val tag = call.receiveParameters()["tag"]
         if (tag == null) {
             call.respondApiError(HttpStatusCode.BadRequest) {
@@ -31,7 +30,7 @@ fun Route.putEditTag() {
             return@put
         }
 
-        val oldEntry = collection.findOne(Filters.eq("_id", ObjectId(id)))?.toPic()
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
         if (oldEntry == null) {
             call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
@@ -56,22 +55,21 @@ fun Route.putEditTag() {
             )),
             Updates.set("timestamp.manual_updated", Calendar.getInstance().timeInMillis)
         )
-        collection.updateOne(Filters.eq("_id", ObjectId(id)), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq id.toId(), updates)
 
-        val entry = collection.findOne(Filters.eq("_id", ObjectId(id)))!!
-        call.respondApi {
-            entry.serialize()
+        val entry = StellaMongoDBPicCollection.findOne(Filters.eq("_id", ObjectId(id)))!!
+        call.respondApiResponse {
+            entry
         }
 
         logger.info {
-            val pic = entry.toPic()
-            "${pic.url} のエントリが更新されました。「$tag」が追加されました。(${call.request.origin.remoteHost})"
+            "${entry.url} のエントリが更新されました。「$tag」が追加されました。(${call.request.origin.remoteHost})"
         }
     }
 }
 
 fun Route.deleteEditTag() {
-    delete<EditTag> { (id) ->
+    delete<PutEditTag> { (id) ->
         val tag = call.receiveParameters()["tag"]
         if (tag == null) {
             call.respondApiError(HttpStatusCode.BadRequest) {
@@ -81,7 +79,7 @@ fun Route.deleteEditTag() {
             return@delete
         }
 
-        val oldEntry = collection.findOne(Filters.eq("_id", ObjectId(id)))?.toPic()
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
         if (oldEntry == null) {
             call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
@@ -118,16 +116,15 @@ fun Route.deleteEditTag() {
             Updates.set("tags", tags),
             Updates.set("timestamp.manual_updated", Calendar.getInstance().timeInMillis)
         )
-        collection.updateOne(Filters.eq("_id", ObjectId(id)), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq id.toId(), updates)
 
-        val entry = collection.findOne(Filters.eq("_id", ObjectId(id)))!!
-        call.respondApi {
-            entry.serialize()
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())!!
+        call.respondApiResponse {
+            entry
         }
 
         logger.info {
-            val pic = entry.toPic()
-            "${pic.url} のエントリが更新されました。「$tag」が削除されました。(${call.request.origin.remoteHost})"
+            "${entry.url} のエントリが更新されました。「$tag」が削除されました。(${call.request.origin.remoteHost})"
         }
     }
 }

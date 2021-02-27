@@ -1,59 +1,57 @@
 package blue.starry.stella.worker.platform
 
-import blue.starry.stella.Config
+import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.worker.StellaNijieClient
 import io.ktor.client.features.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.time.minutes
 
 object NijieSourceProvider {
-    fun start(email: String, password: String) {
-        GlobalScope.launch {
-            while (true) {
+    suspend fun start(): Unit = coroutineScope {
+        val client = StellaNijieClient ?: return@coroutineScope
+
+        launch {
+            while (isActive) {
                 try {
-                    fetchBookmark(email, password)
+                    fetchBookmark(client)
+                } catch (e: CancellationException) {
+                    break
                 } catch (e: ResponseException) {
                     // セッション切れ
-                    if (NijieClient.isLoggedIn) {
-                        login(email, password)
+                    if (client.isLoggedIn) {
+                        client.login()
                     }
                 } catch (e: Throwable) {
                     logger.error(e) { "NijieSource で例外が発生しました。" }
                 }
 
-                delay(Config.CheckIntervalMins.minutes)
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }
 
-    private suspend fun fetchBookmark(email: String, password: String) {
-        if (!NijieClient.isLoggedIn) {
-            login(email, password)
+    private suspend fun fetchBookmark(client: NijieClient) {
+        if (!client.isLoggedIn) {
+            client.login()
         }
 
-        for (bookmark in NijieClient.bookmarks().reversed()) {
-            val picture = NijieClient.picture(bookmark.id)
-            register(picture, "User", false)
+        for (bookmark in client.bookmarks().reversed()) {
+            val picture = client.picture(bookmark.id)
+            register(client, picture, "User", false)
 
-            NijieClient.deleteBookmark(bookmark.id)
+            client.deleteBookmark(bookmark.id)
         }
     }
 
-    private suspend fun login(email: String, password: String) {
-        NijieClient.login(email, password)
-        logger.info { "Nijie にログインしました。" }
+    suspend fun fetch(client: NijieClient, url: String, user: String?, auto: Boolean) {
+        val picture = client.picture(url.split("=").last())
+        register(client, picture, user, auto)
     }
 
-    suspend fun fetch(url: String, user: String?, auto: Boolean) {
-        val picture = NijieClient.picture(url.split("=").last())
-        register(picture, user, auto)
-    }
-
-    private suspend fun register(picture: NijieModel.Picture, user: String?, auto: Boolean): MediaRegister.Entry {
+    private suspend fun register(client: NijieClient, picture: NijieModel.Picture, user: String?, auto: Boolean): MediaRegister.Entry {
         return MediaRegister.Entry(
             title = picture.title,
             description = picture.description,
@@ -71,7 +69,7 @@ object NijieSourceProvider {
 
                 val file = mediaDirectory.resolve("nijie_${picture.id}_$index.$ext").toFile()
                 if (!file.exists()) {
-                    NijieClient.download(url, file)
+                    client.download(url, file)
                 }
 
                 MediaRegister.Entry.Picture(index, "nijie_${picture.id}_$index.$ext", url, ext)

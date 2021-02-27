@@ -1,6 +1,6 @@
 package blue.starry.stella
 
-import blue.starry.stella.api.endpoints.*
+import blue.starry.stella.endpoints.*
 import blue.starry.stella.worker.MissingMediaRefetchWorker
 import blue.starry.stella.worker.RefreshWorker
 import blue.starry.stella.worker.platform.NijieSourceProvider
@@ -11,8 +11,12 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,16 +24,32 @@ import java.nio.file.Paths
 internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
 
-fun main() {
-    embeddedServer(CIO, host = Config.HttpHost, port = Config.HttpPort, module = Application::module).start(wait = true)
+suspend fun main() {
+    if (!Files.exists(mediaDirectory)) {
+        withContext(Dispatchers.IO) {
+            @Suppress("BlockingMethodInNonBlockingContext")
+            Files.createDirectory(mediaDirectory)
+        }
+    }
+
+    RefreshWorker.start()
+    MissingMediaRefetchWorker.start()
+
+    TwitterSourceProvider.start()
+    PixivSourceProvider.start()
+    NijieSourceProvider.start()
+
+    embeddedServer(CIO, host = Env.HTTP_HOST, port = Env.HTTP_PORT, module = Application::module).start(wait = true)
 }
 
 fun Application.module() {
-    if (!Files.exists(mediaDirectory)) {
-        Files.createDirectory(mediaDirectory)
-    }
-
     install(Locations)
+
+    install(ContentNegotiation) {
+        json(Json {
+            encodeDefaults = true
+        })
+    }
 
     routing {
         getMedia()
@@ -54,23 +74,7 @@ fun Application.module() {
         allowNonSimpleContentTypes = true
         header("x-requested-with")
 
-        if (Config.Host != null) {
-            host(Config.Host, schemes = listOf("http", "https"))
-        }
-    }
-
-    RefreshWorker.start()
-    MissingMediaRefetchWorker.start()
-
-    if (Config.TwitterConsumerKey != null && Config.TwitterConsumerSecret != null && Config.TwitterAccessToken != null && Config.TwitterAccessTokenSecret != null) {
-        TwitterSourceProvider.start()
-    }
-
-    if (Config.PixivEmail != null && Config.PixivPassword != null) {
-        PixivSourceProvider.start()
-    }
-
-    if (Config.NijieEmail != null && Config.NijiePassword != null) {
-        NijieSourceProvider.start(Config.NijieEmail, Config.NijiePassword)
+        val host = Env.HOST ?: return@install
+        host(host, schemes = listOf("http", "https"))
     }
 }

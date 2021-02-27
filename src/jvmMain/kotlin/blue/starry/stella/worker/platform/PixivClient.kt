@@ -1,34 +1,30 @@
 package blue.starry.stella.worker.platform
 
 import blue.starry.jsonkt.parseObject
-import blue.starry.stella.Config
 import blue.starry.stella.logger
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.cookies.*
+import blue.starry.stella.worker.StellaHttpClient
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.apache.commons.lang3.time.FastDateFormat
 import java.io.File
 import java.security.MessageDigest
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-object PixivClient {
+class PixivClient(private val email: String, private val password: String) {
     private val lock = Mutex()
-    private val httpClient = HttpClient(CIO) {
-        install(HttpCookies)
-    }
 
     private var token: PixivModel.Token? = null
     private val isLoggedIn: Boolean
         get() = token != null
 
-    private val dateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH)
+    private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH)
     private fun HttpRequestBuilder.setHeaders(credentials: Boolean) {
-        val time = dateFormat.format(Calendar.getInstance())
+        DateTimeFormatter.ISO_DATE_TIME
+        val time = dateFormat.format(Instant.now())
 
         userAgent("PixivAndroidApp/5.0.64 (Android 6.0)")
         header("X-Client-Time", time)
@@ -49,9 +45,6 @@ object PixivClient {
             return
         }
 
-        val email = Config.PixivEmail!!
-        val password = Config.PixivPassword!!
-
         val parameters = Parameters.build {
             append("grant_type", "password")
             append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
@@ -62,7 +55,7 @@ object PixivClient {
         }
 
         token = lock.withLock(token) {
-            httpClient.submitForm<String>(parameters) {
+            StellaHttpClient.submitForm<String>(parameters) {
                 url("https://oauth.secure.pixiv.net/auth/token")
 
                 setHeaders(false)
@@ -83,8 +76,7 @@ object PixivClient {
     suspend fun getBookmarks(private: Boolean): PixivModel.Bookmark {
         login()
 
-        return httpClient.get<String>("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
-            parameter("tag", "未分類")
+        return StellaHttpClient.get<String>("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
             parameter("user_id", token?.response?.user?.id)
             parameter("restrict", if (private) "private" else "public")
 
@@ -102,7 +94,7 @@ object PixivClient {
             append("illust_id", id.toString())
         }
 
-        return httpClient.submitForm("https://app-api.pixiv.net/v2/illust/bookmark/add", parameters) {
+        return StellaHttpClient.submitForm("https://app-api.pixiv.net/v2/illust/bookmark/add", parameters) {
             setHeaders(true)
         }
     }
@@ -114,13 +106,13 @@ object PixivClient {
             append("illust_id", id.toString())
         }
 
-        return httpClient.submitForm("https://app-api.pixiv.net/v1/illust/bookmark/delete", parameters) {
+        return StellaHttpClient.submitForm("https://app-api.pixiv.net/v1/illust/bookmark/delete", parameters) {
             setHeaders(true)
         }
     }
 
     suspend fun download(url: String, file: File) {
-        val response = httpClient.get<ByteArray>(url) {
+        val response = StellaHttpClient.get<ByteArray>(url) {
             setHeaders(false)
             header(HttpHeaders.Referrer, "https://app-api.pixiv.net/")
         }

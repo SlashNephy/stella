@@ -1,33 +1,28 @@
 package blue.starry.stella.worker
 
-import blue.starry.jsonkt.encodeToString
-import blue.starry.jsonkt.jsonObjectOf
-import blue.starry.stella.api.toPic
-import blue.starry.stella.api.toTagReplaceTable
-import blue.starry.stella.collection
 import blue.starry.stella.logger
-import blue.starry.stella.tagReplaceTable
+import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicTagReplaceTableModel
 import blue.starry.stella.worker.platform.NijieSourceProvider
 import blue.starry.stella.worker.platform.PixivSourceProvider
 import blue.starry.stella.worker.platform.TwitterSourceProvider
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Updates
-import org.bson.Document
-import java.util.*
+import org.litote.kmongo.coroutine.updateOne
+import org.litote.kmongo.eq
+import org.litote.kmongo.newId
+import java.time.Instant
 
 object MediaRegister {
     suspend fun registerByUrl(url: String, user: String?, auto: Boolean): Boolean {
         return runCatching {
-            @Suppress("IMPLICIT_CAST_TO_ANY")
             when {
                 "twitter.com" in url -> {
-                    TwitterSourceProvider.fetch(url, user, auto)
+                    TwitterSourceProvider.fetch(StellaTwitterClient ?: return false, url, user, auto)
                 }
                 "pixiv.net" in url -> {
-                    PixivSourceProvider.enqueue(url)
+                    PixivSourceProvider.enqueue(StellaPixivClient ?: return false, url)
                 }
                 "nijie.info" in url -> {
-                    NijieSourceProvider.fetch(url, user, auto)
+                    NijieSourceProvider.fetch(StellaNijieClient ?: return false, url, user, auto)
                 }
                 else -> return false
             }
@@ -35,107 +30,80 @@ object MediaRegister {
     }
 
     suspend fun register(entry: Entry, auto: Boolean) {
-        val oldEntry = collection.findOne(Filters.eq("url", entry.url))?.toPic()
-
-        val title = entry.title.replace("\r\n", " ").replace("\n", " ").replace("<br>", " ")
-        val description = entry.description.replace("\r\n", "<br>").replace("\n", "<br>")
-        if (oldEntry != null) {
-            val tags = entry.tags.map {
-                mapOf(
-                    "value" to (tagReplaceTable.findOne(Filters.eq("from", it))?.toTagReplaceTable()?.to ?: it),
-                    "user" to null,
-                    "locked" to true
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::url eq entry.url)
+        val newEntry = PicModel(
+            _id = oldEntry?._id ?: newId(),
+            title = entry.title.normalizeTitle(),
+            description = entry.description.normalizeDescription(),
+            url = entry.url,
+            tags = (entry.tags.map {
+                PicModel.Tag(
+                    value = it.normalizeTag(),
+                    user = null,
+                    locked = true
                 )
-            } + oldEntry.tags.filter { !it.locked && it.value !in entry.tags }.map {
-                mapOf(
-                    "value" to (tagReplaceTable.findOne(Filters.eq("from", it.value))?.toTagReplaceTable()?.to ?: it.value),
-                    "user" to it.user,
-                    "locked" to it.locked
+            } + oldEntry?.tags?.map {
+                it.copy(
+                    value = it.value.normalizeTag()
                 )
-            }
-
-            collection.updateOne(
-                Filters.eq("url", entry.url),
-                Updates.combine(
-                    Updates.set("title", title),
-                    Updates.set("description", description),
-                    Updates.set("tags", tags.distinctBy { it["value"] }),
-                    Updates.set("user", entry.user ?: oldEntry.user),
-                    Updates.set("sensitive_level", maxOf(entry.sensitiveLevel, oldEntry.sensitiveLevel)),
-                    Updates.set("timestamp.${if (auto) "auto" else "manual"}_updated", Date().time),
-                    Updates.set("author.name", entry.author.name),
-                    Updates.set("author.url", entry.author.url),
-                    Updates.set("author.username", entry.author.username),
-                    Updates.set("media", entry.media.map {
-                        mapOf(
-                            "index" to it.index,
-                            "filename" to it.filename,
-                            "original" to it.original,
-                            "ext" to it.ext
-                        )
-                    }),
-                    Updates.set("popularity.like", entry.popularity.like),
-                    Updates.set("popularity.bookmark", entry.popularity.bookmark),
-                    Updates.set("popularity.view", entry.popularity.view),
-                    Updates.set("popularity.retweet", entry.popularity.retweet),
-                    Updates.set("popularity.reply", entry.popularity.reply)
+            }.orEmpty()).distinctBy { it.value },
+            user = entry.user ?: oldEntry?.user,
+            platform = entry.platform,
+            sensitive_level = maxOf(entry.sensitiveLevel, oldEntry?.sensitive_level ?: 0),
+            timestamp = PicModel.Timestamp(
+                created = entry.created,
+                added = oldEntry?.timestamp?.added ?: Instant.now().toEpochMilli(),
+                auto_updated = if (auto) Instant.now().toEpochMilli() else (oldEntry?.timestamp?.auto_updated ?: Instant.now().toEpochMilli()),
+                manual_updated = if (!auto) Instant.now().toEpochMilli() else (oldEntry?.timestamp?.manual_updated ?: Instant.now().toEpochMilli())
+            ),
+            author = PicModel.Author(
+                name = entry.author.name,
+                url = entry.author.url,
+                username = entry.author.username
+            ),
+            media = entry.media.map {
+                PicModel.Media(
+                    index = it.index,
+                    filename = it.filename,
+                    original = it.filename,
+                    ext = it.ext
                 )
+            },
+            rating = PicModel.Rating(
+                count = oldEntry?.rating?.count ?: 0,
+                score = oldEntry?.rating?.score ?: 0
+            ),
+            popularity = PicModel.Popularity(
+                like = entry.popularity.like,
+                bookmark = entry.popularity.bookmark,
+                view = entry.popularity.view,
+                retweet = entry.popularity.retweet,
+                reply = entry.popularity.reply
             )
+        )
 
-            if (!auto) {
-                logger.info { "${entry.author.name} (${entry.platform}): \"${entry.title}\" (${entry.url}) を更新しました。" }
-            }
+        if (oldEntry != null) {
+            StellaMongoDBPicCollection.updateOne(newEntry)
+            logger.info { "\"${entry.title}\" (${entry.url}) を更新しました。" }
         } else {
-            collection.insertOne(Document.parse(jsonObjectOf(
-                "title" to title,
-                "description" to description,
-                "url" to entry.url,
-                "tags" to entry.tags.map {
-                    mapOf(
-                        "value" to (tagReplaceTable.findOne(Filters.eq("from", it))?.toTagReplaceTable()?.to ?: it),
-                        "user" to null,
-                        "locked" to true
-                    )
-                }.distinctBy { it["value"] },
-                "user" to entry.user,
-
-                "platform" to entry.platform,
-                "sensitive_level" to entry.sensitiveLevel,
-
-                "timestamp" to mapOf(
-                    "created" to entry.created,
-                    "added" to Calendar.getInstance().timeInMillis,
-                    "auto_updated" to Calendar.getInstance().timeInMillis,
-                    "manual_updated" to Calendar.getInstance().timeInMillis
-                ),
-                "author" to mapOf(
-                    "name" to entry.author.name,
-                    "url" to entry.author.url,
-                    "username" to entry.author.username
-                ),
-                "media" to entry.media.map {
-                    mapOf(
-                        "index" to it.index,
-                        "filename" to it.filename,
-                        "original" to it.original,
-                        "ext" to it.ext
-                    )
-                },
-                "rating" to mapOf(
-                    "count" to 0,
-                    "score" to 0
-                ),
-                "popularity" to mapOf(
-                    "like" to entry.popularity.like,
-                    "bookmark" to entry.popularity.bookmark,
-                    "view" to entry.popularity.view,
-                    "retweet" to entry.popularity.retweet,
-                    "reply" to entry.popularity.reply
-                )
-            ).encodeToString()))
-
-            logger.info { "${entry.author.name} (${entry.platform}): \"${entry.title}\" (${entry.url}) を追加しました。" }
+            StellaMongoDBPicCollection.insertOne(newEntry)
+            logger.info { "\"${entry.title}\" (${entry.url}) を追加しました。" }
         }
+    }
+
+    private fun String.normalizeTitle(): String {
+        return replace("\r\n", " ")
+            .replace("\n", " ")
+            .replace("<br>", " ")
+    }
+
+    private fun String.normalizeDescription(): String {
+        return replace("\r\n", "<br>")
+            .replace("\n", "<br>")
+    }
+
+    private suspend fun String.normalizeTag(): String {
+        return StellaMongoDBPicTagReplaceTableCollection.findOne(PicTagReplaceTableModel::from eq this)?.to ?: this
     }
 
     data class Entry(val title: String, val description: String, val url: String, val tags: List<String>, val user: String?, val platform: String, val sensitiveLevel: Int, val created: Long, val author: Author, val media: List<Picture>, val popularity: Popularity) {
