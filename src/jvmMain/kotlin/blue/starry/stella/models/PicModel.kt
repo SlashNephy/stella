@@ -1,12 +1,13 @@
 package blue.starry.stella.models
 
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
 
 @Serializable
 data class PicModel(
-    @Contextual val _id: Id<PicModel>,
+    @SerialName("_id") @Contextual val id: Id<PicModel>,
     val title: String,
     val description: String,
     val url: String,

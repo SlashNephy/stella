@@ -5,6 +5,7 @@ import blue.starry.stella.models.PicTagsModel
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
 import io.ktor.locations.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.aggregate
@@ -21,7 +22,7 @@ data class GetQueryTags(
 fun Route.getQueryTags() {
     get<GetQueryTags> { param ->
         val existingTags = param.id?.let { id ->
-            StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())?.tags
+            StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())?.tags
         }.orEmpty().map {
             it.value
         }
@@ -62,7 +63,7 @@ fun Route.getQueryTags() {
             .take(param.count)
             .toList()
 
-        call.respondApiResponse(
+        call.respond(
             PicTagsModel(
                 tags = tags
             )

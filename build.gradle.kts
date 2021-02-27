@@ -27,7 +27,8 @@ object Libraries {
     const val KtorSerialization = "io.ktor:ktor-serialization:${Versions.Ktor}"
     const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
 
-    const val KMongoCoroutine = "org.litote.kmongo:kmongo-coroutine:${Versions.KMongo}"
+    const val KMongoCoroutineSerialization = "org.litote.kmongo:kmongo-coroutine-serialization:${Versions.KMongo}"
+    const val KMongoIdSerialization = "org.litote.kmongo:kmongo-id-serialization:${Versions.KMongo}"
     const val Penicillin = "blue.starry:penicillin:${Versions.Penicillin}"
     const val Jsoup = "org.jsoup:jsoup:${Versions.Jsoup}"
 
@@ -90,7 +91,8 @@ kotlin {
                 implementation(Libraries.KtorSerialization)
                 implementation(Libraries.KtorClientCIO)
 
-                implementation(Libraries.KMongoCoroutine)
+                implementation(Libraries.KMongoCoroutineSerialization)
+                implementation(Libraries.KMongoIdSerialization)
                 implementation(Libraries.Jsoup)
 
                 implementation(Libraries.LogbackCore)

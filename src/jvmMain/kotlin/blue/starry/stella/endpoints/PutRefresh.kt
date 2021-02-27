@@ -7,6 +7,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.locations.put
+import io.ktor.response.*
 import io.ktor.routing.Route
 import org.litote.kmongo.eq
 import org.litote.kmongo.toId
@@ -16,7 +17,7 @@ data class PutRefresh(val id: String)
 
 fun Route.putRefresh() {
     put<PutRefresh> { (id) ->
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -26,11 +27,9 @@ fun Route.putRefresh() {
                 "Unknown error occurred."
             }
         } else {
-            val newEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())!!
+            val newEntry = StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())!!
 
-            call.respondApiResponse {
-                newEntry
-            }
+            call.respond(newEntry)
         }
     }
 }

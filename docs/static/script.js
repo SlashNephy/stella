@@ -1219,11 +1219,7 @@
                 xhr.onload = () => {
                     try {
                         const json = JSON.parse(xhr.responseText);
-                        if (json.success && xhr.status === 200) {
-                            resolve(json.result);
-                        } else {
-                            reject(new Error(json.error));
-                        }
+                        resolve(json);
                     } catch (e) {
                         reject(e);
                     }

@@ -5,6 +5,7 @@ import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
 import io.ktor.locations.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flowOf
@@ -70,7 +71,7 @@ fun Route.getQuery() {
             GetQueryPipelines.limit(param.sort, param.page, param.count)
         ).flattenConcat().toList()
 
-        call.respondApiResponse(
+        call.respond(
             StellaMongoDBPicCollection.aggregate<PicModel>(pipeline).toList()
         )
     }

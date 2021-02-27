@@ -14,30 +14,30 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
+import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
 import java.nio.file.Files
 import java.nio.file.Paths
 
 internal val logger = KotlinLogging.logger("Stella")
 internal val mediaDirectory = Paths.get("media")
 
-suspend fun main() {
+fun main() {
     if (!Files.exists(mediaDirectory)) {
-        withContext(Dispatchers.IO) {
-            @Suppress("BlockingMethodInNonBlockingContext")
-            Files.createDirectory(mediaDirectory)
-        }
+        Files.createDirectory(mediaDirectory)
     }
 
-    RefreshWorker.start()
-    MissingMediaRefetchWorker.start()
+    GlobalScope.launch {
+        RefreshWorker.start()
+        MissingMediaRefetchWorker.start()
 
-    TwitterSourceProvider.start()
-    PixivSourceProvider.start()
-    NijieSourceProvider.start()
+        TwitterSourceProvider.start()
+        PixivSourceProvider.start()
+        NijieSourceProvider.start()
+    }
 
     embeddedServer(CIO, host = Env.HTTP_HOST, port = Env.HTTP_PORT, module = Application::module).start(wait = true)
 }
@@ -48,6 +48,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json(Json {
             encodeDefaults = true
+            serializersModule = IdKotlinXSerializationModule
         })
     }
 
