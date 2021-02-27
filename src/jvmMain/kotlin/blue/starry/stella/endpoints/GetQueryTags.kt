@@ -22,7 +22,7 @@ data class GetQueryTags(
 fun Route.getQueryTags() {
     get<GetQueryTags> { param ->
         val existingTags = param.id?.let { id ->
-            StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())?.tags
+            StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())?.tags
         }.orEmpty().map {
             it.value
         }

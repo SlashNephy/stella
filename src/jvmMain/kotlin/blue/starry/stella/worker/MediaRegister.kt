@@ -32,7 +32,7 @@ object MediaRegister {
     suspend fun register(entry: Entry, auto: Boolean) {
         val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::url eq entry.url)
         val newEntry = PicModel(
-            id = oldEntry?.id ?: newId(),
+            _id = oldEntry?._id ?: newId(),
             title = entry.title.normalizeTitle(),
             description = entry.description.normalizeDescription(),
             url = entry.url,

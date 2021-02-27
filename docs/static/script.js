@@ -481,7 +481,7 @@
         createMediaItem() {
             const a = document.createElement("a");
             a.classList.add("direction-reveal__card", "media-item");
-            a.setAttribute("data-id", this.pic.id);
+            a.setAttribute("data-id", this.pic._id);
             return a;
         }
 
@@ -1153,7 +1153,7 @@
             this.pic.tags.push({user: null, locked: false, value: tagValue});
             this.tagCurrentResult.appendChild(this.createDeleteTagEach({user: null, locked: false, value: tagValue}));
 
-            for (const element of Array.from(Container.element.querySelectorAll(`a.media-item[data-id="${this.pic.id}"] .overlay-tags`))) {
+            for (const element of Array.from(Container.element.querySelectorAll(`a.media-item[data-id="${this.pic._id}"] .overlay-tags`))) {
                 element.insertBefore(PicOverlayBuilder.createTagEach({user: null, locked: false, value: tagValue}), element.lastChild);
             }
 
@@ -1164,7 +1164,7 @@
             this.pic.tags = this.pic.tags.filter(e => e.value !== tagValue);
             this.tagRelationalResult.appendChild(this.createAddTagEach(tagValue));
 
-            for (const element of Array.from(Container.element.querySelector(`a.media-item[data-id="${this.pic.id}"] a[data-tag=\"${tagValue}\"]`))) {
+            for (const element of Array.from(Container.element.querySelector(`a.media-item[data-id="${this.pic._id}"] a[data-tag=\"${tagValue}\"]`))) {
                 element.remove();
             }
 
@@ -1248,12 +1248,12 @@
             }).map(value => `${encodeURIComponent(value[0])}=${encodeURIComponent(value[1])}`).join("&");
         },
         summary: () => API.asyncRequest("GET", "/summary", null, null),
-        refreshEntry: pic => API.asyncRequest("PUT", `/refresh/${pic.id}`, null, null),
-        addTag: (pic, tag) => API.asyncRequest("PUT", `/edit/${pic.id}/tag`, null, {tag: tag}),
-        deleteTag: (pic, tag) => API.asyncRequest("DELETE", `/edit/${pic.id}/tag`, null, {tag: tag}),
-        updateSensitiveLevel: (pic, level) => API.asyncRequest("PATCH", `/edit/${pic.id}/sensitive_level`, null, {sensitive_level: level}),
-        relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic.id, sensitive_level: pic.sensitive_level, count: 20}, null),
-        searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic.id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
+        refreshEntry: pic => API.asyncRequest("PUT", `/refresh/${pic._id}`, null, null),
+        addTag: (pic, tag) => API.asyncRequest("PUT", `/edit/${pic._id}/tag`, null, {tag: tag}),
+        deleteTag: (pic, tag) => API.asyncRequest("DELETE", `/edit/${pic._id}/tag`, null, {tag: tag}),
+        updateSensitiveLevel: (pic, level) => API.asyncRequest("PATCH", `/edit/${pic._id}/sensitive_level`, null, {sensitive_level: level}),
+        relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic._id, sensitive_level: pic.sensitive_level, count: 20}, null),
+        searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic._id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
     };
 
     if (App.isMobile) {

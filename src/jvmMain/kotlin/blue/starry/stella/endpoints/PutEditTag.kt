@@ -31,7 +31,7 @@ fun Route.putEditTag() {
             return@put
         }
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
         if (oldEntry == null) {
             call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
@@ -56,7 +56,7 @@ fun Route.putEditTag() {
             )),
             Updates.set("timestamp.manual_updated", Calendar.getInstance().timeInMillis)
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::id eq id.toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq id.toId(), updates)
 
         val entry = StellaMongoDBPicCollection.findOne(Filters.eq("_id", ObjectId(id)))!!
         call.respond(entry)
@@ -78,7 +78,7 @@ fun Route.deleteEditTag() {
             return@delete
         }
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
         if (oldEntry == null) {
             call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
@@ -115,9 +115,9 @@ fun Route.deleteEditTag() {
             Updates.set("tags", tags),
             Updates.set("timestamp.manual_updated", Calendar.getInstance().timeInMillis)
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::id eq id.toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicModel::_id eq id.toId(), updates)
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::id eq id.toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())!!
         call.respond(entry)
 
         logger.info {

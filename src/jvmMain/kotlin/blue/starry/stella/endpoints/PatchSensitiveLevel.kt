@@ -30,21 +30,21 @@ fun Route.patchSensitiveLevel() {
             }
         }
 
-        if (StellaMongoDBPicCollection.countDocuments(PicModel::id eq param.id.toId()) == 0L) {
+        if (StellaMongoDBPicCollection.countDocuments(PicModel::_id eq param.id.toId()) == 0L) {
             return@patch call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
         }
 
         StellaMongoDBPicCollection.updateOne(
-            PicModel::id eq param.id.toId(),
+            PicModel::_id eq param.id.toId(),
             combine(
                 setValue(PicModel::sensitive_level, param.sensitive_level),
                 Updates.set("timestamp.manual_updated", Instant.now().toEpochMilli())
             )
         )
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::id eq param.id.toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())!!
         call.respond(entry)
 
         logger.info {
