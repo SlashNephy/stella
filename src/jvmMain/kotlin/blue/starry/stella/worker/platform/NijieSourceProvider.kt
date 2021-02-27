@@ -5,7 +5,6 @@ import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaNijieClient
-import io.ktor.client.features.*
 import kotlinx.coroutines.*
 import kotlin.time.minutes
 
@@ -19,12 +18,8 @@ object NijieSourceProvider {
                     fetchBookmark(client)
                 } catch (e: CancellationException) {
                     break
-                } catch (e: ResponseException) {
-                    // セッション切れ
-                    if (client.isLoggedIn) {
-                        client.login()
-                    }
                 } catch (e: Throwable) {
+                    client.logout()
                     logger.error(e) { "NijieSource で例外が発生しました。" }
                 }
 
@@ -34,10 +29,6 @@ object NijieSourceProvider {
     }
 
     private suspend fun fetchBookmark(client: NijieClient) {
-        if (!client.isLoggedIn) {
-            client.login()
-        }
-
         for (bookmark in client.bookmarks().reversed()) {
             val picture = client.picture(bookmark.id)
             register(client, picture, "User", false)

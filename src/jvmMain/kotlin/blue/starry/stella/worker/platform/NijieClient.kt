@@ -4,11 +4,12 @@ import blue.starry.jsonkt.parseObject
 import blue.starry.jsonkt.toJsonObject
 import blue.starry.stella.logger
 import blue.starry.stella.worker.StellaHttpClient
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import org.jsoup.Jsoup
@@ -19,34 +20,29 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class NijieClient(private val email: String, private val password: String) {
-    var isLoggedIn = checkSession()
-        private set
+    private val mutex = Mutex()
+    private var loggedIn = false
 
-    private fun checkSession(): Boolean {
-        return runCatching {
-            runBlocking {
-                StellaHttpClient.get<HttpStatement>("https://nijie.info") {
-                    setHeaders()
-                }.execute {
-                    it.call.request.url.encodedPath == "/"
-                }
-            }
-        }.getOrNull() ?: false
+    private suspend fun isLoggedIn(): Boolean {
+        return mutex.withLock {
+            loggedIn
+        }
     }
 
-    private fun HttpRequestBuilder.setHeaders() {
-        header(HttpHeaders.AcceptLanguage, "ja")
-        userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36")
-    }
+    private suspend fun login() {
+        StellaHttpClient.get<Unit>("https://nijie.info") {
+            setHeaders()
+            expectSuccess = false
+        }
 
-    suspend fun login() {
         val parameters = Parameters.build {
             append("email", email)
             append("password", password)
             append("save", "on")
 
-            val jsoup = StellaHttpClient.get<String>("https://nijie.info/login.php") {
+            val jsoup = StellaHttpClient.get<String>("https://nijie.info/age_jump.php?url=") {
                 setHeaders()
+                expectSuccess = false
             }.let {
                 Jsoup.parse(it)
             }
@@ -54,17 +50,28 @@ class NijieClient(private val email: String, private val password: String) {
             append("url", jsoup.select("input[name=url]").attr("value"))
         }
 
-        StellaHttpClient.submitForm<HttpStatement>(parameters) {
+        StellaHttpClient.submitForm<Unit>(parameters) {
             url("https://nijie.info/login_int.php")
             setHeaders()
-            header(HttpHeaders.Referrer, "https://nijie.info/login.php")
-        }.execute()
+            header(HttpHeaders.Referrer, "https://nijie.info/login.php?url=$url")
+            expectSuccess = false
+        }
 
-        isLoggedIn = true
+        loggedIn = true
         logger.info { "Nijie にログインしました。" }
     }
 
+    suspend fun logout() {
+        mutex.withLock {
+            loggedIn = false
+        }
+    }
+
     suspend fun bookmarks(page: Int = 1): List<NijieModel.Bookmark> {
+        if (!isLoggedIn()) {
+            login()
+        }
+
         val html = StellaHttpClient.get<String>("https://nijie.info/okiniiri.php?p=$page") {
             setHeaders()
         }
@@ -78,26 +85,34 @@ class NijieClient(private val email: String, private val password: String) {
     }
 
     suspend fun deleteBookmark(id: String) {
-        val jsoup = StellaHttpClient.get<String>("https://nijie.info/bookmark_edit.php?id=$id") {
+        if (!isLoggedIn()) {
+            login()
+        }
+
+        val html = StellaHttpClient.get<String>("https://nijie.info/bookmark_edit.php?id=$id") {
             setHeaders()
         }.let {
             Jsoup.parse(it)
         }
 
-        val key = jsoup.select("input[value=$id]").last().attr("name")
-
+        val key = html.select("input[value=$id]").last().attr("name")
         val parameters = Parameters.build {
             append(key, id)
         }
 
-        StellaHttpClient.submitForm<HttpStatement>(parameters) {
+        StellaHttpClient.submitForm<Unit>(parameters) {
             url("https://nijie.info/bookmark_delete.php")
             setHeaders()
-        }.execute()
+            expectSuccess = false
+        }
     }
 
     private val formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH)
     suspend fun picture(id: String): NijieModel.Picture {
+        if (!isLoggedIn()) {
+            login()
+        }
+
         val jsoup = StellaHttpClient.get<String>("https://nijie.info/view.php?id=$id") {
             setHeaders()
         }.let {
@@ -122,6 +137,10 @@ class NijieClient(private val email: String, private val password: String) {
     }
 
     private suspend fun viewCount(id: String): Int {
+        if (!isLoggedIn()) {
+            login()
+        }
+
         val parameters = Parameters.build {
             append("id", id)
         }
@@ -133,7 +152,7 @@ class NijieClient(private val email: String, private val password: String) {
                 header("X-Requested-With", "XMLHttpRequest")
                 setHeaders()
             }.toJsonObject()["view_count"]!!.jsonPrimitive.int
-        }.getOrNull() ?: 0
+        }.getOrDefault(0)
     }
 
     suspend fun download(url: String, file: File) {
@@ -143,5 +162,10 @@ class NijieClient(private val email: String, private val password: String) {
         }
 
         file.writeBytes(response)
+    }
+
+    private fun HttpRequestBuilder.setHeaders() {
+        header(HttpHeaders.AcceptLanguage, "ja")
+        userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Safari/537.36")
     }
 }
