@@ -15,16 +15,18 @@ import java.time.Instant
 import java.util.*
 
 @Location("/pic/{id}/tag")
-data class EditTag(val id: String, val tag: String)
+data class EditTag(val id: String)
 
 fun Route.putPicTag() {
     put<EditTag> { param ->
+        val tag = call.receiveParameters()["tag"] ?: return@put
+
         val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
 
-        if (param.tag in oldEntry.tags.map { it.value }) {
+        if (tag in oldEntry.tags.map { it.value }) {
             return@put call.respondApiError(HttpStatusCode.BadRequest) {
                 "Input tag already exists in database."
             }
@@ -32,7 +34,7 @@ fun Route.putPicTag() {
 
         val updates = combine(
             addToSet(PicModel::tags, PicModel.Tag(
-                value = param.tag,
+                value = tag,
                 user = call.request.origin.remoteHost,
                 locked = false
             )),
@@ -44,31 +46,33 @@ fun Route.putPicTag() {
         call.respond(entry)
 
         logger.info {
-            "${entry.url} のエントリが更新されました。「${param.tag}」が追加されました。(${call.request.origin.remoteHost})"
+            "${entry.url} のエントリが更新されました。「$tag」が追加されました。(${call.request.origin.remoteHost})"
         }
     }
 }
 
 fun Route.deletePicTag() {
     delete<EditTag> { param ->
+        val tag = call.receiveParameters()["tag"] ?: return@delete
+
         val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
             ?: return@delete call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
 
-        if (param.tag !in oldEntry.tags.map { it.value }) {
+        if (tag !in oldEntry.tags.map { it.value }) {
             return@delete call.respondApiError(HttpStatusCode.BadRequest) {
                 "Input tag is not found in database."
             }
         }
 
-        if (param.tag in oldEntry.tags.filter { it.locked }.map { it.value }) {
+        if (tag in oldEntry.tags.filter { it.locked }.map { it.value }) {
             return@delete call.respondApiError(HttpStatusCode.BadRequest) {
                 "Input tag is locked in database."
             }
         }
 
-        val tags = oldEntry.tags.filter { it.value != param.tag }
+        val tags = oldEntry.tags.filter { it.value != tag }
         val updates = combine(
             setValue(PicModel::tags, tags),
             setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
@@ -79,7 +83,7 @@ fun Route.deletePicTag() {
         call.respond(entry)
 
         logger.info {
-            "${entry.url} のエントリが更新されました。「${param.tag}」が削除されました。(${call.request.origin.remoteHost})"
+            "${entry.url} のエントリが更新されました。「$tag」が削除されました。(${call.request.origin.remoteHost})"
         }
     }
 }

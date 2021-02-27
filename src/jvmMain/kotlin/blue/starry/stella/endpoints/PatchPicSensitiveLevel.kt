@@ -11,16 +11,19 @@ import io.ktor.locations.patch
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.Route
+import io.ktor.util.*
 import org.litote.kmongo.*
 import java.time.Instant
 import java.util.*
 
 @Location("/pic/{id}/sensitive_level")
-data class PatchPicSensitiveLevel(val id: String, val sensitive_level: Int)
+data class PatchPicSensitiveLevel(val id: String)
 
 fun Route.patchPicSensitiveLevel() {
     patch<PatchPicSensitiveLevel> { param ->
-        if (param.sensitive_level !in 0..3) {
+        val sensitiveLevel = call.receiveParameters()["sensitive_level"]?.toIntOrNull()
+
+        if (sensitiveLevel !in 0..3) {
             return@patch call.respondApiError(HttpStatusCode.BadRequest) {
                 "Essential \"sensitive_level\" is invalid."
             }
@@ -35,7 +38,7 @@ fun Route.patchPicSensitiveLevel() {
         StellaMongoDBPicCollection.updateOne(
             PicModel::_id eq param.id.toId(),
             combine(
-                setValue(PicModel::sensitive_level, param.sensitive_level),
+                setValue(PicModel::sensitive_level, sensitiveLevel),
                 setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
             )
         )
@@ -44,7 +47,7 @@ fun Route.patchPicSensitiveLevel() {
         call.respond(entry)
 
         logger.info {
-            "${entry.url} のエントリが更新されました。sensitive_level が ${param.sensitive_level} に変更されました。(${call.request.origin.remoteHost})"
+            "${entry.url} のエントリが更新されました。sensitive_level が $sensitiveLevel に変更されました。(${call.request.origin.remoteHost})"
         }
     }
 }
