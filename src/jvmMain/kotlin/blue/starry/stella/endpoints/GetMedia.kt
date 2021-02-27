@@ -9,7 +9,7 @@ import io.ktor.routing.*
 @Location("/media/{filename}")
 data class GetMedia(val filename: String)
 
-fun Route.getMedia() {
+fun Route.getMediaByFilename() {
     get<GetMedia> { (filename) ->
         call.respondFile(mediaDirectory.toFile(), filename)
     }

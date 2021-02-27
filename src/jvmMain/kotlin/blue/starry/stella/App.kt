@@ -9,6 +9,7 @@ import blue.starry.stella.worker.platform.TwitterSourceProvider
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -53,14 +55,25 @@ fun Application.module() {
     }
 
     routing {
-        getMedia()
-        getQuery()
-        getSummary()
-        putRefresh()
-        getQueryTags()
-        putEditTag()
-        deleteEditTag()
-        patchSensitiveLevel()
+        static("/") {
+            staticRootFolder = File("docs")
+
+            static("static") {
+                files("static")
+            }
+            default("index.html")
+        }
+
+        route("/api") {
+            getQuery()
+            getQueryTags()
+            getSummary()
+            getMediaByFilename()
+            putPicRefresh()
+            putPicTag()
+            deletePicTag()
+            patchPicSensitiveLevel()
+        }
     }
 
     install(XForwardedHeaderSupport)

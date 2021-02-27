@@ -12,11 +12,11 @@ import io.ktor.routing.Route
 import org.litote.kmongo.eq
 import org.litote.kmongo.toId
 
-@Location("/refresh/{id}")
-data class PutRefresh(val id: String)
+@Location("/pic/{id}/refresh")
+data class PutPicRefresh(val id: String)
 
-fun Route.putRefresh() {
-    put<PutRefresh> { (id) ->
+fun Route.putPicRefresh() {
+    put<PutPicRefresh> { (id) ->
         val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."

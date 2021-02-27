@@ -14,10 +14,10 @@ import org.litote.kmongo.*
 import java.time.Instant
 import java.util.*
 
-@Location("/edit/{id}/tag")
+@Location("/pic/{id}/tag")
 data class EditTag(val id: String, val tag: String)
 
-fun Route.putEditTag() {
+fun Route.putPicTag() {
     put<EditTag> { param ->
         val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
@@ -49,7 +49,7 @@ fun Route.putEditTag() {
     }
 }
 
-fun Route.deleteEditTag() {
+fun Route.deletePicTag() {
     delete<EditTag> { param ->
         val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq param.id.toId())
             ?: return@delete call.respondApiError(HttpStatusCode.NotFound) {

@@ -15,11 +15,11 @@ import org.litote.kmongo.*
 import java.time.Instant
 import java.util.*
 
-@Location("/edit/{id}/sensitive_level")
-data class PatchEditSensitiveLevel(val id: String, val sensitive_level: Int)
+@Location("/pic/{id}/sensitive_level")
+data class PatchPicSensitiveLevel(val id: String, val sensitive_level: Int)
 
-fun Route.patchSensitiveLevel() {
-    patch<PatchEditSensitiveLevel> { param ->
+fun Route.patchPicSensitiveLevel() {
+    patch<PatchPicSensitiveLevel> { param ->
         if (param.sensitive_level !in 0..3) {
             return@patch call.respondApiError(HttpStatusCode.BadRequest) {
                 "Essential \"sensitive_level\" is invalid."

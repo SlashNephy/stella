@@ -23,6 +23,7 @@ RUN gradle -version > /dev/null \
 # Final Stage
 FROM openjdk:17-jdk-alpine
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
+COPY docs/ /app/docs/
 
 WORKDIR /app
 ENTRYPOINT ["java", "-jar", "/app/stella.jar"]
