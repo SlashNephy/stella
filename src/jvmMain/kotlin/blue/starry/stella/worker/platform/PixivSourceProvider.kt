@@ -16,10 +16,10 @@ import kotlin.time.minutes
 object PixivSourceProvider {
     private val requestedIds = CopyOnWriteArrayList<Int>()
 
-    suspend fun start(): Unit = coroutineScope {
-        val client = StellaPixivClient ?: return@coroutineScope
+    fun start() {
+        val client = StellaPixivClient ?: return
 
-        launch {
+        GlobalScope.launch {
             while (isActive) {
                 try {
                     fetchBookmark(client, false)

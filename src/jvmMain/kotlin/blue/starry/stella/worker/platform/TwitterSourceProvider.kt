@@ -18,7 +18,9 @@ import blue.starry.penicillin.extensions.execute
 import blue.starry.penicillin.extensions.idObj
 import blue.starry.penicillin.extensions.models.text
 import blue.starry.penicillin.models.Status
-import blue.starry.stella.*
+import blue.starry.stella.Env
+import blue.starry.stella.logger
+import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
@@ -29,10 +31,10 @@ import kotlin.time.minutes
 object TwitterSourceProvider {
     private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
 
-    suspend fun start(): Unit = coroutineScope {
-        val client = StellaTwitterClient ?: return@coroutineScope
+    fun start() {
+        val client = StellaTwitterClient ?: return
 
-        launch {
+        GlobalScope.launch {
             while (isActive) {
                 try {
                     fetchTimeline(client)

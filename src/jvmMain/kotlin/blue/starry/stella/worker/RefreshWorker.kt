@@ -13,8 +13,8 @@ import kotlin.time.minutes
 import kotlin.time.seconds
 
 object RefreshWorker {
-    suspend fun start(): Unit = coroutineScope {
-        launch {
+    fun start() {
+        GlobalScope.launch {
             while (isActive) {
                 try {
                     check()

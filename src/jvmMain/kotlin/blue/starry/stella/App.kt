@@ -33,14 +33,12 @@ fun main() {
         Files.createDirectory(mediaDirectory)
     }
 
-    GlobalScope.launch {
-        RefreshWorker.start()
-        MissingMediaRefetchWorker.start()
+    RefreshWorker.start()
+    MissingMediaRefetchWorker.start()
 
-        TwitterSourceProvider.start()
-        PixivSourceProvider.start()
-        NijieSourceProvider.start()
-    }
+    TwitterSourceProvider.start()
+    PixivSourceProvider.start()
+    NijieSourceProvider.start()
 
     embeddedServer(CIO, host = Env.HTTP_HOST, port = Env.HTTP_PORT, module = Application::module).start(wait = true)
 }

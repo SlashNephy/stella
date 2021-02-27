@@ -10,10 +10,10 @@ import kotlinx.coroutines.*
 import kotlin.time.minutes
 
 object NijieSourceProvider {
-    suspend fun start(): Unit = coroutineScope {
-        val client = StellaNijieClient ?: return@coroutineScope
+    fun start() {
+        val client = StellaNijieClient ?: return
 
-        launch {
+        GlobalScope.launch {
             while (isActive) {
                 try {
                     fetchBookmark(client)

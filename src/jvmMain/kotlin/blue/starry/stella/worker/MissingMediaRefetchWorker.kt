@@ -11,8 +11,8 @@ import java.nio.file.Files
 import kotlin.time.minutes
 
 object MissingMediaRefetchWorker {
-    suspend fun start(): Unit = coroutineScope {
-        launch {
+    fun start() {
+        GlobalScope.launch {
             while (isActive) {
                 try {
                     check()
