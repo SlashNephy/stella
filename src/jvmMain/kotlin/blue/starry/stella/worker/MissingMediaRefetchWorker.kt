@@ -2,23 +2,22 @@ package blue.starry.stella.worker
 
 import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
 import blue.starry.penicillin.core.exceptions.TwitterApiError
-import blue.starry.stella.api.toPic
-import blue.starry.stella.collection
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
-import com.mongodb.client.model.Filters
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import blue.starry.stella.models.PicModel
+import kotlinx.coroutines.*
+import org.litote.kmongo.eq
 import java.nio.file.Files
 import kotlin.time.minutes
 
 object MissingMediaRefetchWorker {
     fun start() {
         GlobalScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
                     check()
+                } catch (e: CancellationException) {
+                    break
                 } catch (e: Throwable) {
                     logger.error(e) { "MissingMediaRefetchWorker で例外が発生しました。" }
                 }
@@ -29,8 +28,7 @@ object MissingMediaRefetchWorker {
     }
 
     private suspend fun check() {
-        for (document in collection.find().toList()) {
-            val pic = document.toPic()
+        for (pic in StellaMongoDBPicCollection.find().toList()) {
             if (pic.media.all { Files.exists(mediaDirectory.resolve(it.filename)) }) {
                 continue
             }
@@ -41,14 +39,16 @@ object MissingMediaRefetchWorker {
                 MediaRegister.registerByUrl(pic.url, pic.user, true)
 
                 logger.info { "エントリー: \"${pic.title}\" (${pic.url}) を更新しました。" }
+            } catch (e: CancellationException) {
+                return
             } catch (e: PenicillinTwitterApiException) {
                 when (e.error) {
                     TwitterApiError.NoStatusFound, TwitterApiError.ResourceNotFound -> {
-                        collection.deleteOne(Filters.eq("url", pic.url))
+                        StellaMongoDBPicCollection.deleteOne(PicModel::url eq pic.url)
                         logger.warn { "\"${pic.title}\" (${pic.url}) は削除されているため, エントリを削除しました。" }
                     }
                     TwitterApiError.SuspendedUser -> {
-                        collection.deleteOne(Filters.eq("url", pic.url))
+                        StellaMongoDBPicCollection.deleteOne(PicModel::url eq pic.url)
                         logger.warn { "\"${pic.title}\" (${pic.url}) は作者が凍結されているため, エントリを削除しました。" }
                     }
                     TwitterApiError.CannotSeeProtectedStatus -> {

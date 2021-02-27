@@ -1,4 +1,4 @@
-package blue.starry.stella.common
+package blue.starry.stella.models
 
 enum class FileExtension(internal val text: String, vararg val exts: String) {
     Image("image", "jpg", "jpeg", "png"),
@@ -9,8 +9,4 @@ enum class FileExtension(internal val text: String, vararg val exts: String) {
     Gif("gif", "gif"),
     MP4("mp4", "mp4"),
     M3U8("m3u8", "m3u8")
-}
-
-fun String.toFileExtension(): FileExtension? {
-    return FileExtension.values().find { equals(it.text, true) }
 }

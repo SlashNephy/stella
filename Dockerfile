@@ -15,7 +15,6 @@ FROM gradle:jdk8 AS build
 WORKDIR /app
 COPY --from=cache /app/gradle /home/gradle/.gradle
 COPY *.gradle.kts gradle.properties /app/
-COPY src/commonMain/ /app/src/commonMain/
 COPY src/jvmMain/ /app/src/jvmMain/
 # Stop printing Welcome
 RUN gradle -version > /dev/null \
@@ -24,6 +23,7 @@ RUN gradle -version > /dev/null \
 # Final Stage
 FROM openjdk:17-jdk-alpine
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
+COPY docs/ /app/docs/
 
 WORKDIR /app
 ENTRYPOINT ["java", "-jar", "/app/stella.jar"]

@@ -1,14 +1,13 @@
 package blue.starry.stella.worker.platform
 
-import blue.starry.stella.Config
+import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
-import io.ktor.client.features.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.apache.commons.lang3.time.FastDateFormat
+import blue.starry.stella.worker.StellaPixivClient
+import kotlinx.coroutines.*
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.time.minutes
@@ -17,46 +16,49 @@ object PixivSourceProvider {
     private val requestedIds = CopyOnWriteArrayList<Int>()
 
     fun start() {
+        val client = StellaPixivClient ?: return
+
         GlobalScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
-                    fetchBookmark(false)
-                    fetchBookmark(true)
-                } catch (e: ResponseException) {
-                    PixivClient.logout()
+                    fetchBookmark(client, false)
+                    fetchBookmark(client, true)
+                } catch (e: CancellationException) {
+                    break
                 } catch (e: Throwable) {
+                    client.logout()
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
 
-                delay(Config.CheckIntervalMins.minutes)
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }
 
-    suspend fun enqueue(url: String) {
+    suspend fun enqueue(client: PixivClient, url: String) {
         val id = url.split("=", "/").last().toInt()
         if (id in requestedIds) {
             return
         }
 
-        PixivClient.addBookmark(id, true)
+        client.addBookmark(id, true)
         requestedIds += id
     }
 
-    private suspend fun fetchBookmark(private: Boolean) {
-        for (illust in PixivClient.getBookmarks(private).illusts.reversed()) {
+    private suspend fun fetchBookmark(client: PixivClient, private: Boolean) {
+        for (illust in client.getBookmarks(private).illusts.reversed()) {
             if (illust.id in requestedIds) {
-                register(illust, null, true)
+                register(client, illust, null, true)
             } else {
-                register(illust, "User", false)
+                register(client, illust, "User", false)
             }
 
-            PixivClient.deleteBookmark(illust.id)
+            client.deleteBookmark(illust.id)
         }
     }
 
-    private val dateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ENGLISH)
-    private suspend fun register(illust: PixivModel.Illust, user: String?, auto: Boolean) {
+    private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ENGLISH)
+    private suspend fun register(client: PixivClient, illust: PixivModel.Illust, user: String?, auto: Boolean) {
         val tags = illust.tags.map { it.name }
 
         val entry = MediaRegister.Entry(
@@ -83,7 +85,7 @@ object PixivSourceProvider {
                     else -> 1
                 }
             },
-            created = dateFormat.parse(illust.createDate).time,
+            created = ZonedDateTime.parse(illust.createDate, dateFormat).toInstant().toEpochMilli(),
 
             media = (illust.metaSinglePage.originalImageUrl?.let {
                 listOf(it)
@@ -94,7 +96,7 @@ object PixivSourceProvider {
 
                 val file = mediaDirectory.resolve("pixiv_${illust.id}_$index.$ext").toFile()
                 if (!file.exists()) {
-                    PixivClient.download(url, file)
+                    client.download(url, file)
                 }
 
                 MediaRegister.Entry.Picture(index, "pixiv_${illust.id}_$index.$ext", url, ext)

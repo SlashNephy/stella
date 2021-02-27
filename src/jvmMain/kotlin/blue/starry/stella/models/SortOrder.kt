@@ -1,4 +1,4 @@
-package blue.starry.stella.common
+package blue.starry.stella.models
 
 enum class SortOrder(internal val text: String) {
     AddedDescending("added_descending"), AddedAscending("added_ascending"),
@@ -26,8 +26,4 @@ enum class SortOrder(internal val text: String) {
     ReplyDescending("reply_descending"), ReplyAscending("reply_ascending"),
 
     Random("random");
-}
-
-fun String.toSortOrder(): SortOrder? {
-    return SortOrder.values().find { equals(it.text, true) }
 }

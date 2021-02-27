@@ -1,9 +1,6 @@
 package blue.starry.stella.worker.platform
 
-import blue.starry.penicillin.PenicillinClient
-import blue.starry.penicillin.core.session.config.account
-import blue.starry.penicillin.core.session.config.application
-import blue.starry.penicillin.core.session.config.token
+import blue.starry.penicillin.core.session.ApiClient
 import blue.starry.penicillin.endpoints.common.TweetMode
 import blue.starry.penicillin.endpoints.favorites
 import blue.starry.penicillin.endpoints.favorites.create
@@ -21,50 +18,42 @@ import blue.starry.penicillin.extensions.execute
 import blue.starry.penicillin.extensions.idObj
 import blue.starry.penicillin.extensions.models.text
 import blue.starry.penicillin.models.Status
-import blue.starry.stella.Config
+import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.worker.StellaHttpClient
+import blue.starry.stella.worker.StellaTwitterClient
 import io.ktor.client.request.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.time.minutes
 
 object TwitterSourceProvider {
-    private val client by lazy {
-        PenicillinClient {
-            account {
-                application(
-                    Config.TwitterConsumerKey!!,
-                    Config.TwitterConsumerSecret!!
-                )
-                token(
-                    Config.TwitterAccessToken!!,
-                    Config.TwitterAccessTokenSecret!!
-                )
-            }
-        }
-    }
     private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
+    private val tcoUrlPattern = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
 
     fun start() {
+        val client = StellaTwitterClient ?: return
+
         GlobalScope.launch {
-            while (true) {
+            while (isActive) {
                 try {
-                    fetchTimeline()
-                    fetchFavorites()
+                    fetchTimeline(client)
+                    fetchFavorites(client)
+                } catch (e: CancellationException) {
+                    break
                 } catch (e: Throwable) {
                     logger.error(e) { "TwitterSource で例外が発生しました。" }
                 }
 
-                delay(Config.CheckIntervalMins.minutes)
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }
 
-    private suspend fun fetchTimeline() {
+    private suspend fun fetchTimeline(client: ApiClient) {
         val timeline = client.timeline.userTimeline().execute()
+
         for (status in timeline) {
             if (status.retweetedStatus != null) {
                 // RT を処理
@@ -85,7 +74,7 @@ object TwitterSourceProvider {
         }
     }
 
-    private suspend fun fetchFavorites() {
+    private suspend fun fetchFavorites(client: ApiClient) {
         val favorites = client.favorites.list(options = arrayOf("tweet_mode" to TweetMode.Extended)).execute()
         for (status in favorites) {
             register(status, "User", false)
@@ -93,17 +82,21 @@ object TwitterSourceProvider {
             if (!status.user.following) {
                 client.friendships.createByUserId(userId = status.user.id).execute()
             }
+
             client.favorites.destroy(id = status.id).execute()
         }
     }
 
-    suspend fun fetch(url: String, user: String?, auto: Boolean) {
-        val status = client.statuses.show(url.split("/").last().split("?").first().toLong(), options = arrayOf("tweet_mode" to TweetMode.Extended)).execute().result
+    suspend fun fetch(client: ApiClient, url: String, user: String?, auto: Boolean) {
+        val status = client.statuses.show(
+            id = url.split("/").last().split("?").first().toLong(),
+            tweetMode = TweetMode.Extended
+        ).execute()
 
-        register(status, user, auto)
+        register(status.result, user, auto)
     }
 
-    private val tcoRegex = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
+
     private suspend fun register(status: Status, user: String?, auto: Boolean) {
         val media = status.extendedEntities?.media ?: status.entities.media
         if (media.isEmpty()) {
@@ -112,7 +105,7 @@ object TwitterSourceProvider {
 
         val entry = MediaRegister.Entry(
             title = "${status.text.take(20)}...",
-            description = status.text.replace(tcoRegex) {
+            description = status.text.replace(tcoUrlPattern) {
                 "<a href=\"${it.value}\">${it.value}</a>"
             },
             url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}",
@@ -130,10 +123,8 @@ object TwitterSourceProvider {
 
                 val file = mediaDirectory.resolve("twitter_${status.idStr}_$i.$ext").toFile()
                 if (!file.exists()) {
-                    file.outputStream().use {
-                        val response = client.session.httpClient.get<ByteArray>(url)
-                        it.write(response)
-                    }
+                    val response = StellaHttpClient.get<ByteArray>(url)
+                    file.writeBytes(response)
                 }
 
                 MediaRegister.Entry.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)

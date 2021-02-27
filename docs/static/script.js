@@ -89,7 +89,7 @@
     };
 
     const App = {
-        mediaBaseUrl: "https://stella-api.starry.blue/media/",
+        mediaBaseUrl: "/api/media/",
         mobileWarningArea: document.getElementById("mobile-warning"),
         isMobile: navigator.userAgent.includes("iPhone OS") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("Mobile"),
         countEntriesArea: document.getElementById("count-entries"),
@@ -104,7 +104,7 @@
                     parameters.count = 10;
                     const query = API.buildParameterString(parameters);
 
-                    return `https://stella-api.starry.blue/query${query !== null ? "?" + query : ""}`;
+                    return `/api/query${query !== null ? "?" + query : ""}`;
                 },
                 responseType: "text",
                 status: ".page-load-status",
@@ -112,7 +112,7 @@
             });
 
             App.infiniteScroll.on("load", response => {
-                JSON.parse(response).result.map(t => (new PicElementBuilder(t)).build());
+                JSON.parse(response).map(t => (new PicElementBuilder(t)).build());
 
                 const items = Container.element.querySelectorAll(".direction-reveal__card");
                 App.infiniteScroll.appendItems(items);
@@ -481,7 +481,7 @@
         createMediaItem() {
             const a = document.createElement("a");
             a.classList.add("direction-reveal__card", "media-item");
-            a.setAttribute("data-id", this.pic.id);
+            a.setAttribute("data-id", this.pic._id);
             return a;
         }
 
@@ -1153,7 +1153,7 @@
             this.pic.tags.push({user: null, locked: false, value: tagValue});
             this.tagCurrentResult.appendChild(this.createDeleteTagEach({user: null, locked: false, value: tagValue}));
 
-            for (const element of Array.from(Container.element.querySelectorAll(`a.media-item[data-id="${this.pic.id}"] .overlay-tags`))) {
+            for (const element of Array.from(Container.element.querySelectorAll(`a.media-item[data-id="${this.pic._id}"] .overlay-tags`))) {
                 element.insertBefore(PicOverlayBuilder.createTagEach({user: null, locked: false, value: tagValue}), element.lastChild);
             }
 
@@ -1164,7 +1164,7 @@
             this.pic.tags = this.pic.tags.filter(e => e.value !== tagValue);
             this.tagRelationalResult.appendChild(this.createAddTagEach(tagValue));
 
-            for (const element of Array.from(Container.element.querySelector(`a.media-item[data-id="${this.pic.id}"] a[data-tag=\"${tagValue}\"]`))) {
+            for (const element of Array.from(Container.element.querySelector(`a.media-item[data-id="${this.pic._id}"] a[data-tag=\"${tagValue}\"]`))) {
                 element.remove();
             }
 
@@ -1215,15 +1215,11 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 const query = API.buildParameterString(params);
-                xhr.open(method, `https://stella-api.starry.blue${path}${query !== null ? "?" + query : ""}`, true);
+                xhr.open(method, `/api${path}${query !== null ? "?" + query : ""}`, true);
                 xhr.onload = () => {
                     try {
                         const json = JSON.parse(xhr.responseText);
-                        if (json.success && xhr.status === 200) {
-                            resolve(json.result);
-                        } else {
-                            reject(new Error(json.error));
-                        }
+                        resolve(json);
                     } catch (e) {
                         reject(e);
                     }
@@ -1252,12 +1248,12 @@
             }).map(value => `${encodeURIComponent(value[0])}=${encodeURIComponent(value[1])}`).join("&");
         },
         summary: () => API.asyncRequest("GET", "/summary", null, null),
-        refreshEntry: pic => API.asyncRequest("PUT", `/refresh/${pic.id}`, null, null),
-        addTag: (pic, tag) => API.asyncRequest("PUT", `/edit/${pic.id}/tag`, null, {tag: tag}),
-        deleteTag: (pic, tag) => API.asyncRequest("DELETE", `/edit/${pic.id}/tag`, null, {tag: tag}),
-        updateSensitiveLevel: (pic, level) => API.asyncRequest("PATCH", `/edit/${pic.id}/sensitive_level`, null, {sensitive_level: level}),
-        relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic.id, sensitive_level: pic.sensitive_level, count: 20}, null),
-        searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic.id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
+        refreshEntry: pic => API.asyncRequest("PUT", `/pic/${pic._id}/refresh`, null, null),
+        addTag: (pic, tag) => API.asyncRequest("PUT", `/pic/${pic._id}/tag`, null, {tag: tag}),
+        deleteTag: (pic, tag) => API.asyncRequest("DELETE", `/pic/${pic._id}/tag`, null, {tag: tag}),
+        updateSensitiveLevel: (pic, level) => API.asyncRequest("PATCH", `/pic/${pic._id}/sensitive_level`, null, {sensitive_level: level}),
+        relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic._id, sensitive_level: pic.sensitive_level, count: 20}, null),
+        searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic._id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
     };
 
     if (App.isMobile) {
