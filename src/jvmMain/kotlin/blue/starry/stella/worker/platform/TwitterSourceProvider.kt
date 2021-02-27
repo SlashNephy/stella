@@ -30,6 +30,7 @@ import kotlin.time.minutes
 
 object TwitterSourceProvider {
     private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
+    private val tcoUrlPattern = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
 
     fun start() {
         val client = StellaTwitterClient ?: return
@@ -52,6 +53,7 @@ object TwitterSourceProvider {
 
     private suspend fun fetchTimeline(client: ApiClient) {
         val timeline = client.timeline.userTimeline().execute()
+
         for (status in timeline) {
             if (status.retweetedStatus != null) {
                 // RT を処理
@@ -80,6 +82,7 @@ object TwitterSourceProvider {
             if (!status.user.following) {
                 client.friendships.createByUserId(userId = status.user.id).execute()
             }
+
             client.favorites.destroy(id = status.id).execute()
         }
     }
@@ -93,7 +96,7 @@ object TwitterSourceProvider {
         register(status.result, user, auto)
     }
 
-    private val tcoRegex = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
+
     private suspend fun register(status: Status, user: String?, auto: Boolean) {
         val media = status.extendedEntities?.media ?: status.entities.media
         if (media.isEmpty()) {
@@ -102,7 +105,7 @@ object TwitterSourceProvider {
 
         val entry = MediaRegister.Entry(
             title = "${status.text.take(20)}...",
-            description = status.text.replace(tcoRegex) {
+            description = status.text.replace(tcoUrlPattern) {
                 "<a href=\"${it.value}\">${it.value}</a>"
             },
             url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}",
@@ -120,10 +123,8 @@ object TwitterSourceProvider {
 
                 val file = mediaDirectory.resolve("twitter_${status.idStr}_$i.$ext").toFile()
                 if (!file.exists()) {
-                    file.outputStream().use {
-                        val response = StellaHttpClient.get<ByteArray>(url)
-                        it.write(response)
-                    }
+                    val response = StellaHttpClient.get<ByteArray>(url)
+                    file.writeBytes(response)
                 }
 
                 MediaRegister.Entry.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)

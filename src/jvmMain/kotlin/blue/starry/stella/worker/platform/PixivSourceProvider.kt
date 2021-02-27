@@ -5,7 +5,6 @@ import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaPixivClient
-import io.ktor.client.features.*
 import kotlinx.coroutines.*
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -26,10 +25,8 @@ object PixivSourceProvider {
                     fetchBookmark(client, true)
                 } catch (e: CancellationException) {
                     break
-                } catch (e: ResponseException) {
-                    client.logout()
-                    logger.error(e) { "PixivSource でリクエストに失敗しました。ログインを試行します。" }
                 } catch (e: Throwable) {
+                    client.logout()
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
 
