@@ -8,7 +8,7 @@ plugins {
 }
 
 object Versions {
-    const val Ktor = "1.5.1"
+    const val Ktor = "1.5.2"
     const val Penicillin = "6.0.5"
     const val KMongo = "4.2.3"
     const val Jsoup = "1.13.1"
@@ -54,7 +54,7 @@ object Libraries {
 
 repositories {
     mavenCentral()
-    // jcenter()
+
     maven(url = "https://kotlin.bintray.com/kotlinx")
 }
 
