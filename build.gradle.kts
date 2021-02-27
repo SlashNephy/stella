@@ -11,7 +11,7 @@ plugins {
 object Versions {
     const val Ktor = "1.5.2"
     const val Penicillin = "6.0.5"
-    const val KMongo = "4.2.4"
+    const val KMongo = "4.2.3"
     const val Jsoup = "1.13.1"
 
     const val JUnit = "5.7.0"
