@@ -13,12 +13,25 @@ import blue.starry.stella.worker.platform.PixivClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.cookies.*
+import io.ktor.client.features.logging.*
+import mu.KotlinLogging
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
 val StellaHttpClient by lazy {
     HttpClient(CIO) {
         install(HttpCookies)
+
+        Logging {
+            level = LogLevel.INFO
+            logger = object : Logger {
+                private val logger = KotlinLogging.logger("stella.http")
+
+                override fun log(message: String) {
+                    logger.trace { message }
+                }
+            }
+        }
     }
 }
 

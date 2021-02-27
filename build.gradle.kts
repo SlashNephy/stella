@@ -26,6 +26,7 @@ object Libraries {
     const val KtorLocations = "io.ktor:ktor-locations:${Versions.Ktor}"
     const val KtorSerialization = "io.ktor:ktor-serialization:${Versions.Ktor}"
     const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
+    const val KtorClientLogging = "io.ktor:ktor-client-logging:${Versions.Ktor}"
 
     const val KMongoCoroutineSerialization = "org.litote.kmongo:kmongo-coroutine-serialization:${Versions.KMongo}"
     const val KMongoIdSerialization = "org.litote.kmongo:kmongo-id-serialization:${Versions.KMongo}"
@@ -84,12 +85,11 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
-                implementation(kotlin("reflect"))
-
                 implementation(Libraries.KtorServerCIO)
                 implementation(Libraries.KtorLocations)
                 implementation(Libraries.KtorSerialization)
                 implementation(Libraries.KtorClientCIO)
+                implementation(Libraries.KtorClientLogging)
 
                 implementation(Libraries.KMongoCoroutineSerialization)
                 implementation(Libraries.KMongoIdSerialization)
