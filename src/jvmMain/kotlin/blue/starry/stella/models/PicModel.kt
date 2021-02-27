@@ -34,8 +34,8 @@ data class PicModel(
     data class Timestamp(
         val created: Long,
         val added: Long,
-        val manual_updated: Long,
-        val auto_updated: Long
+        val manual_updated: Long?,
+        val auto_updated: Long?
     )
 
     @Serializable
