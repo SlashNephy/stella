@@ -7,8 +7,14 @@ import io.ktor.application.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import org.litote.kmongo.*
+import kotlinx.coroutines.flow.flattenConcat
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.aggregate
+import org.litote.kmongo.eq
+import org.litote.kmongo.match
+import org.litote.kmongo.toId
 
 @Location("/query/tags")
 data class GetQueryTags(
@@ -23,27 +29,16 @@ fun Route.getQueryTags() {
     get<GetQueryTags> { param ->
         val existingTags = param.id?.let { id ->
             StellaMongoDBPicCollection.findOne(PicModel::_id eq id.toId())?.tags
-        }.orEmpty().map {
+        }?.map {
             it.value
-        }
+        }.orEmpty()
 
-        val filters = buildList {
-            this += not(PicModel::tags.size(0))
-
-            if (param.name != null) {
-                this += PicModel::tags.elemMatch(PicModel.Tag::value.regex(param.name, "i"))
-            }
-
-            if (existingTags.isNotEmpty()) {
-                this += or(existingTags.map { tag ->
-                    PicModel::tags.elemMatch(PicModel.Tag::value.regex(tag, "i"))
-                })
-            }
-
-            if (param.sensitive_level != null) {
-                this += PicModel::sensitive_level lte param.sensitive_level
-            }
-        }
+        val filters = flowOf(
+            GetQueryTagsFilters.ensureNotEmpty(),
+            GetQueryTagsFilters.name(param.name),
+            GetQueryTagsFilters.existingTags(existingTags),
+            GetQueryTagsFilters.sensitiveLevel(param.sensitive_level)
+        ).flattenConcat().toList()
 
         val tags = StellaMongoDBPicCollection
             .aggregate<PicModel>(match(and(filters)))

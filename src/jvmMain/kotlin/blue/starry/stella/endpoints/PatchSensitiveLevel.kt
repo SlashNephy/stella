@@ -3,7 +3,6 @@ package blue.starry.stella.endpoints
 import blue.starry.stella.logger
 import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.StellaMongoDBPicCollection
-import com.mongodb.client.model.Updates
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
@@ -12,10 +11,7 @@ import io.ktor.locations.patch
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.Route
-import org.litote.kmongo.combine
-import org.litote.kmongo.eq
-import org.litote.kmongo.setValue
-import org.litote.kmongo.toId
+import org.litote.kmongo.*
 import java.time.Instant
 import java.util.*
 
@@ -26,7 +22,7 @@ fun Route.patchSensitiveLevel() {
     patch<PatchEditSensitiveLevel> { param ->
         if (param.sensitive_level !in 0..3) {
             return@patch call.respondApiError(HttpStatusCode.BadRequest) {
-                "Essential \"sensitive_level\" is invalid or not present."
+                "Essential \"sensitive_level\" is invalid."
             }
         }
 
@@ -40,7 +36,7 @@ fun Route.patchSensitiveLevel() {
             PicModel::_id eq param.id.toId(),
             combine(
                 setValue(PicModel::sensitive_level, param.sensitive_level),
-                Updates.set("timestamp.manual_updated", Instant.now().toEpochMilli())
+                setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
             )
         )
 
