@@ -10,56 +10,49 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.security.MessageDigest
-import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
 
-class PixivClient(private val email: String, private val password: String) {
-    private val lock = Mutex()
+class PixivClient(private val refreshToken: String) {
+    private val mutex = Mutex()
 
     private var token: PixivModel.Token? = null
-    private val isLoggedIn: Boolean
-        get() = token != null
-
-    private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH)
-    private fun HttpRequestBuilder.setHeaders(credentials: Boolean) {
-        DateTimeFormatter.ISO_DATE_TIME
-        val time = dateFormat.format(Instant.now())
-
-        userAgent("PixivAndroidApp/5.0.64 (Android 6.0)")
-        header("X-Client-Time", time)
-        header("X-Client-Hash", MessageDigest.getInstance("MD5").digest(
-            (time + "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c").toByteArray()
-        ).joinToString("") {
-            "%02x".format(it)
-        })
-
-        if (credentials) {
-            requireNotNull(token)
-            header(HttpHeaders.Authorization, "Bearer ${token?.response?.accessToken}")
+    private suspend fun isLoggedIn(): Boolean {
+        return mutex.withLock {
+            token != null
         }
     }
 
     private suspend fun login() {
-        if (isLoggedIn) {
+        if (isLoggedIn()) {
             return
         }
 
         val parameters = Parameters.build {
-            append("grant_type", "password")
-            append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
-            append("username", email)
             append("get_secure_url", "1")
-            append("password", password)
+            append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
             append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
+            append("grant_type", "refresh_token")
+            append("refresh_token", refreshToken)
         }
 
-        token = lock.withLock(token) {
+        token = mutex.withLock {
             StellaHttpClient.submitForm<String>(parameters) {
                 url("https://oauth.secure.pixiv.net/auth/token")
+                userAgent("PixivAndroidApp/5.0.234 (Android 11; Pixel 5)")
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
+                val time = OffsetDateTime.now(ZoneId.of("UTC")).format(formatter)
 
-                setHeaders(false)
+                header("X-Client-Time", time)
+                header("X-Client-Hash", MessageDigest.getInstance("MD5").digest(
+                    (time + "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c").toByteArray()
+                ).joinToString("") {
+                    "%02x".format(it)
+                })
             }.parseObject {
+                logger.trace { it }
+
                 PixivModel.Token(it)
             }
         }
@@ -68,7 +61,7 @@ class PixivClient(private val email: String, private val password: String) {
     }
 
     suspend fun logout() {
-        lock.withLock {
+        mutex.withLock {
             token = null
         }
     }
@@ -80,7 +73,7 @@ class PixivClient(private val email: String, private val password: String) {
             parameter("user_id", token?.response?.user?.id)
             parameter("restrict", if (private) "private" else "public")
 
-            setHeaders(true)
+            setHeaders()
         }.parseObject {
             PixivModel.Bookmark(it)
         }
@@ -94,8 +87,8 @@ class PixivClient(private val email: String, private val password: String) {
             append("illust_id", id.toString())
         }
 
-        return StellaHttpClient.submitForm("https://app-api.pixiv.net/v2/illust/bookmark/add", parameters) {
-            setHeaders(true)
+        StellaHttpClient.submitForm<Unit>("https://app-api.pixiv.net/v2/illust/bookmark/add", parameters) {
+            setHeaders()
         }
     }
 
@@ -106,8 +99,8 @@ class PixivClient(private val email: String, private val password: String) {
             append("illust_id", id.toString())
         }
 
-        return StellaHttpClient.submitForm("https://app-api.pixiv.net/v1/illust/bookmark/delete", parameters) {
-            setHeaders(true)
+        StellaHttpClient.submitForm<Unit>("https://app-api.pixiv.net/v1/illust/bookmark/delete", parameters) {
+            setHeaders()
         }
     }
 
@@ -118,6 +111,18 @@ class PixivClient(private val email: String, private val password: String) {
         }
 
         file.writeBytes(response)
+    }
+
+    private fun HttpRequestBuilder.setHeaders(requireAuth: Boolean = true) {
+        header("App-OS", "ios")
+        header("App-OS-Version", "12.2")
+        header("App-Version", "7.6.2")
+        userAgent("PixivIOSApp/7.6.2 (iOS 12.2; iPhone9,1)")
+
+        if (requireAuth) {
+            val token = token?.response?.accessToken ?: error("Login required.")
+            header(HttpHeaders.Authorization, "Bearer $token")
+        }
     }
 }
 

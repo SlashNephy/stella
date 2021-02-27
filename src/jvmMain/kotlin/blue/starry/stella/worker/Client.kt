@@ -23,7 +23,7 @@ val StellaHttpClient by lazy {
         install(HttpCookies)
 
         Logging {
-            level = LogLevel.INFO
+            level = LogLevel.ALL
             logger = object : Logger {
                 private val logger = KotlinLogging.logger("stella.http")
 
@@ -36,12 +36,9 @@ val StellaHttpClient by lazy {
 }
 
 val StellaPixivClient by lazy {
-    val (email, password) = Env.PIXIV_EMAIL to Env.PIXIV_PASSWORD
-    if (email == null || password == null) {
-        return@lazy null
-    }
+    val token = Env.PIXIV_REFRESH_TOKEN ?: return@lazy null
 
-    PixivClient(email, password)
+    PixivClient(token)
 }
 
 val StellaTwitterClient by lazy {

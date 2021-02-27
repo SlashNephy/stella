@@ -74,8 +74,7 @@ services:
       TWITTER_CS: xxx
       TWITTER_AT: xxx
       TWITTER_ATS: xxx
-      PIXIV_EMAIL: xxx
-      PIXIV_PASSWORD: xxx
+      PIXIV_REFRESH_TOKEN: xxx
       NIJIE_EMAIL: xxx
       NIJIE_PASSWORD: xxx
 

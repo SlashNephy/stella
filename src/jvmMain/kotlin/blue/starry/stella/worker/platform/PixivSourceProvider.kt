@@ -28,6 +28,7 @@ object PixivSourceProvider {
                     break
                 } catch (e: ResponseException) {
                     client.logout()
+                    logger.error(e) { "PixivSource でリクエストに失敗しました。ログインを試行します。" }
                 } catch (e: Throwable) {
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
