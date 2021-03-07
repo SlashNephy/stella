@@ -1,4 +1,5 @@
-.idea
-.gradle
+.idea/*
+.gradle/*
+build/*
 
 media
