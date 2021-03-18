@@ -9,7 +9,7 @@
 [![issues](https://img.shields.io/github/issues/SlashNephy/stella)](https://github.com/SlashNephy/stella/issues)
 [![pull requests](https://img.shields.io/github/issues-pr/SlashNephy/stella)](https://github.com/SlashNephy/stella/pulls)
 
-- [Demo](https://stella.starry.blue)
+- [Demo](https://stella-public.starry.blue/)
 
 ---
 
