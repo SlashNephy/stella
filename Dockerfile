@@ -25,5 +25,6 @@ FROM adoptopenjdk:11-jre-hotspot
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 COPY docs/ /app/docs/
 
+LABEL org.opencontainers.image.source="https://github.com/SlashNephy/stella"
 WORKDIR /app
 ENTRYPOINT ["java", "-jar", "/app/stella.jar"]
