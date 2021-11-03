@@ -1,5 +1,7 @@
 package blue.starry.stella.models
 
+import blue.starry.stella.models.internal.PlatformSerializer
+import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
@@ -13,8 +15,8 @@ data class PicModel(
     val tags: List<Tag>,
     val user: String?,
 
-    val platform: String,
-    val sensitive_level: Int,
+    val platform: Platform,
+    val sensitive_level: SensitiveLevel,
 
     val timestamp: Timestamp,
     val author: Author,
@@ -67,4 +69,21 @@ data class PicModel(
         val retweet: Int?,
         val reply: Int?
     )
+
+    @Serializable(PlatformSerializer::class)
+    @Suppress("unused")
+    enum class Platform {
+        Twitter,
+        Pixiv,
+        Nijie
+    }
+
+    @Serializable(SensitiveLevelSerializer::class)
+    @Suppress("unused")
+    enum class SensitiveLevel {
+        Safe,
+        R15,
+        R18,
+        R18G
+    }
 }

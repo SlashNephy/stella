@@ -1,8 +1,10 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.models.FileExtension
-import blue.starry.stella.models.ImagePlatform
 import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.internal.PlatformSerializer
+import blue.starry.stella.models.internal.SensitiveLevelSerializer
+import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.flow
 import org.bson.conversions.Bson
 import org.litote.kmongo.*
@@ -39,16 +41,13 @@ object GetQueryFilters {
     }
 
     fun platform(value: String?) = flow {
-        val platform = value?.toImagePlatform()
+        val platform = value?.let { PlatformSerializer.deserializeOrNull(it) }
+
         if (platform != null) {
             emit(
-                PicModel::platform eq platform.name
+                Filters.eq(PicModel::platform.name, PlatformSerializer.serialize(platform))
             )
         }
-    }
-
-    private fun String.toImagePlatform(): ImagePlatform? {
-       return ImagePlatform.values().find { equals(it.name, true) }
     }
 
     fun author(value: String?) = flow {
@@ -72,15 +71,19 @@ object GetQueryFilters {
 
     fun sensitiveLevel(value: String?, trusted: Boolean) = flow {
         if (trusted) {
-            val levels = value?.split(",")?.mapNotNull { it.toIntOrNull() }.orEmpty()
+            val levels = value?.split(",")
+                ?.mapNotNull { it.toIntOrNull() }
+                ?.mapNotNull { SensitiveLevelSerializer.deserializeOrNull(it) }
+                .orEmpty()
+
             if (levels.isNotEmpty()) {
                 emit(
-                    PicModel::sensitive_level.`in`(levels)
+                    Filters.`in`(PicModel::sensitive_level.name, levels.map { SensitiveLevelSerializer.serialize(it) })
                 )
             }
         } else {
             emit(
-                PicModel::sensitive_level eq 0
+                Filters.eq(PicModel::sensitive_level.name, SensitiveLevelSerializer.serialize(PicModel.SensitiveLevel.Safe))
             )
         }
     }

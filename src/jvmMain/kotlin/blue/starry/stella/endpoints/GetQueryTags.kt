@@ -2,11 +2,13 @@ package blue.starry.stella.endpoints
 
 import blue.starry.stella.models.PicModel
 import blue.starry.stella.models.PicTagsModel
+import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import blue.starry.stella.worker.StellaMongoDBPicCollection
-import io.ktor.application.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.call
+import io.ktor.locations.Location
+import io.ktor.locations.get
+import io.ktor.response.respond
+import io.ktor.routing.Route
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -16,7 +18,6 @@ import org.litote.kmongo.coroutine.aggregate
 import org.litote.kmongo.eq
 import org.litote.kmongo.id.toId
 import org.litote.kmongo.match
-import org.litote.kmongo.toId
 
 @Location("/query/tags")
 data class GetQueryTags(
@@ -39,7 +40,7 @@ fun Route.getQueryTags() {
             GetQueryTagsFilters.ensureNotEmpty(),
             GetQueryTagsFilters.name(param.name),
             GetQueryTagsFilters.existingTags(existingTags),
-            GetQueryTagsFilters.sensitiveLevel(param.sensitive_level)
+            GetQueryTagsFilters.sensitiveLevel(param.sensitive_level?.let { SensitiveLevelSerializer.deserializeOrNull(it) })
         ).flattenConcat().toList()
 
         val tags = StellaMongoDBPicCollection

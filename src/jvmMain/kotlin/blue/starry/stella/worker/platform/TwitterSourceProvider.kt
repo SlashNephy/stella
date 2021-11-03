@@ -14,22 +14,23 @@ import blue.starry.penicillin.endpoints.statuses.show
 import blue.starry.penicillin.endpoints.statuses.unretweet
 import blue.starry.penicillin.endpoints.timeline
 import blue.starry.penicillin.endpoints.timeline.userTimeline
-import blue.starry.penicillin.extensions.execute
 import blue.starry.penicillin.extensions.idObj
 import blue.starry.penicillin.extensions.models.text
 import blue.starry.penicillin.models.Status
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
+import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
+import kotlin.time.Duration
 import kotlin.time.minutes
 
 object TwitterSourceProvider {
-    private val tweetUrlPattern = "^(?:http(?:s)?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
+    private val tweetUrlPattern = "^(?:https?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
     private val tcoUrlPattern = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
 
     fun start() {
@@ -46,7 +47,7 @@ object TwitterSourceProvider {
                     logger.error(e) { "TwitterSource で例外が発生しました。" }
                 }
 
-                delay(Env.CHECK_INTERVAL_MINS.minutes)
+                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
             }
         }
     }
@@ -113,8 +114,12 @@ object TwitterSourceProvider {
             tags = status.entities.hashtags.map { it.text },
 
             user = user,
-            platform = "Twitter",
-            sensitiveLevel = if ("🔞" in status.text) 2 else if (status.possiblySensitive) 1 else 0,
+            platform = PicModel.Platform.Twitter,
+            sensitiveLevel = when {
+                "🔞" in status.text -> PicModel.SensitiveLevel.R18
+                status.possiblySensitive -> PicModel.SensitiveLevel.R15
+                else -> PicModel.SensitiveLevel.Safe
+            },
             created = status.idObj.epochTimeMillis,
 
             media = media.mapIndexed { i, it ->

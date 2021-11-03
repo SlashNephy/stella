@@ -37,9 +37,10 @@ object Libraries {
         "kotlin.ExperimentalStdlibApi",
         "kotlin.time.ExperimentalTime",
         "kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "io.ktor.util.KtorExperimentalAPI",
+        "kotlinx.coroutines.DelicateCoroutinesApi",
         "io.ktor.locations.KtorExperimentalLocationsAPI",
-        "kotlinx.coroutines.FlowPreview"
+        "kotlinx.coroutines.FlowPreview",
+        "io.ktor.util.InternalAPI"
     )
 }
 

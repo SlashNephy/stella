@@ -3,9 +3,11 @@ package blue.starry.stella.worker.platform
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
+import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaNijieClient
 import kotlinx.coroutines.*
+import kotlin.time.Duration
 import kotlin.time.minutes
 
 object NijieSourceProvider {
@@ -23,7 +25,7 @@ object NijieSourceProvider {
                     logger.error(e) { "NijieSource で例外が発生しました。" }
                 }
 
-                delay(Env.CHECK_INTERVAL_MINS.minutes)
+                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
             }
         }
     }
@@ -51,8 +53,8 @@ object NijieSourceProvider {
             author = MediaRegister.Entry.Author(picture.authorName, picture.authorUrl, null),
 
             user = user,
-            platform = "Nijie",
-            sensitiveLevel = 2,
+            platform = PicModel.Platform.Nijie,
+            sensitiveLevel = PicModel.SensitiveLevel.R18,
             created = picture.createdAt,
 
             media = picture.media.mapIndexed { index, url ->

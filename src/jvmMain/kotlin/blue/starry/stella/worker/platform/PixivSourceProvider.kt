@@ -3,6 +3,7 @@ package blue.starry.stella.worker.platform
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
+import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaPixivClient
 import kotlinx.coroutines.*
@@ -10,6 +11,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration
 import kotlin.time.minutes
 
 object PixivSourceProvider {
@@ -30,7 +32,7 @@ object PixivSourceProvider {
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
 
-                delay(Env.CHECK_INTERVAL_MINS.minutes)
+                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
             }
         }
     }
@@ -73,16 +75,16 @@ object PixivSourceProvider {
 
             user = user,
             tags = tags,
-            platform = "Pixiv",
+            platform = PicModel.Platform.Pixiv,
             sensitiveLevel = when {
-                "R-15" in tags -> 1
-                "R-18" in tags -> 2
-                "R-18G" in tags -> 3
+                "R-15" in tags -> PicModel.SensitiveLevel.R15
+                "R-18" in tags -> PicModel.SensitiveLevel.R18
+                "R-18G" in tags -> PicModel.SensitiveLevel.R18G
                 else -> when (illust.xRestrict) {
-                    0 -> 0
-                    1 -> 2
-                    2 -> 3
-                    else -> 1
+                    0 -> PicModel.SensitiveLevel.Safe
+                    1 -> PicModel.SensitiveLevel.R18
+                    2 -> PicModel.SensitiveLevel.R18G
+                    else -> PicModel.SensitiveLevel.R18
                 }
             },
             created = ZonedDateTime.parse(illust.createDate, dateFormat).toInstant().toEpochMilli(),

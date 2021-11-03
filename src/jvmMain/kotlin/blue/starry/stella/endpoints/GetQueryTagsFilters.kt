@@ -1,6 +1,8 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.internal.SensitiveLevelSerializer
+import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.litote.kmongo.*
@@ -28,10 +30,10 @@ object GetQueryTagsFilters {
         }
     }
 
-    fun sensitiveLevel(value: Int?) = flow {
+    fun sensitiveLevel(value: PicModel.SensitiveLevel?) = flow {
         if (value != null) {
             emit(
-                PicModel::sensitive_level lte value
+                Filters.lte(PicModel::sensitive_level.name, SensitiveLevelSerializer.serialize(value))
             )
         }
     }
