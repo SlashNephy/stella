@@ -1,6 +1,6 @@
 WebFontConfig = {
     google: {
-        families: ['Zen+Maru+Gothic:500']
+        families: ['Zen+Maru+Gothic:500&display=swap']
     },
     active: function() {
         sessionStorage.fonts = true;
@@ -111,7 +111,6 @@ if (sessionStorage.fonts) {
 
     const App = {
         mediaBaseUrl: "api/media/",
-        mobileWarningArea: document.getElementById("mobile-warning"),
         isMobile: navigator.userAgent.includes("iPhone OS") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("Mobile"),
         countEntriesArea: document.getElementById("count-entries"),
         editorModal: document.getElementById("editor"),
@@ -1276,10 +1275,6 @@ if (sessionStorage.fonts) {
         relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic._id, sensitive_level: pic.sensitive_level, count: 20}, null),
         searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic._id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
     };
-
-    if (App.isMobile) {
-        App.mobileWarningArea.style = "";
-    }
 
     window.addEventListener("load", () => {
         quicklink();
