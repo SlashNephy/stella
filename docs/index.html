@@ -15,19 +15,19 @@
 
                     <span class="controls">
                         <a id="dark-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <span class="iconify-inline" data-icon="fa-solid:moon"></span>
+                            <span class="iconify-inline" data-icon="fa-solid:moon" title="ダークテーマに切り替える"></span>
                         </a>
                         <a id="light-button" class="btn btn-secondary btn-sm control-button" role="button" style="display: none">
-                            <span class="iconify-inline" data-icon="fa-solid:sun"></span>
+                            <span class="iconify-inline" data-icon="fa-solid:sun" title="ライトテーマに切り替える"></span>
                         </a>
                         <a id="reset-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <span class="iconify-inline" data-icon="fa-solid:trash-alt"></span>
+                            <span class="iconify-inline" data-icon="fa-solid:trash-alt" title="検索条件をリセットする"></span>
                         </a>
                         <a id="refresh-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <span class="iconify-inline" data-icon="fa-solid:sync-alt"></span>
+                            <span class="iconify-inline" data-icon="fa-solid:sync-alt" title="データを更新する"></span>
                         </a>
                         <a href="#search-box" class="btn btn-secondary btn-sm control-button" role="button" data-toggle="collapse">
-                            <span class="iconify-inline" data-icon="fa-solid:sliders-h"></span>
+                            <span class="iconify-inline" data-icon="fa-solid:sliders-h" title="検索パネルを表示する"></span>
                         </a>
                     </span>
                 </h5>
@@ -48,7 +48,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:font"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:font" title="タイトル"></span></span>
                                     </div>
                                     <input id="title-search" type="text" class="form-control" placeholder="タイトル...">
                                 </div>
@@ -57,7 +57,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:file-alt"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:file-alt" title="説明欄"></span></span>
                                     </div>
                                     <input id="description-search" type="text" class="form-control" placeholder="説明欄...">
                                 </div>
@@ -66,7 +66,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:tags"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:tags" title="タグ (半角カンマで複数指定)"></span></span>
                                     </div>
                                     <input id="tags-search" type="text" class="form-control" placeholder="タグ...">
                                 </div>
@@ -75,7 +75,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:user"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:user" title="作者名"></span></span>
                                     </div>
                                     <input id="author-search" type="text" class="form-control" placeholder="作者名...">
                                 </div>
@@ -92,7 +92,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-alt"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-alt" title="投稿日"></span></span>
                                     </div>
                                     <input id="created-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -105,7 +105,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-plus"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-plus" title="追加日"></span></span>
                                     </div>
                                     <input id="added-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -118,7 +118,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-check"></span></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-check" title="更新日"></span></span>
                                     </div>
                                     <input id="updated-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -140,7 +140,7 @@
                                     <input id="min-rating-search" type="number" class="form-control" min="0" max="5" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:star"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:star" title="レート (★0 ～ ★5)"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -155,7 +155,7 @@
                                     <input id="min-bookmark-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:bookmark"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:bookmark" title="ブックマーク数"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -170,7 +170,7 @@
                                     <input id="min-view-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:eye"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:eye" title="閲覧数"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -186,7 +186,7 @@
                                     <input id="min-like-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:heart"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:heart" title="いいね数"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -201,7 +201,7 @@
                                     <input id="min-retweet-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:retweet"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:retweet" title="RT 数"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -216,7 +216,7 @@
                                     <input id="min-reply-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:reply-all"></span> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:reply-all" title="リプライ数 / コメント数"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
