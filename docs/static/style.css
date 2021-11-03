@@ -1,31 +1,5 @@
-@charset "UTF-8";
-
-@font-face {
-    font-family: "Avenir Next LT Pro";
-    unicode-range: U+0-5FF;
-    font-display: swap;
-    src:
-        local(Avenir Next LT Pro),
-        local(AvenirNext LT Pro),
-        url(/static/AvenirNextLTPro-Regular.woff2) format("woff2"),
-        url(/static/AvenirNextLTPro-Regular.woff) format("woff");
-}
-
-@font-face {
-    font-family: "Noto Sans Japanese DemiLight";
-    unicode-range: U+3000-9FFF, U+ff??;
-    font-display: swap;
-    src:
-        local(Noto Sans CJK JP DemiLight),
-        url(/static/NotoSansJP-DemiLight.woff2) format("woff2"),
-        url(/static/NotoSansJP-DemiLight.woff) format("woff");
-}
-
 * {
-    font-family: "Avenir Next LT Pro", optima, Belleza, "Noto Sans Japanese DemiLight", apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", メイリオ, Meiryo, Osaka, Verdana, Roboto, "Helvetica Neue", Arial, sans-serif;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: subpixel-antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Zen Maru Gothic', 'Noto Sans CJK JP', 'Noto Sans JP', apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", メイリオ, Meiryo, Osaka, Verdana, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
@@ -36,7 +10,6 @@ body {
 .card {
     margin-bottom: .75rem;
 }
-
 
 /* Container */
 
