@@ -4,6 +4,7 @@ import blue.starry.stella.models.FileExtension
 import blue.starry.stella.models.ImagePlatform
 import blue.starry.stella.models.PicModel
 import kotlinx.coroutines.flow.flow
+import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import java.time.LocalDate
 
@@ -84,7 +85,7 @@ object GetQueryFilters {
         }
     }
 
-    fun created(since: String?, until: String?) = flow {
+    fun created(since: String?, until: String?) = flow<Bson> {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)
@@ -106,7 +107,7 @@ object GetQueryFilters {
         }
     }
 
-    fun added(since: String?, until: String?) = flow {
+    fun added(since: String?, until: String?) = flow<Bson> {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)
@@ -128,7 +129,7 @@ object GetQueryFilters {
         }
     }
 
-    fun updated(since: String?, until: String?) = flow {
+    fun updated(since: String?, until: String?) = flow<Bson> {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)

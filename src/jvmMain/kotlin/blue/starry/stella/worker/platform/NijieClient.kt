@@ -78,7 +78,7 @@ class NijieClient(private val email: String, private val password: String) {
 
         return Jsoup.parse(html).select("div[class=nijie-bookmark]").map { element ->
             val title = element.select("p[class=title]").text()
-            val id = element.select("p[class=nijiedao]").first().getElementsByTag("a").first().attr("href").split("=").last()
+            val id = element.select("p[class=nijiedao]").first()!!.getElementsByTag("a").first()!!.attr("href").split("=").last()
 
             NijieModel.Bookmark(title, id)
         }
@@ -95,7 +95,7 @@ class NijieClient(private val email: String, private val password: String) {
             Jsoup.parse(it)
         }
 
-        val key = html.select("input[value=$id]").last().attr("name")
+        val key = html.select("input[value=$id]").last()!!.attr("name")
         val parameters = Parameters.build {
             append(key, id)
         }
@@ -124,12 +124,12 @@ class NijieClient(private val email: String, private val password: String) {
             Jsoup.parse(it)
         }
 
-        val json = jsoup.select("script[type=application/ld+json]").first().html().parseObject { NijieModel.PictureJson(it) }
+        val json = jsoup.select("script[type=application/ld+json]").first()!!.html().parseObject { NijieModel.PictureJson(it) }
         val tags = jsoup.select("li[class=tag]").map { it.select("span[class=tag_name]").text() }
         val images = jsoup2.select("img[class=box-shadow999]").map { it.attr("src") }.map { "https:$it" }
-        val like = jsoup.getElementById("good_cnt").text().toInt()
-        val bookmark = jsoup.getElementById("nuita_cnt").text().toInt()
-        val reply = jsoup.getElementById("comment_list_js").childNodeSize() / 2
+        val like = jsoup.getElementById("good_cnt")!!.text().toInt()
+        val bookmark = jsoup.getElementById("nuita_cnt")!!.text().toInt()
+        val reply = jsoup.getElementById("comment_list_js")!!.childNodeSize() / 2
         val view = viewCount(id)
 
         return NijieModel.Picture(json.name, json.author.name, json.author.sameAs, LocalDateTime.parse(json.datePublished, formatter).atZone(
