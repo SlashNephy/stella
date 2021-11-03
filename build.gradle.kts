@@ -7,7 +7,7 @@ plugins {
 object Versions {
     const val Ktor = "1.6.5"
     const val Penicillin = "6.2.1"
-    const val KMongo = "4.3.0"
+    const val KMongo = "4.2.3"
     const val Jsoup = "1.14.3"
 
     const val KotlinLogging = "2.0.11"
