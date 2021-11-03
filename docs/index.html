@@ -6,35 +6,28 @@
 
         <link rel="stylesheet" href="static/style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
         <div class="container">
-            <div id="mobile-warning" class="alert alert-warning" role="alert" style="display: none">
-                <h5 class="alert-heading">お使いの環境はモバイル環境です</h5>
-                <hr>
-                <p class="mb-0">このアプリは PC 向けに最適化されているため, モバイル環境では一部の機能をご利用いただけません。PC 環境でお楽しみください。</p>
-            </div>
-
             <div class="alert alert-dark" role="alert">
                 <h5 class="alert-heading">
                     stella
 
                     <span class="controls">
                         <a id="dark-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <i class="fas fa-moon" title="ダークテーマに切り替える"></i>
+                            <span class="iconify-inline" data-icon="fa-solid:moon"></span>
                         </a>
                         <a id="light-button" class="btn btn-secondary btn-sm control-button" role="button" style="display: none">
-                            <i class="fas fa-sun" title="ライトテーマに切り替える"></i>
+                            <span class="iconify-inline" data-icon="fa-solid:sun"></span>
                         </a>
                         <a id="reset-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <i class="fas fa-trash-alt" title="検索条件をリセットする"></i>
+                            <span class="iconify-inline" data-icon="fa-solid:trash-alt"></span>
                         </a>
                         <a id="refresh-button" class="btn btn-secondary btn-sm control-button" role="button">
-                            <i class="fas fa-sync-alt" title="データを更新する"></i>
+                            <span class="iconify-inline" data-icon="fa-solid:sync-alt"></span>
                         </a>
                         <a href="#search-box" class="btn btn-secondary btn-sm control-button" role="button" data-toggle="collapse">
-                            <i class="fas fa-sliders-h" title="検索パネルを表示する"></i>
+                            <span class="iconify-inline" data-icon="fa-solid:sliders-h"></span>
                         </a>
                     </span>
                 </h5>
@@ -49,13 +42,13 @@
                     <hr>
 
                     <div class="form-group">
-                        <label><i class="fas fa-search"></i> 検索</label>
+                        <label><span class="iconify-inline" data-icon="fa-solid:search"></span> 検索</label>
 
                         <div class="form-row text-form">
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-font" title="タイトル"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:font"></span></span>
                                     </div>
                                     <input id="title-search" type="text" class="form-control" placeholder="タイトル...">
                                 </div>
@@ -64,7 +57,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-file-alt" title="説明欄"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:file-alt"></span></span>
                                     </div>
                                     <input id="description-search" type="text" class="form-control" placeholder="説明欄...">
                                 </div>
@@ -73,7 +66,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-tags" title="タグ (半角カンマで複数指定)"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:tags"></span></span>
                                     </div>
                                     <input id="tags-search" type="text" class="form-control" placeholder="タグ...">
                                 </div>
@@ -82,7 +75,7 @@
                             <div class="col-md-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-user" title="作者名"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:user"></span></span>
                                     </div>
                                     <input id="author-search" type="text" class="form-control" placeholder="作者名...">
                                 </div>
@@ -93,13 +86,13 @@
                     <hr>
 
                     <div class="form-group">
-                        <label><i class="far fa-clock"></i> 期間指定</label>
+                        <label><span class="iconify-inline" data-icon="fa-regular:clock"></span> 期間指定</label>
 
                         <div class="form-row text-form">
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-alt" title="投稿日"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-alt"></span></span>
                                     </div>
                                     <input id="created-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -112,7 +105,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-plus" title="追加日"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-plus"></span></span>
                                     </div>
                                     <input id="added-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -125,7 +118,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="far fa-calendar-check" title="更新日"></i></span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:calendar-check"></span></span>
                                     </div>
                                     <input id="updated-since-search" type="date" class="form-control">
                                     <div class="input-group-prepend">
@@ -139,7 +132,7 @@
 
                     <hr>
 
-                    <label><i class="far fa-chart-bar"></i> レート絞り込み</label>
+                    <label><span class="iconify-inline" data-icon="fa-regular:chart-bar"></span> レート絞り込み</label>
                     <div class="form-row">
                         <div class="col-md-4">
                             <div class="form-group text-form">
@@ -147,7 +140,7 @@
                                     <input id="min-rating-search" type="number" class="form-control" min="0" max="5" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="far fa-star" title="レート (★0 ～ ★5)"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:star"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -162,7 +155,7 @@
                                     <input id="min-bookmark-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="far fa-bookmark" title="ブックマーク数"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:bookmark"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -177,7 +170,7 @@
                                     <input id="min-view-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="far fa-eye" title="閲覧数"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:eye"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -193,7 +186,7 @@
                                     <input id="min-like-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="far fa-heart" title="いいね数"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-regular:heart"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -208,7 +201,7 @@
                                     <input id="min-retweet-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="fas fa-retweet" title="RT 数"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:retweet"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -223,7 +216,7 @@
                                     <input id="min-reply-search" type="number" class="form-control" min="0" placeholder="下限">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text math">≦</span>
-                                        <span class="input-group-text"><i class="fas fa-reply-all" title="リプライ数 / コメント数"></i> </span>
+                                        <span class="input-group-text"><span class="iconify-inline" data-icon="fa-solid:reply-all"></span> </span>
                                         <span class="input-group-text math">≦</span>
                                     </div>
 
@@ -237,7 +230,7 @@
 
                     <div class="form-row text-form">
                         <div class="col-md-4">
-                            <label for="platform-select"><i class="fas fa-cloud"></i> プラットフォーム</label>
+                            <label for="platform-select"><span class="iconify-inline" data-icon="fa-solid:cloud"></span> プラットフォーム</label>
 
                             <select id="platform-select" class="form-control form-control-sm">
                                 <option value="" selected>任意のプラットフォーム</option>
@@ -248,7 +241,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label for="ext-select"><i class="fas fa-file-image"></i> 拡張子</label>
+                            <label for="ext-select"><span class="iconify-inline" data-icon="fa-solid:file-image"></span> 拡張子</label>
 
                             <select id="ext-select" class="form-control form-control-sm">
                                 <option value="" selected>任意の拡張子</option>
@@ -263,7 +256,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label for="sort-select"><i class="fas fa-sort-alpha-up"></i> ソート</label>
+                            <label for="sort-select"><span class="iconify-inline" data-icon="fa-solid:sort-alpha-up"></span> ソート</label>
 
                             <select id="sort-select" class="form-control form-control-sm">
                                 <option value="title_ascending">タイトル (A→Z順)</option>
@@ -299,35 +292,35 @@
 
                     <div class="form-row text-form">
                         <div class="col-md-6">
-                            <label><i class="fas fa-filter"></i> コンテンツフィルター</label>
+                            <label><span class="iconify-inline" data-icon="fa-solid:filter"></span> コンテンツフィルター</label>
 
                             <div class="form-check">
                                 <input id="sensitive-level-0-checkbox" type="checkbox" class="form-check-input" value="0" checked>
-                                <label for="sensitive-level-0-checkbox"><i class="far fa-check-circle"></i> 全年齢対象</label>
+                                <label for="sensitive-level-0-checkbox"><span class="iconify-inline" data-icon="fa-regular:check-circle"></span> 全年齢対象</label>
                             </div>
 
                             <div class="form-check">
                                 <input id="sensitive-level-1-checkbox" type="checkbox" class="form-check-input" value="1">
-                                <label for="sensitive-level-1-checkbox"><i class="fas fa-exclamation-triangle"></i> R-15 (軽度な性描写を含む)</label>
+                                <label for="sensitive-level-1-checkbox"><span class="iconify-inline" data-icon="fa-solid:exclamation-triangle"></span> R-15 (軽度な性描写を含む)</label>
                             </div>
 
                             <div class="form-check">
                                 <input id="sensitive-level-2-checkbox" type="checkbox" class="form-check-input" value="2">
-                                <label for="sensitive-level-2-checkbox"><i class="fas fa-ban"></i> R-18 (露骨な性描写を含む)</label>
+                                <label for="sensitive-level-2-checkbox"><span class="iconify-inline" data-icon="fa-solid:ban"></span> R-18 (露骨な性描写を含む)</label>
                             </div>
 
                             <div class="form-check">
                                 <input id="sensitive-level-3-checkbox" type="checkbox" class="form-check-input" value="3">
-                                <label for="sensitive-level-3-checkbox"><i class="fas fa-skull-crossbones"></i> R-18G (グロテスクな表現を含む)</label>
+                                <label for="sensitive-level-3-checkbox"><span class="iconify-inline" data-icon="fa-solid:skull-crossbones"></span> R-18G (グロテスクな表現を含む)</label>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label><i class="fas fa-magic"></i> 表示オプション</label>
+                            <label><span class="iconify-inline" data-icon="fa-solid:magic"></span> 表示オプション</label>
 
                             <div class="form-check">
                                 <input id="diff-checkbox" type="checkbox" class="form-check-input" checked>
-                                <label for="diff-checkbox"><i class="far fa-images"></i> 差分を表示する / 複数枚ある場合はすべて表示する</label>
+                                <label for="diff-checkbox"><span class="iconify-inline" data-icon="fa-regular:images"></span> 差分を表示する / 複数枚ある場合はすべて表示する</label>
                             </div>
                         </div>
                     </div>
@@ -354,7 +347,8 @@
             </div>
         </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/4.0.6/bootstrap-native-v4.min.js" integrity="sha512-rPVFwUimo0p8O7TI0Tuc5vV565e6EJ0Y+BfIh94TSMGjr251TLPHvo/CzUFXEgFAn2ydAouMAR0Qp09soA/ddg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script async src="https://code.iconify.design/2/2.0.4/iconify.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.27/bootstrap-native-v4.min.js" integrity="sha512-t4IMYK8ly/iNemOXSWKVCb7HQMudWXFy9pvs0CkB8WRLviZwG1/byqIYeksURP6dcMaVl9kNdKA9M/Tmg6mmPg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/11.4.0/2/twemoji.min.js" integrity="sha512-dDIEjSEP1QDNhOtUpcOce7bVx1nR4cq7byXTpy/Yb1hUMd7IA2QcFVajsvLJtWWhB1WaeKSGLHudPqVAYG8iDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/infinite-scroll@3.0.5/dist/infinite-scroll.pkgd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js" integrity="sha512-Meww2sXqNHxI1+5Dyh/9KAtvI9RZSA4c1K2k5iL02oiPO/RH3Q30L3M1albtqMg50u4gRTYdV4EXOQqXEI336A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
