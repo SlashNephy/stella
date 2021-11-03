@@ -8,7 +8,7 @@ import blue.starry.stella.models.PicModel
 import kotlinx.coroutines.*
 import org.litote.kmongo.eq
 import java.nio.file.Files
-import kotlin.time.minutes
+import kotlin.time.Duration
 
 object MissingMediaRefetchWorker {
     fun start() {
@@ -22,7 +22,7 @@ object MissingMediaRefetchWorker {
                     logger.error(e) { "MissingMediaRefetchWorker で例外が発生しました。" }
                 }
 
-                delay(15.minutes)
+                delay(Duration.minutes(15))
             }
         }
     }

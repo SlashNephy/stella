@@ -9,8 +9,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.lte
 import org.litote.kmongo.or
 import java.time.Instant
-import kotlin.time.minutes
-import kotlin.time.seconds
+import kotlin.time.Duration
 
 object RefreshWorker {
     fun start() {
@@ -24,13 +23,13 @@ object RefreshWorker {
                     logger.error(e) { "RefreshWorker で例外が発生しました。" }
                 }
 
-                delay(15.minutes)
+                delay(Duration.minutes(15))
             }
         }
     }
 
     private suspend fun check() {
-        delay(30.seconds)
+        delay(Duration.seconds(30))
 
         val filter = or(
             PicModel::timestamp / PicModel.Timestamp::auto_updated eq null,
@@ -45,7 +44,7 @@ object RefreshWorker {
             } catch (e: Throwable) {
                 logger.error(e) { "エントリー: \"${pic.title}\" (${pic.url}) の更新に失敗しました。" }
             } finally {
-                delay(3.seconds)
+                delay(Duration.seconds(3))
             }
         }
     }
