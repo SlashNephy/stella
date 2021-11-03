@@ -1,24 +1,17 @@
 plugins {
-    kotlin("multiplatform") version "1.4.30"
-    kotlin("plugin.serialization") version "1.4.30"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
-    id("com.adarshr.test-logger") version "2.1.1"
-    id("net.rdrei.android.buildtimetracker") version "0.11.0"
+    kotlin("multiplatform") version "1.5.31"
+    kotlin("plugin.serialization") version "1.5.31"
+    id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
 object Versions {
-    const val Ktor = "1.5.2"
-    const val Penicillin = "6.0.5"
-    const val KMongo = "4.2.3"
-    const val Jsoup = "1.13.1"
+    const val Ktor = "1.6.5"
+    const val Penicillin = "6.2.1"
+    const val KMongo = "4.3.0"
+    const val Jsoup = "1.14.3"
 
-    const val JUnit = "5.7.0"
-
-    const val KotlinLogging = "2.0.4"
+    const val KotlinLogging = "2.0.11"
     const val Logback = "1.2.3"
-    const val Jansi = "1.18"
 }
 
 object Libraries {
@@ -36,9 +29,6 @@ object Libraries {
     const val KotlinLogging = "io.github.microutils:kotlin-logging:${Versions.KotlinLogging}"
     const val LogbackCore = "ch.qos.logback:logback-core:${Versions.Logback}"
     const val LogbackClassic = "ch.qos.logback:logback-classic:${Versions.Logback}"
-    const val Jansi = "org.fusesource.jansi:jansi:${Versions.Jansi}"
-
-    const val JUnitJupiter = "org.junit.jupiter:junit-jupiter:${Versions.JUnit}"
 
     const val KtorClientJs = "io.ktor:ktor-client-js:${Versions.Ktor}"
 
@@ -55,14 +45,12 @@ object Libraries {
 
 repositories {
     mavenCentral()
-
-    maven(url = "https://kotlin.bintray.com/kotlinx")
 }
 
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
         }
     }
     js {
@@ -97,14 +85,11 @@ kotlin {
 
                 implementation(Libraries.LogbackCore)
                 implementation(Libraries.LogbackClassic)
-                implementation(Libraries.Jansi)
             }
         }
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
-                implementation(kotlin("test-junit5"))
-                implementation(Libraries.JUnitJupiter)
             }
         }
 
@@ -131,8 +116,8 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
-                apiVersion = "1.4"
-                languageVersion = "1.4"
+                apiVersion = "1.5"
+                languageVersion = "1.5"
                 allWarningsAsErrors = true
                 verbose = true
             }
@@ -143,44 +128,8 @@ kotlin {
         languageSettings.progressiveMode = true
 
         Libraries.ExperimentalAnnotations.forEach {
-            languageSettings.useExperimentalAnnotation(it)
+            languageSettings.optIn(it)
         }
-    }
-}
-
-/*
- * Tests
- */
-
-ktlint {
-    verbose.set(true)
-    outputToConsole.set(true)
-    reporters {
-        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
-    }
-    ignoreFailures.set(true)
-}
-
-buildtimetracker {
-    reporters {
-        register("summary") {
-            options["ordered"] = "true"
-            options["barstyle"] = "ascii"
-            options["shortenTaskNames"] = "false"
-        }
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-
-    testLogging {
-        showStandardStreams = true
-        events("passed", "failed")
-    }
-
-    testlogger {
-        theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
     }
 }
 
