@@ -24,10 +24,9 @@ import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
-import io.ktor.client.request.*
+import io.ktor.client.request.get
 import kotlinx.coroutines.*
 import kotlin.time.Duration
-import kotlin.time.minutes
 
 object TwitterSourceProvider {
     private val tweetUrlPattern = "^(?:https?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
@@ -123,7 +122,11 @@ object TwitterSourceProvider {
             created = status.idObj.epochTimeMillis,
 
             media = media.mapIndexed { i, it ->
-                val url = it.videoInfo?.variants?.firstOrNull()?.url ?: it.mediaUrlHttps
+                val url = it.videoInfo?.variants?.filter {
+                    it.contentType == "video/mp4"
+                }?.maxByOrNull { it.bitrate ?: 0 }?.url
+                    ?: it.videoInfo?.variants?.firstOrNull()?.url
+                    ?: it.mediaUrlHttps
                 val ext = url.split(".").last().split("?").first()
 
                 val file = mediaDirectory.resolve("twitter_${status.idStr}_$i.$ext").toFile()
