@@ -103,41 +103,28 @@ object TwitterSourceProvider {
             return
         }
 
-        val entry = MediaRegister.Entry(
-            title = "${status.text.take(20)}...",
-            description = status.text.replace(tcoUrlPattern) {
-                "<a href=\"${it.value}\">${it.value}</a>"
-            },
-            url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}",
-            author = MediaRegister.Entry.Author(status.user.name, "https://twitter.com/${status.user.screenName}", status.user.screenName),
-            tags = status.entities.hashtags.map { it.text },
+        val entry = MediaRegister.Entry(title = "${status.text.take(20)}...", description = status.text.replace(tcoUrlPattern) {
+            "<a href=\"${it.value}\">${it.value}</a>"
+        }, url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}", tags = status.entities.hashtags.map { it.text }, platform = PicModel.Platform.Twitter, sensitiveLevel = when {
+            "🔞" in status.text -> PicModel.SensitiveLevel.R18
+            status.possiblySensitive -> PicModel.SensitiveLevel.R15
+            else -> PicModel.SensitiveLevel.Safe
+        }, created = status.idObj.epochTimeMillis, author = MediaRegister.Entry.Author(status.user.name, "https://twitter.com/${status.user.screenName}", status.user.screenName), media = media.mapIndexed { i, it ->
+            val url = it.videoInfo?.variants?.filter {
+                it.contentType == "video/mp4"
+            }?.maxByOrNull { it.bitrate ?: 0 }?.url
+                ?: it.videoInfo?.variants?.firstOrNull()?.url
+                ?: it.mediaUrlHttps
+            val ext = url.split(".").last().split("?").first()
 
-            user = user,
-            platform = PicModel.Platform.Twitter,
-            sensitiveLevel = when {
-                "🔞" in status.text -> PicModel.SensitiveLevel.R18
-                status.possiblySensitive -> PicModel.SensitiveLevel.R15
-                else -> PicModel.SensitiveLevel.Safe
-            },
-            created = status.idObj.epochTimeMillis,
+            val file = mediaDirectory.resolve("twitter_${status.idStr}_$i.$ext").toFile()
+            if (!file.exists()) {
+                val response = StellaHttpClient.get<ByteArray>(url)
+                file.writeBytes(response)
+            }
 
-            media = media.mapIndexed { i, it ->
-                val url = it.videoInfo?.variants?.filter {
-                    it.contentType == "video/mp4"
-                }?.maxByOrNull { it.bitrate ?: 0 }?.url
-                    ?: it.videoInfo?.variants?.firstOrNull()?.url
-                    ?: it.mediaUrlHttps
-                val ext = url.split(".").last().split("?").first()
-
-                val file = mediaDirectory.resolve("twitter_${status.idStr}_$i.$ext").toFile()
-                if (!file.exists()) {
-                    val response = StellaHttpClient.get<ByteArray>(url)
-                    file.writeBytes(response)
-                }
-
-                MediaRegister.Entry.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)
-            },
-            popularity = MediaRegister.Entry.Popularity(like = status.favoriteCount, retweet = status.retweetCount)
+            MediaRegister.Entry.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)
+        }, popularity = MediaRegister.Entry.Popularity(like = status.favoriteCount, retweet = status.retweetCount)
         )
 
         MediaRegister.register(entry, auto)

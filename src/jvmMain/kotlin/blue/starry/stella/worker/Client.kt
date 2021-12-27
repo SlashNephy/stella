@@ -13,14 +13,22 @@ import blue.starry.stella.worker.platform.PixivClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.cookies.*
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.logging.*
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import io.ktor.client.features.json.serializer.KotlinxSerializer
 
 val StellaHttpClient by lazy {
     HttpClient(CIO) {
         install(HttpCookies)
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(Json {
+                ignoreUnknownKeys = true
+            })
+        }
 
         Logging {
             level = LogLevel.INFO

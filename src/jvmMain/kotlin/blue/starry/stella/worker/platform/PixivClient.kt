@@ -4,15 +4,20 @@ import blue.starry.jsonkt.parseObject
 import blue.starry.stella.logger
 import blue.starry.stella.worker.StellaHttpClient
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.forms.submitForm
+import io.ktor.http.HttpHeaders
+import io.ktor.http.Parameters
+import io.ktor.http.userAgent
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.io.File
+import org.litote.kmongo.MongoOperator
+import java.nio.file.Path
 import java.security.MessageDigest
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.io.path.writeBytes
 
 class PixivClient(private val refreshToken: String) {
     private val mutex = Mutex()
@@ -29,27 +34,29 @@ class PixivClient(private val refreshToken: String) {
             return
         }
 
-        val parameters = Parameters.build {
-            append("get_secure_url", "1")
-            append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
-            append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
-            append("grant_type", "refresh_token")
-            append("refresh_token", token?.response?.refreshToken ?: refreshToken)
-        }
-
         token = mutex.withLock {
-            StellaHttpClient.submitForm<String>(parameters) {
+            StellaHttpClient.submitForm<String> {
                 url("https://oauth.secure.pixiv.net/auth/token")
                 userAgent("PixivAndroidApp/5.0.234 (Android 11; Pixel 5)")
+
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
                 val time = OffsetDateTime.now(ZoneId.of("UTC")).format(formatter)
-
                 header("X-Client-Time", time)
+
                 header("X-Client-Hash", MessageDigest.getInstance("MD5").digest(
                     (time + "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c").toByteArray()
                 ).joinToString("") {
                     "%02x".format(it)
                 })
+
+                val parameters = Parameters.build {
+                    append("get_secure_url", "1")
+                    append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
+                    append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
+                    append("grant_type", "refresh_token")
+                    append("refresh_token", token?.response?.refreshToken ?: refreshToken)
+                }
+                body = FormDataContent(parameters)
             }.parseObject {
                 logger.trace { it }
 
@@ -66,7 +73,7 @@ class PixivClient(private val refreshToken: String) {
         }
     }
 
-    suspend fun getBookmarks(private: Boolean): PixivModel.Bookmark {
+    suspend fun getBookmarks(private: Boolean): PixivModel.Bookmarks {
         login()
 
         return StellaHttpClient.get<String>("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
@@ -75,7 +82,7 @@ class PixivClient(private val refreshToken: String) {
 
             setHeaders()
         }.parseObject {
-            PixivModel.Bookmark(it)
+            PixivModel.Bookmarks(it)
         }
     }
 
@@ -104,13 +111,29 @@ class PixivClient(private val refreshToken: String) {
         }
     }
 
-    suspend fun download(url: String, file: File) {
+    private suspend fun <T> callAjax(url: String): T {
+        val response = StellaHttpClient.get<PixivModel.AjaxResponse<T>>("https://www.pixiv.net/ajax/illust/${MongoOperator.id}") {
+            setBrowserHeaders()
+        }
+
+        if (response.error) {
+            error(response.message)
+        }
+
+        return response.body
+    }
+
+    suspend fun getIllust(id: Int) = callAjax<PixivModel.Illust>("https://www.pixiv.net/ajax/illust/$id")
+    suspend fun getIllustPages(id: String) = callAjax<List<PixivModel.IllustPage>>("https://www.pixiv.net/ajax/illust/$id/pages?lang=ja")
+    suspend fun getIllustUgoiraMeta(id: String) = callAjax<PixivModel.IllustUgoiraMeta>("https://www.pixiv.net/ajax/illust/$id/ugoira_meta")
+
+    suspend fun download(url: String, path: Path) {
         val response = StellaHttpClient.get<ByteArray>(url) {
             setHeaders(false)
             header(HttpHeaders.Referrer, "https://app-api.pixiv.net/")
         }
 
-        file.writeBytes(response)
+        path.writeBytes(response)
     }
 
     private fun HttpRequestBuilder.setHeaders(requireAuth: Boolean = true) {
@@ -123,6 +146,12 @@ class PixivClient(private val refreshToken: String) {
             val token = token?.response?.accessToken ?: error("Login required.")
             header(HttpHeaders.Authorization, "Bearer $token")
         }
+    }
+
+    private fun HttpRequestBuilder.setBrowserHeaders() {
+        header("Accept", "*/*")
+        header("Accept-Language", "ja-JP")
+        header("User-Agent", "PixivIOSApp/7.6.2 (iOS 12.2; iPhone9,1)")
     }
 }
 

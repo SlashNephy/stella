@@ -47,7 +47,7 @@ object MediaRegister {
                     value = it.value.normalizeTag()
                 )
             }.orEmpty()).distinctBy { it.value },
-            user = entry.user ?: oldEntry?.user,
+            user = oldEntry?.user,
             platform = entry.platform,
             sensitive_level = maxOf(entry.sensitiveLevel, oldEntry?.sensitive_level ?: PicModel.SensitiveLevel.Safe),
             timestamp = PicModel.Timestamp(
@@ -106,7 +106,18 @@ object MediaRegister {
         return StellaMongoDBPicTagReplaceTableCollection.findOne(PicTagReplaceTableModel::from eq this)?.to ?: this
     }
 
-    data class Entry(val title: String, val description: String, val url: String, val tags: List<String>, val user: String?, val platform: PicModel.Platform, val sensitiveLevel: PicModel.SensitiveLevel, val created: Long, val author: Author, val media: List<Picture>, val popularity: Popularity) {
+    data class Entry(
+        val title: String,
+        val description: String,
+        val url: String,
+        val tags: List<String>,
+        val platform: PicModel.Platform,
+        val sensitiveLevel: PicModel.SensitiveLevel,
+        val created: Long,
+        val author: Author,
+        val media: List<Picture>,
+        val popularity: Popularity
+    ) {
         data class Author(val name: String, val url: String, val username: String?)
         data class Picture(val index: Int, val filename: String, val original: String, val ext: String)
         data class Popularity(val like: Int? = null, val bookmark: Int? = null, val view: Int? = null, val retweet: Int? = null, val reply: Int? = null)

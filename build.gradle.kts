@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
+    kotlin("multiplatform") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
@@ -19,6 +19,7 @@ object Libraries {
     const val KtorLocations = "io.ktor:ktor-locations:${Versions.Ktor}"
     const val KtorSerialization = "io.ktor:ktor-serialization:${Versions.Ktor}"
     const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
+    const val KtorClientSerialization = "io.ktor:ktor-client-serialization:${Versions.Ktor}"
     const val KtorClientLogging = "io.ktor:ktor-client-logging:${Versions.Ktor}"
 
     const val KMongoCoroutineSerialization = "org.litote.kmongo:kmongo-coroutine-serialization:${Versions.KMongo}"
@@ -78,11 +79,13 @@ kotlin {
                 implementation(Libraries.KtorLocations)
                 implementation(Libraries.KtorSerialization)
                 implementation(Libraries.KtorClientCIO)
+                implementation(Libraries.KtorClientSerialization)
                 implementation(Libraries.KtorClientLogging)
 
                 implementation(Libraries.KMongoCoroutineSerialization)
                 implementation(Libraries.KMongoIdSerialization)
                 implementation(Libraries.Jsoup)
+                implementation("com.squareup:gifencoder:0.10.1")
 
                 implementation(Libraries.LogbackCore)
                 implementation(Libraries.LogbackClassic)

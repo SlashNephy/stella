@@ -8,7 +8,6 @@ import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaNijieClient
 import kotlinx.coroutines.*
 import kotlin.time.Duration
-import kotlin.time.minutes
 
 object NijieSourceProvider {
     fun start() {
@@ -50,13 +49,10 @@ object NijieSourceProvider {
             description = picture.description,
             url = picture.url,
             tags = picture.tags,
-            author = MediaRegister.Entry.Author(picture.authorName, picture.authorUrl, null),
-
-            user = user,
             platform = PicModel.Platform.Nijie,
             sensitiveLevel = PicModel.SensitiveLevel.R18,
             created = picture.createdAt,
-
+            author = MediaRegister.Entry.Author(picture.authorName, picture.authorUrl, null),
             media = picture.media.mapIndexed { index, url ->
                 val ext = url.split(".").last().split("?").first()
 
