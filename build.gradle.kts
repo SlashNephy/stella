@@ -120,8 +120,8 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
-                apiVersion = "1.5"
-                languageVersion = "1.5"
+                apiVersion = "1.6"
+                languageVersion = "1.6"
                 allWarningsAsErrors = true
                 verbose = true
             }
