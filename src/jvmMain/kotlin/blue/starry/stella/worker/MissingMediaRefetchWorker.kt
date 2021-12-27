@@ -8,7 +8,7 @@ import blue.starry.stella.models.PicModel
 import kotlinx.coroutines.*
 import org.litote.kmongo.eq
 import java.nio.file.Files
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object MissingMediaRefetchWorker {
     fun start() {
@@ -22,7 +22,7 @@ object MissingMediaRefetchWorker {
                     logger.error(e) { "MissingMediaRefetchWorker で例外が発生しました。" }
                 }
 
-                delay(Duration.minutes(15))
+                delay(15.minutes)
             }
         }
     }
@@ -36,7 +36,7 @@ object MissingMediaRefetchWorker {
             logger.info { "\"${pic.title}\" (${pic.url}) はキャッシュが存在しないため 再取得します。" }
 
             try {
-                MediaRegister.registerByUrl(pic.url, pic.user, true)
+                MediaRegister.registerByUrl(pic.url, true)
 
                 logger.info { "エントリー: \"${pic.title}\" (${pic.url}) を更新しました。" }
             } catch (e: CancellationException) {

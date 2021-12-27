@@ -23,6 +23,7 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object PixivSourceProvider {
     private val autoRefreshIds = CopyOnWriteArrayList<Int>()
@@ -42,7 +43,7 @@ object PixivSourceProvider {
                     logger.error(e) { "PixivSource で例外が発生しました。" }
                 }
 
-                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }

@@ -23,7 +23,7 @@ fun Route.putPicRefresh() {
                 "Specified entry is not found."
             }
 
-        if (!MediaRegister.registerByUrl(entry.url, null, false)) {
+        if (!MediaRegister.registerByUrl(entry.url, false)) {
             call.respondApiError {
                 "Unknown error occurred."
             }

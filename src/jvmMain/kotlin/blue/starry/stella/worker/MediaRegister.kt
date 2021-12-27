@@ -12,17 +12,17 @@ import org.litote.kmongo.newId
 import java.time.Instant
 
 object MediaRegister {
-    suspend fun registerByUrl(url: String, user: String?, auto: Boolean): Boolean {
+    suspend fun registerByUrl(url: String, auto: Boolean): Boolean {
         return runCatching {
             when {
                 "twitter.com" in url -> {
-                    TwitterSourceProvider.fetch(StellaTwitterClient ?: return false, url, user, auto)
+                    TwitterSourceProvider.fetch(StellaTwitterClient ?: return false, url, auto)
                 }
                 "pixiv.net" in url -> {
                     PixivSourceProvider.enqueue(StellaPixivClient ?: return false, url)
                 }
                 "nijie.info" in url -> {
-                    NijieSourceProvider.fetch(StellaNijieClient ?: return false, url, user, auto)
+                    NijieSourceProvider.fetch(StellaNijieClient ?: return false, url, auto)
                 }
                 else -> return false
             }

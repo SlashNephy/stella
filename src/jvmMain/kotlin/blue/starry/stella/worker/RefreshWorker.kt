@@ -9,7 +9,8 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.lte
 import org.litote.kmongo.or
 import java.time.Instant
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object RefreshWorker {
     fun start() {
@@ -23,13 +24,13 @@ object RefreshWorker {
                     logger.error(e) { "RefreshWorker で例外が発生しました。" }
                 }
 
-                delay(Duration.minutes(15))
+                delay(15.minutes)
             }
         }
     }
 
     private suspend fun check() {
-        delay(Duration.seconds(30))
+        delay(30.seconds)
 
         val filter = or(
             PicModel::timestamp / PicModel.Timestamp::auto_updated eq null,
@@ -38,13 +39,13 @@ object RefreshWorker {
 
         for (pic in StellaMongoDBPicCollection.find(filter).limit(200).toList()) {
             try {
-                MediaRegister.registerByUrl(pic.url, pic.user, true)
+                MediaRegister.registerByUrl(pic.url, true)
             } catch (e: CancellationException) {
                 return
             } catch (e: Throwable) {
                 logger.error(e) { "エントリー: \"${pic.title}\" (${pic.url}) の更新に失敗しました。" }
             } finally {
-                delay(Duration.seconds(3))
+                delay(3.seconds)
             }
         }
     }

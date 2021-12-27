@@ -11,7 +11,6 @@ import io.ktor.http.Parameters
 import io.ktor.http.userAgent
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.litote.kmongo.MongoOperator
 import java.nio.file.Path
 import java.security.MessageDigest
 import java.time.OffsetDateTime
@@ -112,7 +111,7 @@ class PixivClient(private val refreshToken: String) {
     }
 
     private suspend fun <T> callAjax(url: String): T {
-        val response = StellaHttpClient.get<PixivModel.AjaxResponse<T>>("https://www.pixiv.net/ajax/illust/${MongoOperator.id}") {
+        val response = StellaHttpClient.get<PixivModel.AjaxResponse<T>>(url) {
             setBrowserHeaders()
         }
 

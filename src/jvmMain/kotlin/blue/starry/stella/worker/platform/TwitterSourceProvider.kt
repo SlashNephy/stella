@@ -26,7 +26,7 @@ import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
 import io.ktor.client.request.get
 import kotlinx.coroutines.*
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object TwitterSourceProvider {
     private val tweetUrlPattern = "^(?:https?://)?(?:m|mobile)?twitter\\.com/(?:\\w|_)+?/status/(\\d+)".toRegex()
@@ -46,7 +46,7 @@ object TwitterSourceProvider {
                     logger.error(e) { "TwitterSource で例外が発生しました。" }
                 }
 
-                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }
@@ -57,7 +57,7 @@ object TwitterSourceProvider {
         for (status in timeline) {
             if (status.retweetedStatus != null) {
                 // RT を処理
-                register(status.retweetedStatus!!, "User", false)
+                register(status.retweetedStatus!!, false)
 
                 client.statuses.unretweet(status.retweetedStatus!!.id).execute()
             } else if (status.entities.urls.isEmpty()) {
@@ -77,7 +77,7 @@ object TwitterSourceProvider {
     private suspend fun fetchFavorites(client: ApiClient) {
         val favorites = client.favorites.list(options = arrayOf("tweet_mode" to TweetMode.Extended)).execute()
         for (status in favorites) {
-            register(status, "User", false)
+            register(status, false)
 
             if (!status.user.following) {
                 client.friendships.createByUserId(userId = status.user.id).execute()
@@ -87,17 +87,17 @@ object TwitterSourceProvider {
         }
     }
 
-    suspend fun fetch(client: ApiClient, url: String, user: String?, auto: Boolean) {
+    suspend fun fetch(client: ApiClient, url: String, auto: Boolean) {
         val status = client.statuses.show(
             id = url.split("/").last().split("?").first().toLong(),
             tweetMode = TweetMode.Extended
         ).execute()
 
-        register(status.result, user, auto)
+        register(status.result, auto)
     }
 
 
-    private suspend fun register(status: Status, user: String?, auto: Boolean) {
+    private suspend fun register(status: Status, auto: Boolean) {
         val media = status.extendedEntities?.media ?: status.entities.media
         if (media.isEmpty()) {
             return

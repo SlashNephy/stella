@@ -7,7 +7,7 @@ import blue.starry.stella.models.PicModel
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaNijieClient
 import kotlinx.coroutines.*
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 object NijieSourceProvider {
     fun start() {
@@ -24,7 +24,7 @@ object NijieSourceProvider {
                     logger.error(e) { "NijieSource で例外が発生しました。" }
                 }
 
-                delay(Duration.minutes(Env.CHECK_INTERVAL_MINS))
+                delay(Env.CHECK_INTERVAL_MINS.minutes)
             }
         }
     }
@@ -32,18 +32,18 @@ object NijieSourceProvider {
     private suspend fun fetchBookmark(client: NijieClient) {
         for (bookmark in client.bookmarks().reversed()) {
             val picture = client.picture(bookmark.id)
-            register(client, picture, "User", false)
+            register(client, picture, false)
 
             client.deleteBookmark(bookmark.id)
         }
     }
 
-    suspend fun fetch(client: NijieClient, url: String, user: String?, auto: Boolean) {
+    suspend fun fetch(client: NijieClient, url: String, auto: Boolean) {
         val picture = client.picture(url.split("=").last())
-        register(client, picture, user, auto)
+        register(client, picture, auto)
     }
 
-    private suspend fun register(client: NijieClient, picture: NijieModel.Picture, user: String?, auto: Boolean): MediaRegister.Entry {
+    private suspend fun register(client: NijieClient, picture: NijieModel.Picture, auto: Boolean): MediaRegister.Entry {
         return MediaRegister.Entry(
             title = picture.title,
             description = picture.description,
