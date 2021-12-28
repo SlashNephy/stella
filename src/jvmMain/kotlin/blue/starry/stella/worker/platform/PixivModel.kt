@@ -257,7 +257,7 @@ object PixivModel {
             val isMasked: Boolean,
             val isUnlisted: Boolean,
             val pageCount: Int,
-            val profileImageUrl: String,
+            val profileImageUrl: String? = null,
             val restrict: Int,
             val sl: Int,
             val tags: List<String>,
