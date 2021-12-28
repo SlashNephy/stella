@@ -14,6 +14,7 @@ object Env {
     val DB_PASSWORD by stringOrNull
     val DB_NAME by string { "stella" }
 
+    val ENABLE_MISSING_MEDIA_REFETCH by boolean { true }
     val AUTO_REFRESH_THRESHOLD by long { 6 * 60 * 60 * 1000L }
     val CHECK_INTERVAL_MINS by int { 1 }
 
@@ -41,4 +42,8 @@ private fun int(default: () -> Int): ReadOnlyProperty<Env, Int> = ReadOnlyProper
 
 private fun long(default: () -> Long): ReadOnlyProperty<Env, Long> = ReadOnlyProperty { _, property ->
     System.getenv(property.name)?.toLongOrNull() ?: default()
+}
+
+private fun boolean(default: () -> Boolean): ReadOnlyProperty<Env, Boolean> = ReadOnlyProperty { _, property ->
+    System.getenv(property.name)?.toIntOrNull()?.equals(1) ?: default()
 }

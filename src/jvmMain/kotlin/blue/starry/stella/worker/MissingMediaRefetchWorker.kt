@@ -2,6 +2,7 @@ package blue.starry.stella.worker
 
 import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
 import blue.starry.penicillin.core.exceptions.TwitterApiError
+import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.models.PicEntry
@@ -13,6 +14,10 @@ import kotlin.time.Duration.Companion.minutes
 
 object MissingMediaRefetchWorker {
     fun start() {
+        if (!Env.ENABLE_MISSING_MEDIA_REFETCH) {
+            return
+        }
+
         GlobalScope.launch {
             while (isActive) {
                 try {
