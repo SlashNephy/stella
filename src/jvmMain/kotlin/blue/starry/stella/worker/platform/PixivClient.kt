@@ -34,7 +34,7 @@ class PixivClient(private val refreshToken: String) {
         }
 
         token = mutex.withLock {
-            StellaHttpClient.submitForm<String> {
+            StellaHttpClient.post<String> {
                 url("https://oauth.secure.pixiv.net/auth/token")
                 userAgent("PixivAndroidApp/5.0.234 (Android 11; Pixel 5)")
 
@@ -122,14 +122,20 @@ class PixivClient(private val refreshToken: String) {
         return response.body
     }
 
+    suspend fun getArtworkPage(id: Int) {
+        StellaHttpClient.get<Unit>("https://www.pixiv.net/artworks/$id") {
+            setBrowserHeaders(null)
+        }
+    }
+
     suspend fun getIllust(id: Int) = callAjax<PixivModel.Illust>("https://www.pixiv.net/ajax/illust/$id", "https://www.pixiv.net/artworks/$id")
-    suspend fun getIllustPages(id: String) = callAjax<List<PixivModel.IllustPage>>("https://www.pixiv.net/ajax/illust/$id/pages?lang=ja", "https://www.pixiv.net/artworks/$id")
-    suspend fun getIllustUgoiraMeta(id: String) = callAjax<PixivModel.IllustUgoiraMeta>("https://www.pixiv.net/ajax/illust/$id/ugoira_meta", "https://www.pixiv.net/artworks/$id")
+    suspend fun getIllustUgoiraMeta(id: String) = callAjax<PixivModel.IllustUgoiraMeta>("https://www.pixiv.net/ajax/illust/$id/ugoira_meta?lang=ja", "https://www.pixiv.net/artworks/$id")
 
     suspend fun download(url: String, path: Path) {
         val response = StellaHttpClient.get<ByteArray>(url) {
             setHeaders(false)
-            header(HttpHeaders.Referrer, "https://app-api.pixiv.net/")
+            header(HttpHeaders.Origin, "https://www.pixiv.net")
+            header(HttpHeaders.Referrer, "https://www.pixiv.net/")
         }
 
         path.writeBytes(response)
@@ -154,5 +160,6 @@ class PixivClient(private val refreshToken: String) {
         header(HttpHeaders.Origin, "${url.protocol.name}://${url.host}")
         header(HttpHeaders.Referrer, referer ?: "${url.protocol.name}://${url.host}/")
         userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4692.56 Safari/537.36")
+        header("X-Requested-With", "XMLHttpRequest")
     }
 }

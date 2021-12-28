@@ -169,7 +169,7 @@ object PixivModel {
         ) {
             @Serializable
             data class Meta(
-                val alternateLanguages: AlternateLanguages,
+                // val alternateLanguages: AlternateLanguages,
                 val canonical: String,
                 val description: String,
                 val descriptionHeader: String,
@@ -177,12 +177,6 @@ object PixivModel {
                 val title: String,
                 val twitter: Twitter
             ) {
-                @Serializable
-                data class AlternateLanguages(
-                    val en: String,
-                    val ja: String
-                )
-
                 @Serializable
                 data class Ogp(
                     val description: String,
@@ -207,8 +201,8 @@ object PixivModel {
             val userImageUrl: String,
             val contentUrl: String,
             val description: String,
-            val imageUrl: String,
-            val imageUrlMobile: String,
+            val imageUrl: String?,
+            val imageUrlMobile: String?,
             val hasAdultContent: Boolean
         )
 
@@ -224,8 +218,8 @@ object PixivModel {
                 val deletable: Boolean,
                 val locked: Boolean,
                 val tag: String,
-                val userId: String? = null,
-                val userName: String? = null
+                val userId: String?,
+                val userName: String?
             )
         }
 
@@ -257,7 +251,7 @@ object PixivModel {
             val isMasked: Boolean,
             val isUnlisted: Boolean,
             val pageCount: Int,
-            val profileImageUrl: String? = null,
+            val profileImageUrl: String?,
             val restrict: Int,
             val sl: Int,
             val tags: List<String>,

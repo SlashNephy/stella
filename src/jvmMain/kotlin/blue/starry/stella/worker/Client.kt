@@ -20,13 +20,17 @@ import mu.KotlinLogging
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import io.ktor.client.features.json.serializer.KotlinxSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 
+@OptIn(ExperimentalSerializationApi::class)
 val StellaHttpClient by lazy {
     HttpClient(CIO) {
         install(HttpCookies)
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json {
                 ignoreUnknownKeys = true
+                coerceInputValues = true
+                explicitNulls = false
             })
         }
 

@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
-import kotlin.io.path.deleteExisting
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
 import kotlin.time.Duration.Companion.minutes
@@ -71,12 +71,17 @@ object PixivSourceProvider {
         val tags = illust.tags.tags.map { it.tag }
         val media = when (illust.illustType) {
             0 -> {
-                downloadIllusts(illust.id)
+                downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
             }
-            2 -> {
-                listOf(downloadUgoira(illust.id, illust.urls.original))
+//            2 -> {
+//                listOf(
+//                    downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
+//                )
+//            }
+            else -> {
+                return
+                // TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
             }
-            else -> TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
         }
 
         val entry = PicRegistration(
@@ -103,7 +108,7 @@ object PixivSourceProvider {
             popularity = PicRegistration.Popularity(
                 like = illust.likeCount,
                 bookmark = illust.bookmarkCount,
-                reply = illust.commentCount,
+                reply = illust.commentCount + illust.responseCount + illust.imageResponseCount,
                 view = illust.viewCount
             )
         )
@@ -111,10 +116,11 @@ object PixivSourceProvider {
         MediaRegister.register(entry, auto)
     }
 
-    private suspend fun PixivClient.downloadIllust(id: String, url: String, index: Int): PicRegistration.Picture {
-        val extension = url.split(".").last().split("?").first()
+    private suspend fun PixivClient.downloadIllust(id: String, base_url: String, index: Int): PicRegistration.Picture {
+        val extension = base_url.split(".").last().split("?").first()
         val filename = "pixiv_${id}_$index.$extension"
 
+        val url = base_url.replace("_p0", "_p${index}")
         val path = mediaDirectory.resolve(filename)
         if (!path.exists()) {
             download(url, path)
@@ -123,15 +129,13 @@ object PixivSourceProvider {
         return PicRegistration.Picture(index, filename, url, extension)
     }
 
-    private suspend fun PixivClient.downloadIllusts(id: String): List<PicRegistration.Picture> {
-        val pages = getIllustPages(id)
-
-        return pages.mapIndexed { index, page ->
-            downloadIllust(id, page.urls.original, index)
+    private suspend fun PixivClient.downloadIllusts(id: String, url: String, pages: Int): List<PicRegistration.Picture> {
+        return (0 until pages).map { index ->
+            downloadIllust(id, url, index)
         }
     }
 
-    private suspend fun PixivClient.downloadUgoira(id: String, url: String): PicRegistration.Picture {
+    private suspend fun PixivClient.downloadUgoira(id: String, url: String, width: Int, height: Int): PicRegistration.Picture {
         val filename = "pixiv_${id}_0.gif"
 
         val path = mediaDirectory.resolve(filename)
@@ -146,9 +150,6 @@ object PixivSourceProvider {
             }
 
             try {
-                val regex = "ugoira(\\d+)x(\\d+).zip".toRegex()
-                val (width, height) = regex.find(meta.originalSrc)!!.groupValues.map { it.toInt() }
-
                 path.outputStream().use { stream ->
                     val gif = GifEncoder(stream, width, height, 0)
                     meta.frames.forEach {
@@ -166,7 +167,7 @@ object PixivSourceProvider {
             } finally {
                 withContext(Dispatchers.IO) {
                     zipFile.close()
-                    tmp.deleteExisting()
+                    tmp.deleteIfExists()
                 }
             }
         }
