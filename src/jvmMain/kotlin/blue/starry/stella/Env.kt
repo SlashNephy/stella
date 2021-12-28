@@ -17,6 +17,7 @@ object Env {
     val ENABLE_MISSING_MEDIA_REFETCH by boolean { true }
     val AUTO_REFRESH_THRESHOLD by long { 6 * 60 * 60 * 1000L }
     val CHECK_INTERVAL_MINS by int { 1 }
+    val DRYRUN by boolean { false }
 
     val TWITTER_CK by stringOrNull
     val TWITTER_CS by stringOrNull

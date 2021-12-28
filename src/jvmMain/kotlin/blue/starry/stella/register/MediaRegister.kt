@@ -1,8 +1,12 @@
 package blue.starry.stella.register
 
+import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.worker.*
+import blue.starry.stella.worker.StellaMongoDBPicCollection
+import blue.starry.stella.worker.StellaNijieClient
+import blue.starry.stella.worker.StellaPixivClient
+import blue.starry.stella.worker.StellaTwitterClient
 import blue.starry.stella.worker.platform.NijieSourceProvider
 import blue.starry.stella.worker.platform.PixivSourceProvider
 import blue.starry.stella.worker.platform.TwitterSourceProvider
@@ -92,10 +96,16 @@ object MediaRegister {
         )
 
         if (old != null) {
-            StellaMongoDBPicCollection.updateOne(new)
+            if (!Env.DRYRUN) {
+                StellaMongoDBPicCollection.updateOne(new)
+            }
+
             logger.info { "\"${entry.title}\" (${entry.url}) を更新しました。" }
         } else {
-            StellaMongoDBPicCollection.insertOne(new)
+            if (!Env.DRYRUN) {
+                StellaMongoDBPicCollection.insertOne(new)
+            }
+
             logger.info { "\"${entry.title}\" (${entry.url}) を追加しました。" }
         }
     }
