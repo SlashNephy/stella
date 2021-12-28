@@ -112,7 +112,7 @@ object PixivModel {
     @Serializable
     data class Illust(
         val alt: String,
-        val bookStyle: String,
+        // val bookStyle: Int,
         val bookmarkCount: Int,
         // val bookmarkData: Any?,
         // val comicPromotion: Any?,
