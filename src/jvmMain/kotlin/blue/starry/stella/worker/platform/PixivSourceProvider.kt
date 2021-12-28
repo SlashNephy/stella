@@ -70,18 +70,13 @@ object PixivSourceProvider {
     private suspend fun PixivClient.register(illust: PixivModel.Illust, auto: Boolean) {
         val tags = illust.tags.tags.map { it.tag }
         val media = when (illust.illustType) {
-            0 -> {
-                downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
-            }
+            0, 2 ->  downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
 //            2 -> {
 //                listOf(
 //                    downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
 //                )
 //            }
-            else -> {
-                return
-                // TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
-            }
+            else -> TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
         }
 
         val entry = PicRegistration(
