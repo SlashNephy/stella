@@ -125,7 +125,7 @@ object PixivModel {
         // val descriptionBoothId: Any?,
         // val descriptionYoutubeId: Any?,
         val extraData: ExtraData,
-        val fanboxPromotion: FanboxPromotion,
+        val fanboxPromotion: FanboxPromotion?,
         val height: Int,
         val id: String,
         val illustComment: String,
