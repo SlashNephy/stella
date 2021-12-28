@@ -1,14 +1,15 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.register.MediaRegister
 import blue.starry.stella.worker.StellaMongoDBPicCollection
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.locations.*
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.Location
 import io.ktor.locations.put
-import io.ktor.response.*
+import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.utils.io.CancellationException
 import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import org.litote.kmongo.id.toId
@@ -23,14 +24,17 @@ fun Route.putPicRefresh() {
                 "Specified entry is not found."
             }
 
-        if (!MediaRegister.registerByUrl(entry.url, false)) {
+        try {
+            MediaRegister.registerByUrl(entry.url, false)
+
+            val newEntry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())!!
+            call.respond(newEntry)
+        } catch (e: CancellationException) {
+            return@put
+        } catch (t: Throwable) {
             call.respondApiError {
                 "Unknown error occurred."
             }
-        } else {
-            val newEntry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())!!
-
-            call.respond(newEntry)
         }
     }
 }

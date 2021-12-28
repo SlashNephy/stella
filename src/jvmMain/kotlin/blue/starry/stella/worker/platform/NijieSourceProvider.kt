@@ -4,7 +4,8 @@ import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.register.MediaRegister
+import blue.starry.stella.register.PicRegistration
 import blue.starry.stella.worker.StellaNijieClient
 import kotlinx.coroutines.*
 import kotlin.time.Duration.Companion.minutes
@@ -43,8 +44,8 @@ object NijieSourceProvider {
         register(client, picture, auto)
     }
 
-    private suspend fun register(client: NijieClient, picture: NijieModel.Picture, auto: Boolean): MediaRegister.Entry {
-        return MediaRegister.Entry(
+    private suspend fun register(client: NijieClient, picture: NijieModel.Picture, auto: Boolean): PicRegistration {
+        return PicRegistration(
             title = picture.title,
             description = picture.description,
             url = picture.url,
@@ -52,7 +53,7 @@ object NijieSourceProvider {
             platform = PicEntry.Platform.Nijie,
             sensitiveLevel = PicEntry.SensitiveLevel.R18,
             created = picture.createdAt,
-            author = MediaRegister.Entry.Author(picture.authorName, picture.authorUrl, null),
+            author = PicRegistration.Author(picture.authorName, picture.authorUrl, null),
             media = picture.media.mapIndexed { index, url ->
                 val ext = url.split(".").last().split("?").first()
 
@@ -61,9 +62,9 @@ object NijieSourceProvider {
                     client.download(url, file)
                 }
 
-                MediaRegister.Entry.Picture(index, "nijie_${picture.id}_$index.$ext", url, ext)
+                PicRegistration.Picture(index, "nijie_${picture.id}_$index.$ext", url, ext)
             },
-            popularity = MediaRegister.Entry.Popularity(
+            popularity = PicRegistration.Popularity(
                 like = picture.like,
                 bookmark = picture.bookmark,
                 reply = picture.reply,

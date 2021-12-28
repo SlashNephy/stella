@@ -5,6 +5,7 @@ import blue.starry.penicillin.core.exceptions.TwitterApiError
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.models.PicEntry
+import blue.starry.stella.register.MediaRegister
 import kotlinx.coroutines.*
 import org.litote.kmongo.eq
 import java.nio.file.Files
@@ -29,7 +30,7 @@ object MissingMediaRefetchWorker {
 
     private suspend fun check() {
         for (pic in StellaMongoDBPicCollection.find().toList()) {
-            if (pic.media.all { Files.exists(mediaDirectory.resolve(it.filename)) }) {
+            if (pic.media.all { Files.exists(mediaDirectory.resolve(it.filename)) } || pic.timestamp.archived) {
                 continue
             }
 
@@ -37,8 +38,6 @@ object MissingMediaRefetchWorker {
 
             try {
                 MediaRegister.registerByUrl(pic.url, true)
-
-                logger.info { "エントリー: \"${pic.title}\" (${pic.url}) を更新しました。" }
             } catch (e: CancellationException) {
                 return
             } catch (e: PenicillinTwitterApiException) {
@@ -62,8 +61,8 @@ object MissingMediaRefetchWorker {
                         logger.error(e) { "\"${pic.title}\" (${pic.url}) の取得に失敗しました。" }
                     }
                 }
-            } catch (e: Throwable) {
-                logger.error(e) { "エントリー: \"${pic.title}\" (${pic.url}) の更新に失敗しました。" }
+            } catch (t: Throwable) {
+                continue
             }
         }
     }

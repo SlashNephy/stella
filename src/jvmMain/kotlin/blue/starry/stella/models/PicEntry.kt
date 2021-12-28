@@ -37,7 +37,8 @@ data class PicEntry(
         val created: Long,
         val added: Long,
         val manual_updated: Long?,
-        val auto_updated: Long?
+        val auto_updated: Long?,
+        val archived: Boolean = false,
     )
 
     @Serializable

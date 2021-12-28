@@ -21,7 +21,8 @@ import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.register.MediaRegister
+import blue.starry.stella.register.PicRegistration
 import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
 import io.ktor.client.request.get
@@ -96,20 +97,19 @@ object TwitterSourceProvider {
         register(status.result, auto)
     }
 
-
     private suspend fun register(status: Status, auto: Boolean) {
         val media = status.extendedEntities?.media ?: status.entities.media
         if (media.isEmpty()) {
             return
         }
 
-        val entry = MediaRegister.Entry(title = "${status.text.take(20)}...", description = status.text.replace(tcoUrlPattern) {
+        val entry = PicRegistration(title = "${status.text.take(20)}...", description = status.text.replace(tcoUrlPattern) {
             "<a href=\"${it.value}\">${it.value}</a>"
         }, url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}", tags = status.entities.hashtags.map { it.text }, platform = PicEntry.Platform.Twitter, sensitiveLevel = when {
             "🔞" in status.text -> PicEntry.SensitiveLevel.R18
             status.possiblySensitive -> PicEntry.SensitiveLevel.R15
             else -> PicEntry.SensitiveLevel.Safe
-        }, created = status.idObj.epochTimeMillis, author = MediaRegister.Entry.Author(status.user.name, "https://twitter.com/${status.user.screenName}", status.user.screenName), media = media.mapIndexed { i, it ->
+        }, created = status.idObj.epochTimeMillis, author = PicRegistration.Author(status.user.name, "https://twitter.com/${status.user.screenName}", status.user.screenName), media = media.mapIndexed { i, it ->
             val url = it.videoInfo?.variants?.filter {
                 it.contentType == "video/mp4"
             }?.maxByOrNull { it.bitrate ?: 0 }?.url
@@ -123,8 +123,8 @@ object TwitterSourceProvider {
                 file.writeBytes(response)
             }
 
-            MediaRegister.Entry.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)
-        }, popularity = MediaRegister.Entry.Popularity(like = status.favoriteCount, retweet = status.retweetCount)
+            PicRegistration.Picture(i, "twitter_${status.idStr}_$i.$ext", url, ext)
+        }, popularity = PicRegistration.Popularity(like = status.favoriteCount, retweet = status.retweetCount)
         )
 
         MediaRegister.register(entry, auto)

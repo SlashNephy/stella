@@ -4,7 +4,8 @@ import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.worker.MediaRegister
+import blue.starry.stella.register.MediaRegister
+import blue.starry.stella.register.PicRegistration
 import blue.starry.stella.worker.StellaPixivClient
 import com.squareup.gifencoder.FloydSteinbergDitherer
 import com.squareup.gifencoder.GifEncoder
@@ -78,11 +79,11 @@ object PixivSourceProvider {
             else -> TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
         }
 
-        val entry = MediaRegister.Entry(
+        val entry = PicRegistration(
             title = illust.illustTitle,
             description = illust.illustComment,
             url = "https://www.pixiv.net/artworks/${illust.illustId}",
-            author = MediaRegister.Entry.Author(
+            author = PicRegistration.Author(
                 illust.userName,
                 "https://www.pixiv.net/users/${illust.userId}",
                 illust.userAccount
@@ -99,7 +100,7 @@ object PixivSourceProvider {
             created = ZonedDateTime.parse(illust.uploadDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant().toEpochMilli(),
 
             media = media,
-            popularity = MediaRegister.Entry.Popularity(
+            popularity = PicRegistration.Popularity(
                 like = illust.likeCount,
                 bookmark = illust.bookmarkCount,
                 reply = illust.commentCount,
@@ -110,7 +111,7 @@ object PixivSourceProvider {
         MediaRegister.register(entry, auto)
     }
 
-    private suspend fun PixivClient.downloadIllust(id: String, url: String, index: Int): MediaRegister.Entry.Picture {
+    private suspend fun PixivClient.downloadIllust(id: String, url: String, index: Int): PicRegistration.Picture {
         val extension = url.split(".").last().split("?").first()
         val filename = "pixiv_${id}_$index.$extension"
 
@@ -119,10 +120,10 @@ object PixivSourceProvider {
             download(url, path)
         }
 
-        return MediaRegister.Entry.Picture(index, filename, url, extension)
+        return PicRegistration.Picture(index, filename, url, extension)
     }
 
-    private suspend fun PixivClient.downloadIllusts(id: String): List<MediaRegister.Entry.Picture> {
+    private suspend fun PixivClient.downloadIllusts(id: String): List<PicRegistration.Picture> {
         val pages = getIllustPages(id)
 
         return pages.mapIndexed { index, page ->
@@ -130,7 +131,7 @@ object PixivSourceProvider {
         }
     }
 
-    private suspend fun PixivClient.downloadUgoira(id: String, url: String): MediaRegister.Entry.Picture {
+    private suspend fun PixivClient.downloadUgoira(id: String, url: String): PicRegistration.Picture {
         val filename = "pixiv_${id}_0.gif"
 
         val path = mediaDirectory.resolve(filename)
@@ -170,7 +171,7 @@ object PixivSourceProvider {
             }
         }
 
-        return MediaRegister.Entry.Picture(0, filename, url, "gif")
+        return PicRegistration.Picture(0, filename, url, "gif")
     }
 
     private fun convertImageToArray(bf: BufferedImage): Array<IntArray> {
