@@ -2,7 +2,7 @@ package blue.starry.stella.worker
 
 import blue.starry.stella.Env
 import blue.starry.stella.logger
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import kotlinx.coroutines.*
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
@@ -33,8 +33,8 @@ object RefreshWorker {
         delay(30.seconds)
 
         val filter = or(
-            PicModel::timestamp / PicModel.Timestamp::auto_updated eq null,
-            PicModel::timestamp / PicModel.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
+            PicEntry::timestamp / PicEntry.Timestamp::auto_updated eq null,
+            PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
         )
 
         for (pic in StellaMongoDBPicCollection.find(filter).limit(200).toList()) {

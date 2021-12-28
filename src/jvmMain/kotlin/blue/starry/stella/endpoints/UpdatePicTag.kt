@@ -1,7 +1,7 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.logger
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
 import io.ktor.features.*
@@ -14,7 +14,6 @@ import org.bson.types.ObjectId
 import org.litote.kmongo.*
 import org.litote.kmongo.id.toId
 import java.time.Instant
-import java.util.*
 
 @Location("/pic/{id}/tag")
 data class EditTag(val id: String)
@@ -23,7 +22,7 @@ fun Route.putPicTag() {
     put<EditTag> { param ->
         val tag = call.receiveParameters()["tag"] ?: return@put
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -35,16 +34,16 @@ fun Route.putPicTag() {
         }
 
         val updates = combine(
-            addToSet(PicModel::tags, PicModel.Tag(
+            addToSet(PicEntry::tags, PicEntry.Tag(
                 value = tag,
                 user = call.request.origin.remoteHost,
                 locked = false
             )),
-            setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
+            setValue(PicEntry::timestamp / PicEntry.Timestamp::manual_updated, Instant.now().toEpochMilli())
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::_id eq ObjectId(param.id).toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicEntry::_id eq ObjectId(param.id).toId(), updates)
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {
@@ -57,7 +56,7 @@ fun Route.deletePicTag() {
     delete<EditTag> { param ->
         val tag = call.receiveParameters()["tag"] ?: return@delete
 
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())
             ?: return@delete call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -76,12 +75,12 @@ fun Route.deletePicTag() {
 
         val tags = oldEntry.tags.filter { it.value != tag }
         val updates = combine(
-            setValue(PicModel::tags, tags),
-            setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
+            setValue(PicEntry::tags, tags),
+            setValue(PicEntry::timestamp / PicEntry.Timestamp::manual_updated, Instant.now().toEpochMilli())
         )
-        StellaMongoDBPicCollection.updateOne(PicModel::_id eq ObjectId(param.id).toId(), updates)
+        StellaMongoDBPicCollection.updateOne(PicEntry::_id eq ObjectId(param.id).toId(), updates)
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {

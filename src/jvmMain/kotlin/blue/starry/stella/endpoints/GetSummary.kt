@@ -1,7 +1,7 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.mediaDirectory
-import blue.starry.stella.models.PicSummaryModel
+import blue.starry.stella.models.PicSummary
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
 import io.ktor.response.*
@@ -13,7 +13,7 @@ import java.nio.file.Files
 fun Route.getSummary() {
     get("/summary") {
         call.respond(
-            PicSummaryModel(
+            PicSummary(
                 entries = StellaMongoDBPicCollection.countDocuments(),
                 media = withContext(Dispatchers.IO) {
                     @Suppress("BlockingMethodInNonBlockingContext")

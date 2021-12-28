@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
 
 @Serializable
-data class PicModel(
-    @Contextual val _id: Id<PicModel>,
+data class PicEntry(
+    @Contextual val _id: Id<PicEntry>,
     val title: String,
     val description: String,
     val url: String,

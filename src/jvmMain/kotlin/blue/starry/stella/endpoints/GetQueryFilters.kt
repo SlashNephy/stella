@@ -1,7 +1,7 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.models.FileExtension
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.internal.PlatformSerializer
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import com.mongodb.client.model.Filters
@@ -14,7 +14,7 @@ object GetQueryFilters {
     fun title(value: String?) = flow {
         if (!value.isNullOrBlank()) {
             emit(
-                PicModel::title.regex(value, "im")
+                PicEntry::title.regex(value, "im")
             )
         }
     }
@@ -22,7 +22,7 @@ object GetQueryFilters {
     fun description(value: String?) = flow {
         if (!value.isNullOrBlank()) {
             emit(
-                PicModel::description.regex(value, "im")
+                PicEntry::description.regex(value, "im")
             )
         }
     }
@@ -33,7 +33,7 @@ object GetQueryFilters {
                 or(
                     value.split(",")
                         .map {
-                            PicModel::tags.elemMatch(PicModel.Tag::value.regex(it.trim(), "i"))
+                            PicEntry::tags.elemMatch(PicEntry.Tag::value.regex(it.trim(), "i"))
                         }
                 )
             )
@@ -45,7 +45,7 @@ object GetQueryFilters {
 
         if (platform != null) {
             emit(
-                Filters.eq(PicModel::platform.name, PlatformSerializer.serialize(platform))
+                Filters.eq(PicEntry::platform.name, PlatformSerializer.serialize(platform))
             )
         }
     }
@@ -54,8 +54,8 @@ object GetQueryFilters {
         if (!value.isNullOrBlank()) {
             emit(
                 or(
-                    (PicModel::author / PicModel.Author::name).regex(value, "im"),
-                    (PicModel::author / PicModel.Author::username).regex(value, "im")
+                    (PicEntry::author / PicEntry.Author::name).regex(value, "im"),
+                    (PicEntry::author / PicEntry.Author::username).regex(value, "im")
                 )
             )
         }
@@ -64,7 +64,7 @@ object GetQueryFilters {
     fun user(value: String?) = flow {
         if (!value.isNullOrBlank()) {
             emit(
-                PicModel::user eq value
+                PicEntry::user eq value
             )
         }
     }
@@ -78,12 +78,12 @@ object GetQueryFilters {
 
             if (levels.isNotEmpty()) {
                 emit(
-                    Filters.`in`(PicModel::sensitive_level.name, levels.map { SensitiveLevelSerializer.serialize(it) })
+                    Filters.`in`(PicEntry::sensitive_level.name, levels.map { SensitiveLevelSerializer.serialize(it) })
                 )
             }
         } else {
             emit(
-                Filters.eq(PicModel::sensitive_level.name, SensitiveLevelSerializer.serialize(PicModel.SensitiveLevel.Safe))
+                Filters.eq(PicEntry::sensitive_level.name, SensitiveLevelSerializer.serialize(PicEntry.SensitiveLevel.Safe))
             )
         }
     }
@@ -94,7 +94,7 @@ object GetQueryFilters {
                 LocalDate.parse(since)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::created gte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::created gte d.toEpochDay()
                 )
             }
         }
@@ -104,7 +104,7 @@ object GetQueryFilters {
                 LocalDate.parse(until)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::created lte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::created lte d.toEpochDay()
                 )
             }
         }
@@ -116,7 +116,7 @@ object GetQueryFilters {
                 LocalDate.parse(since)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::added gte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::added gte d.toEpochDay()
                 )
             }
         }
@@ -126,7 +126,7 @@ object GetQueryFilters {
                 LocalDate.parse(until)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::added lte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::added lte d.toEpochDay()
                 )
             }
         }
@@ -138,7 +138,7 @@ object GetQueryFilters {
                 LocalDate.parse(since)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::manual_updated gte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::manual_updated gte d.toEpochDay()
                 )
             }
         }
@@ -148,7 +148,7 @@ object GetQueryFilters {
                 LocalDate.parse(until)
             }.onSuccess { d ->
                 emit(
-                    PicModel::timestamp / PicModel.Timestamp::manual_updated lte d.toEpochDay()
+                    PicEntry::timestamp / PicEntry.Timestamp::manual_updated lte d.toEpochDay()
                 )
             }
         }
@@ -158,7 +158,7 @@ object GetQueryFilters {
         val extension = value?.toFileExtension()
         if (extension != null) {
             emit(
-                or(extension.exts.map { PicModel::media.elemMatch(PicModel.Media::ext eq it) })
+                or(extension.exts.map { PicEntry::media.elemMatch(PicEntry.Media::ext eq it) })
             )
         }
     }
@@ -184,19 +184,19 @@ object GetQueryFilters {
     fun like(min: Int?, max: Int?) = flow {
         if (min != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::like eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::like eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::like gte min
+                PicEntry::popularity / PicEntry.Popularity::like gte min
             )
         }
 
         if (max != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::like eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::like eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::like lte min
+                PicEntry::popularity / PicEntry.Popularity::like lte min
             )
         }
     }
@@ -204,19 +204,19 @@ object GetQueryFilters {
     fun bookmark(min: Int?, max: Int?) = flow {
         if (min != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::bookmark eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::bookmark eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::bookmark gte min
+                PicEntry::popularity / PicEntry.Popularity::bookmark gte min
             )
         }
 
         if (max != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::bookmark eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::bookmark eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::bookmark lte min
+                PicEntry::popularity / PicEntry.Popularity::bookmark lte min
             )
         }
     }
@@ -224,19 +224,19 @@ object GetQueryFilters {
     fun view(min: Int?, max: Int?) = flow {
         if (min != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::view eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::view eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::view gte min
+                PicEntry::popularity / PicEntry.Popularity::view gte min
             )
         }
 
         if (max != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::view eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::view eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::view lte min
+                PicEntry::popularity / PicEntry.Popularity::view lte min
             )
         }
     }
@@ -244,19 +244,19 @@ object GetQueryFilters {
     fun retweet(min: Int?, max: Int?) = flow {
         if (min != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::retweet eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::retweet eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::retweet gte min
+                PicEntry::popularity / PicEntry.Popularity::retweet gte min
             )
         }
 
         if (max != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::retweet eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::retweet eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::retweet lte min
+                PicEntry::popularity / PicEntry.Popularity::retweet lte min
             )
         }
     }
@@ -264,19 +264,19 @@ object GetQueryFilters {
     fun reply(min: Int?, max: Int?) = flow {
         if (min != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::reply eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::reply eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::reply gte min
+                PicEntry::popularity / PicEntry.Popularity::reply gte min
             )
         }
 
         if (max != null) {
             emit(
-                not(PicModel::popularity / PicModel.Popularity::reply eq null)
+                not(PicEntry::popularity / PicEntry.Popularity::reply eq null)
             )
             emit(
-                PicModel::popularity / PicModel.Popularity::reply lte min
+                PicEntry::popularity / PicEntry.Popularity::reply lte min
             )
         }
     }

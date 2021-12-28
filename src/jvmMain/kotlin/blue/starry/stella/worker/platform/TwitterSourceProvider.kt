@@ -20,7 +20,7 @@ import blue.starry.penicillin.models.Status
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaHttpClient
 import blue.starry.stella.worker.StellaTwitterClient
@@ -105,10 +105,10 @@ object TwitterSourceProvider {
 
         val entry = MediaRegister.Entry(title = "${status.text.take(20)}...", description = status.text.replace(tcoUrlPattern) {
             "<a href=\"${it.value}\">${it.value}</a>"
-        }, url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}", tags = status.entities.hashtags.map { it.text }, platform = PicModel.Platform.Twitter, sensitiveLevel = when {
-            "🔞" in status.text -> PicModel.SensitiveLevel.R18
-            status.possiblySensitive -> PicModel.SensitiveLevel.R15
-            else -> PicModel.SensitiveLevel.Safe
+        }, url = "https://twitter.com/${status.user.screenName}/status/${status.idStr}", tags = status.entities.hashtags.map { it.text }, platform = PicEntry.Platform.Twitter, sensitiveLevel = when {
+            "🔞" in status.text -> PicEntry.SensitiveLevel.R18
+            status.possiblySensitive -> PicEntry.SensitiveLevel.R15
+            else -> PicEntry.SensitiveLevel.Safe
         }, created = status.idObj.epochTimeMillis, author = MediaRegister.Entry.Author(status.user.name, "https://twitter.com/${status.user.screenName}", status.user.screenName), media = media.mapIndexed { i, it ->
             val url = it.videoInfo?.variants?.filter {
                 it.contentType == "video/mp4"

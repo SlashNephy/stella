@@ -1,7 +1,7 @@
 package blue.starry.stella.endpoints
 
-import blue.starry.stella.models.PicModel
-import blue.starry.stella.models.PicTagsModel
+import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.PicTags
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.call
@@ -31,7 +31,7 @@ data class GetQueryTags(
 fun Route.getQueryTags() {
     get<GetQueryTags> { param ->
         val existingTags = param.id?.let { id ->
-            StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(id).toId())?.tags
+            StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())?.tags
         }?.map {
             it.value
         }.orEmpty()
@@ -44,7 +44,7 @@ fun Route.getQueryTags() {
         ).flattenConcat().toList()
 
         val tags = StellaMongoDBPicCollection
-            .aggregate<PicModel>(match(and(filters)))
+            .aggregate<PicEntry>(match(and(filters)))
             .toList()
             .asSequence()
             .flatMap { it.tags }
@@ -62,7 +62,7 @@ fun Route.getQueryTags() {
             .toList()
 
         call.respond(
-            PicTagsModel(
+            PicTags(
                 tags = tags
             )
         )

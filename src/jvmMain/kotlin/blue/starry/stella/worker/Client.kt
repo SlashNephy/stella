@@ -6,8 +6,8 @@ import blue.starry.penicillin.core.session.config.application
 import blue.starry.penicillin.core.session.config.httpClient
 import blue.starry.penicillin.core.session.config.token
 import blue.starry.stella.Env
-import blue.starry.stella.models.PicModel
-import blue.starry.stella.models.PicTagReplaceTableModel
+import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.PicTagReplace
 import blue.starry.stella.worker.platform.NijieClient
 import blue.starry.stella.worker.platform.PixivClient
 import io.ktor.client.*
@@ -89,9 +89,9 @@ val StellaMongoDBDatabase by lazy {
 }
 
 val StellaMongoDBPicCollection by lazy {
-    StellaMongoDBDatabase.getCollection<PicModel>("Pic")
+    StellaMongoDBDatabase.getCollection<PicEntry>("Pic")
 }
 
 val StellaMongoDBPicTagReplaceTableCollection by lazy {
-    StellaMongoDBDatabase.getCollection<PicTagReplaceTableModel>("PicTagReplaceTable")
+    StellaMongoDBDatabase.getCollection<PicTagReplace>("PicTagReplaceTable")
 }

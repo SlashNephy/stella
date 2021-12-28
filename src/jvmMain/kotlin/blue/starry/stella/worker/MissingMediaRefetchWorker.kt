@@ -4,7 +4,7 @@ import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
 import blue.starry.penicillin.core.exceptions.TwitterApiError
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import kotlinx.coroutines.*
 import org.litote.kmongo.eq
 import java.nio.file.Files
@@ -44,11 +44,11 @@ object MissingMediaRefetchWorker {
             } catch (e: PenicillinTwitterApiException) {
                 when (e.error) {
                     TwitterApiError.NoStatusFound, TwitterApiError.ResourceNotFound -> {
-                        StellaMongoDBPicCollection.deleteOne(PicModel::url eq pic.url)
+                        StellaMongoDBPicCollection.deleteOne(PicEntry::url eq pic.url)
                         logger.warn { "\"${pic.title}\" (${pic.url}) は削除されているため, エントリを削除しました。" }
                     }
                     TwitterApiError.SuspendedUser -> {
-                        StellaMongoDBPicCollection.deleteOne(PicModel::url eq pic.url)
+                        StellaMongoDBPicCollection.deleteOne(PicEntry::url eq pic.url)
                         logger.warn { "\"${pic.title}\" (${pic.url}) は作者が凍結されているため, エントリを削除しました。" }
                     }
                     TwitterApiError.CannotSeeProtectedStatus -> {

@@ -1,6 +1,6 @@
 package blue.starry.stella.endpoints
 
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
 import io.ktor.locations.*
@@ -72,7 +72,7 @@ fun Route.getQuery() {
         ).flattenConcat().toList()
 
         call.respond(
-            StellaMongoDBPicCollection.aggregate<PicModel>(pipeline).toList()
+            StellaMongoDBPicCollection.aggregate<PicEntry>(pipeline).toList()
         )
     }
 }

@@ -1,8 +1,8 @@
 package blue.starry.stella.worker
 
 import blue.starry.stella.logger
-import blue.starry.stella.models.PicModel
-import blue.starry.stella.models.PicTagReplaceTableModel
+import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.PicTagReplace
 import blue.starry.stella.worker.platform.NijieSourceProvider
 import blue.starry.stella.worker.platform.PixivSourceProvider
 import blue.starry.stella.worker.platform.TwitterSourceProvider
@@ -30,14 +30,14 @@ object MediaRegister {
     }
 
     suspend fun register(entry: Entry, auto: Boolean) {
-        val oldEntry = StellaMongoDBPicCollection.findOne(PicModel::url eq entry.url)
-        val newEntry = PicModel(
+        val oldEntry = StellaMongoDBPicCollection.findOne(PicEntry::url eq entry.url)
+        val newEntry = PicEntry(
             _id = oldEntry?._id ?: newId(),
             title = entry.title.normalizeTitle(),
             description = entry.description.normalizeDescription(),
             url = entry.url,
             tags = (entry.tags.map {
-                PicModel.Tag(
+                PicEntry.Tag(
                     value = it.normalizeTag(),
                     user = null,
                     locked = true
@@ -49,31 +49,31 @@ object MediaRegister {
             }.orEmpty()).distinctBy { it.value },
             user = oldEntry?.user,
             platform = entry.platform,
-            sensitive_level = maxOf(entry.sensitiveLevel, oldEntry?.sensitive_level ?: PicModel.SensitiveLevel.Safe),
-            timestamp = PicModel.Timestamp(
+            sensitive_level = maxOf(entry.sensitiveLevel, oldEntry?.sensitive_level ?: PicEntry.SensitiveLevel.Safe),
+            timestamp = PicEntry.Timestamp(
                 created = entry.created,
                 added = oldEntry?.timestamp?.added ?: Instant.now().toEpochMilli(),
                 auto_updated = if (auto) Instant.now().toEpochMilli() else (oldEntry?.timestamp?.auto_updated ?: Instant.now().toEpochMilli()),
                 manual_updated = if (!auto) Instant.now().toEpochMilli() else (oldEntry?.timestamp?.manual_updated ?: Instant.now().toEpochMilli())
             ),
-            author = PicModel.Author(
+            author = PicEntry.Author(
                 name = entry.author.name,
                 url = entry.author.url,
                 username = entry.author.username
             ),
             media = entry.media.map {
-                PicModel.Media(
+                PicEntry.Media(
                     index = it.index,
                     filename = it.filename,
                     original = it.filename,
                     ext = it.ext
                 )
             },
-            rating = PicModel.Rating(
+            rating = PicEntry.Rating(
                 count = oldEntry?.rating?.count ?: 0,
                 score = oldEntry?.rating?.score ?: 0
             ),
-            popularity = PicModel.Popularity(
+            popularity = PicEntry.Popularity(
                 like = entry.popularity.like,
                 bookmark = entry.popularity.bookmark,
                 view = entry.popularity.view,
@@ -103,7 +103,7 @@ object MediaRegister {
     }
 
     private suspend fun String.normalizeTag(): String {
-        return StellaMongoDBPicTagReplaceTableCollection.findOne(PicTagReplaceTableModel::from eq this)?.to ?: this
+        return StellaMongoDBPicTagReplaceTableCollection.findOne(PicTagReplace::from eq this)?.to ?: this
     }
 
     data class Entry(
@@ -111,8 +111,8 @@ object MediaRegister {
         val description: String,
         val url: String,
         val tags: List<String>,
-        val platform: PicModel.Platform,
-        val sensitiveLevel: PicModel.SensitiveLevel,
+        val platform: PicEntry.Platform,
+        val sensitiveLevel: PicEntry.SensitiveLevel,
         val created: Long,
         val author: Author,
         val media: List<Picture>,

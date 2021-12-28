@@ -1,7 +1,7 @@
 package blue.starry.stella.endpoints
 
 import blue.starry.stella.logger
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import com.mongodb.client.model.Updates
@@ -33,21 +33,21 @@ fun Route.patchPicSensitiveLevel() {
                 "Essential \"sensitive_level\" is invalid."
             }
 
-        if (StellaMongoDBPicCollection.countDocuments(PicModel::_id eq ObjectId(param.id).toId()) == 0L) {
+        if (StellaMongoDBPicCollection.countDocuments(PicEntry::_id eq ObjectId(param.id).toId()) == 0L) {
             return@patch call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
         }
 
         StellaMongoDBPicCollection.updateOne(
-            PicModel::_id eq ObjectId(param.id).toId(),
+            PicEntry::_id eq ObjectId(param.id).toId(),
             combine(
-                Updates.set(PicModel::sensitive_level.name, SensitiveLevelSerializer.serialize(sensitiveLevel)),
-                setValue(PicModel::timestamp / PicModel.Timestamp::manual_updated, Instant.now().toEpochMilli())
+                Updates.set(PicEntry::sensitive_level.name, SensitiveLevelSerializer.serialize(sensitiveLevel)),
+                setValue(PicEntry::timestamp / PicEntry.Timestamp::manual_updated, Instant.now().toEpochMilli())
             )
         )
 
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(param.id).toId())!!
+        val entry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())!!
         call.respond(entry)
 
         logger.info {

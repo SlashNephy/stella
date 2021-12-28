@@ -3,7 +3,7 @@ package blue.starry.stella.worker.platform
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaPixivClient
 import com.squareup.gifencoder.FloydSteinbergDitherer
@@ -22,7 +22,6 @@ import javax.imageio.ImageIO
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object PixivSourceProvider {
@@ -90,12 +89,12 @@ object PixivSourceProvider {
             ),
 
             tags = tags,
-            platform = PicModel.Platform.Pixiv,
+            platform = PicEntry.Platform.Pixiv,
             sensitiveLevel = when {
-                "R-15" in tags -> PicModel.SensitiveLevel.R15
-                "R-18" in tags || illust.xRestrict == 1 -> PicModel.SensitiveLevel.R18
-                "R-18G" in tags || illust.xRestrict == 2 -> PicModel.SensitiveLevel.R18G
-                else -> PicModel.SensitiveLevel.Safe
+                "R-15" in tags -> PicEntry.SensitiveLevel.R15
+                "R-18" in tags || illust.xRestrict == 1 -> PicEntry.SensitiveLevel.R18
+                "R-18G" in tags || illust.xRestrict == 2 -> PicEntry.SensitiveLevel.R18G
+                else -> PicEntry.SensitiveLevel.Safe
             },
             created = ZonedDateTime.parse(illust.uploadDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant().toEpochMilli(),
 

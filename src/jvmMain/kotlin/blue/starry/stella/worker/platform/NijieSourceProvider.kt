@@ -3,7 +3,7 @@ package blue.starry.stella.worker.platform
 import blue.starry.stella.Env
 import blue.starry.stella.logger
 import blue.starry.stella.mediaDirectory
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaNijieClient
 import kotlinx.coroutines.*
@@ -49,8 +49,8 @@ object NijieSourceProvider {
             description = picture.description,
             url = picture.url,
             tags = picture.tags,
-            platform = PicModel.Platform.Nijie,
-            sensitiveLevel = PicModel.SensitiveLevel.R18,
+            platform = PicEntry.Platform.Nijie,
+            sensitiveLevel = PicEntry.SensitiveLevel.R18,
             created = picture.createdAt,
             author = MediaRegister.Entry.Author(picture.authorName, picture.authorUrl, null),
             media = picture.media.mapIndexed { index, url ->

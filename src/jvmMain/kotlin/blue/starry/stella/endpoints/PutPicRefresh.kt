@@ -1,6 +1,6 @@
 package blue.starry.stella.endpoints
 
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.worker.MediaRegister
 import blue.starry.stella.worker.StellaMongoDBPicCollection
 import io.ktor.application.*
@@ -18,7 +18,7 @@ data class PutPicRefresh(val id: String)
 
 fun Route.putPicRefresh() {
     put<PutPicRefresh> { (id) ->
-        val entry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(id).toId())
+        val entry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())
             ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
                 "Specified entry is not found."
             }
@@ -28,7 +28,7 @@ fun Route.putPicRefresh() {
                 "Unknown error occurred."
             }
         } else {
-            val newEntry = StellaMongoDBPicCollection.findOne(PicModel::_id eq ObjectId(id).toId())!!
+            val newEntry = StellaMongoDBPicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())!!
 
             call.respond(newEntry)
         }

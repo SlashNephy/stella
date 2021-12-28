@@ -1,6 +1,6 @@
 package blue.starry.stella.endpoints
 
-import blue.starry.stella.models.PicModel
+import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.SortOrder
 import kotlinx.coroutines.flow.flow
 import org.bson.conversions.Bson
@@ -11,152 +11,152 @@ object GetQueryPipelines {
         when (value?.toSortOrder() ?: SortOrder.ManualUpdatedDescending) {
             SortOrder.AddedDescending -> {
                 emit(
-                    sort(descending(PicModel::timestamp / PicModel.Timestamp::added))
+                    sort(descending(PicEntry::timestamp / PicEntry.Timestamp::added))
                 )
             }
             SortOrder.AddedAscending -> {
                 emit(
-                    sort(ascending(PicModel::timestamp / PicModel.Timestamp::added))
+                    sort(ascending(PicEntry::timestamp / PicEntry.Timestamp::added))
                 )
             }
             SortOrder.CreatedDescending -> {
                 emit(
-                    sort(descending(PicModel::timestamp / PicModel.Timestamp::created))
+                    sort(descending(PicEntry::timestamp / PicEntry.Timestamp::created))
                 )
             }
             SortOrder.CreatedAscending -> {
                 emit(
-                    sort(ascending(PicModel::timestamp / PicModel.Timestamp::created))
+                    sort(ascending(PicEntry::timestamp / PicEntry.Timestamp::created))
                 )
             }
             SortOrder.ManualUpdatedDescending -> {
                 emit(
-                    sort(descending(PicModel::timestamp / PicModel.Timestamp::manual_updated))
+                    sort(descending(PicEntry::timestamp / PicEntry.Timestamp::manual_updated))
                 )
             }
             SortOrder.ManualUpdatedAscending -> {
                 emit(
-                    sort(ascending(PicModel::timestamp / PicModel.Timestamp::manual_updated))
+                    sort(ascending(PicEntry::timestamp / PicEntry.Timestamp::manual_updated))
                 )
             }
             SortOrder.AutoUpdatedDescending -> {
                 emit(
-                    sort(descending(PicModel::timestamp / PicModel.Timestamp::auto_updated))
+                    sort(descending(PicEntry::timestamp / PicEntry.Timestamp::auto_updated))
                 )
             }
             SortOrder.AutoUpdatedAscending -> {
                 emit(
-                    sort(ascending(PicModel::timestamp / PicModel.Timestamp::auto_updated))
+                    sort(ascending(PicEntry::timestamp / PicEntry.Timestamp::auto_updated))
                 )
             }
             SortOrder.TitleDescending -> {
                 emit(
-                    sort(descending(PicModel::title))
+                    sort(descending(PicEntry::title))
                 )
             }
             SortOrder.TitleAscending -> {
                 emit(
-                    sort(ascending(PicModel::title))
+                    sort(ascending(PicEntry::title))
                 )
             }
             SortOrder.AuthorDescending -> {
                 emit(
-                    sort(descending(PicModel::author / PicModel.Author::name))
+                    sort(descending(PicEntry::author / PicEntry.Author::name))
                 )
             }
             SortOrder.AuthorAscending -> {
                 emit(
-                    sort(ascending(PicModel::author / PicModel.Author::name))
+                    sort(ascending(PicEntry::author / PicEntry.Author::name))
                 )
             }
             SortOrder.RatingDescending -> {
                 emit(
-                    sort(descending(PicModel::rating / PicModel.Rating::score))
+                    sort(descending(PicEntry::rating / PicEntry.Rating::score))
                 )
             }
             SortOrder.RatingAscending -> {
                 emit(
-                    sort(ascending(PicModel::rating / PicModel.Rating::score))
+                    sort(ascending(PicEntry::rating / PicEntry.Rating::score))
                 )
             }
             SortOrder.LikeDescending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::like eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::like eq null))
                 )
                 emit(
-                    sort(descending(PicModel::popularity / PicModel.Popularity::like))
+                    sort(descending(PicEntry::popularity / PicEntry.Popularity::like))
                 )
             }
             SortOrder.LikeAscending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::like eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::like eq null))
                 )
                 emit(
-                    sort(ascending(PicModel::popularity / PicModel.Popularity::like))
+                    sort(ascending(PicEntry::popularity / PicEntry.Popularity::like))
                 )
             }
             SortOrder.BookmarkDescending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::bookmark eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::bookmark eq null))
                 )
                 emit(
-                    sort(descending(PicModel::popularity / PicModel.Popularity::bookmark))
+                    sort(descending(PicEntry::popularity / PicEntry.Popularity::bookmark))
                 )
             }
             SortOrder.BookmarkAscending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::bookmark eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::bookmark eq null))
                 )
                 emit(
-                    sort(ascending(PicModel::popularity / PicModel.Popularity::bookmark))
+                    sort(ascending(PicEntry::popularity / PicEntry.Popularity::bookmark))
                 )
             }
             SortOrder.ViewDescending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::view eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::view eq null))
                 )
                 emit(
-                    sort(descending(PicModel::popularity / PicModel.Popularity::view))
+                    sort(descending(PicEntry::popularity / PicEntry.Popularity::view))
                 )
             }
             SortOrder.ViewAscending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::view eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::view eq null))
                 )
                 emit(
-                    sort(ascending(PicModel::popularity / PicModel.Popularity::view))
+                    sort(ascending(PicEntry::popularity / PicEntry.Popularity::view))
                 )
             }
             SortOrder.RetweetDescending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::retweet eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::retweet eq null))
                 )
                 emit(
-                    sort(descending(PicModel::popularity / PicModel.Popularity::retweet))
+                    sort(descending(PicEntry::popularity / PicEntry.Popularity::retweet))
                 )
             }
             SortOrder.RetweetAscending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::retweet eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::retweet eq null))
                 )
                 emit(
-                    sort(ascending(PicModel::popularity / PicModel.Popularity::retweet))
+                    sort(ascending(PicEntry::popularity / PicEntry.Popularity::retweet))
                 )
             }
             SortOrder.ReplyDescending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::reply eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::reply eq null))
                 )
                 emit(
-                    sort(descending(PicModel::popularity / PicModel.Popularity::reply))
+                    sort(descending(PicEntry::popularity / PicEntry.Popularity::reply))
                 )
             }
             SortOrder.ReplyAscending -> {
                 emit(
-                    match(not(PicModel::popularity / PicModel.Popularity::reply eq null))
+                    match(not(PicEntry::popularity / PicEntry.Popularity::reply eq null))
                 )
                 emit(
-                    sort(ascending(PicModel::popularity / PicModel.Popularity::reply))
+                    sort(ascending(PicEntry::popularity / PicEntry.Popularity::reply))
                 )
             }
             SortOrder.Random -> {
@@ -166,7 +166,7 @@ object GetQueryPipelines {
             }
         }
     }
-    
+
     fun applyFilters(filters: List<Bson>) = flow {
         if (filters.isNotEmpty()) {
             emit(

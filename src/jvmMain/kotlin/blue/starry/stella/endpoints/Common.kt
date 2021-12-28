@@ -1,6 +1,6 @@
 package blue.starry.stella.endpoints
 
-import blue.starry.stella.models.ApiErrorModel
+import blue.starry.stella.models.ApiError
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
@@ -10,7 +10,7 @@ suspend fun ApplicationCall.respondApiError(
     block: () -> String
 ) {
     respond(
-        ApiErrorModel(
+        ApiError(
             code = code.value,
             message = block()
         )
