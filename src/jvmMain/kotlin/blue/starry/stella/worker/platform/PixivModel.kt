@@ -224,8 +224,8 @@ object PixivModel {
                 val deletable: Boolean,
                 val locked: Boolean,
                 val tag: String,
-                val userId: String,
-                val userName: String
+                val userId: String? = null,
+                val userName: String? = null
             )
         }
 
