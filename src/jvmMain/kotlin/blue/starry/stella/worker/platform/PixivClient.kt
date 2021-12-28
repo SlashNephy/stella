@@ -110,9 +110,9 @@ class PixivClient(private val refreshToken: String) {
         }
     }
 
-    private suspend fun <T> callAjax(url: String): T {
+    private suspend inline fun <reified T> callAjax(url: String, referer: String?): T {
         val response = StellaHttpClient.get<PixivModel.AjaxResponse<T>>(url) {
-            setBrowserHeaders()
+            setBrowserHeaders(referer)
         }
 
         if (response.error) {
@@ -122,9 +122,9 @@ class PixivClient(private val refreshToken: String) {
         return response.body
     }
 
-    suspend fun getIllust(id: Int) = callAjax<PixivModel.Illust>("https://www.pixiv.net/ajax/illust/$id")
-    suspend fun getIllustPages(id: String) = callAjax<List<PixivModel.IllustPage>>("https://www.pixiv.net/ajax/illust/$id/pages?lang=ja")
-    suspend fun getIllustUgoiraMeta(id: String) = callAjax<PixivModel.IllustUgoiraMeta>("https://www.pixiv.net/ajax/illust/$id/ugoira_meta")
+    suspend fun getIllust(id: Int) = callAjax<PixivModel.Illust>("https://www.pixiv.net/ajax/illust/$id", "https://www.pixiv.net/artworks/$id")
+    suspend fun getIllustPages(id: String) = callAjax<List<PixivModel.IllustPage>>("https://www.pixiv.net/ajax/illust/$id/pages?lang=ja", "https://www.pixiv.net/artworks/$id")
+    suspend fun getIllustUgoiraMeta(id: String) = callAjax<PixivModel.IllustUgoiraMeta>("https://www.pixiv.net/ajax/illust/$id/ugoira_meta", "https://www.pixiv.net/artworks/$id")
 
     suspend fun download(url: String, path: Path) {
         val response = StellaHttpClient.get<ByteArray>(url) {
@@ -147,10 +147,12 @@ class PixivClient(private val refreshToken: String) {
         }
     }
 
-    private fun HttpRequestBuilder.setBrowserHeaders() {
-        header("Accept", "*/*")
-        header("Accept-Language", "ja-JP")
-        header("User-Agent", "PixivIOSApp/7.6.2 (iOS 12.2; iPhone9,1)")
+    private fun HttpRequestBuilder.setBrowserHeaders(referer: String?) {
+        header(HttpHeaders.AcceptLanguage, "ja,und;q=0.9")
+        header(HttpHeaders.CacheControl, "no-cache")
+
+        header(HttpHeaders.Origin, "${url.protocol.name}://${url.host}")
+        header(HttpHeaders.Referrer, referer ?: "${url.protocol.name}://${url.host}/")
+        userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4692.56 Safari/537.36")
     }
 }
-
