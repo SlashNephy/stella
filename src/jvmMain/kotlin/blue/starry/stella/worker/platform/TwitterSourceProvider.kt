@@ -89,10 +89,8 @@ object TwitterSourceProvider {
     }
 
     suspend fun fetch(client: ApiClient, url: String, auto: Boolean) {
-        val status = client.statuses.show(
-            id = url.split("/").last().split("?").first().toLong(),
-            tweetMode = TweetMode.Extended
-        ).execute()
+        val id = url.split("/").last().split("?").first().toLong()
+        val status = client.statuses.show(id = id, tweetMode = TweetMode.Extended).execute()
 
         register(status.result, auto)
     }

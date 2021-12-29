@@ -24,7 +24,7 @@ object MediaRegister {
                     TwitterSourceProvider.fetch(StellaTwitterClient ?: error("Twitter is not supported."), url, auto)
                 }
                 "pixiv.net" in url -> {
-                    PixivSourceProvider.enqueue(StellaPixivClient ?: error("Pixiv is not supported."), url)
+                    PixivSourceProvider.fetch(StellaPixivClient ?: error("Pixiv is not supported."), url, auto)
                 }
                 "nijie.info" in url -> {
                     NijieSourceProvider.fetch(StellaNijieClient ?: error("Nijie is not supported."), url, auto)
@@ -100,13 +100,13 @@ object MediaRegister {
                 StellaMongoDBPicCollection.updateOne(new)
             }
 
-            logger.info { "\"${entry.title}\" (${entry.url}) を更新しました。" }
+            logger.info { "エントリー: \"${entry.title}\" (${entry.url}) を更新しました。" }
         } else {
             if (!Env.DRYRUN) {
                 StellaMongoDBPicCollection.insertOne(new)
             }
 
-            logger.info { "\"${entry.title}\" (${entry.url}) を追加しました。" }
+            logger.info { "エントリー: \"${entry.title}\" (${entry.url}) を追加しました。" }
         }
     }
 }

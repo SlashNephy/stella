@@ -16,7 +16,6 @@ import java.awt.image.BufferedImage
 import java.nio.file.Files
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
@@ -26,8 +25,6 @@ import kotlin.io.path.outputStream
 import kotlin.time.Duration.Companion.minutes
 
 object PixivSourceProvider {
-    private val autoRefreshIds = CopyOnWriteArrayList<Int>()
-
     fun start() {
         val client = StellaPixivClient ?: return
 
@@ -48,29 +45,26 @@ object PixivSourceProvider {
         }
     }
 
-    suspend fun enqueue(client: PixivClient, url: String) {
-        val id = url.split("=", "/").last().toInt()
-        if (id in autoRefreshIds) {
-            return
-        }
+    suspend fun fetch(client: PixivClient, url: String, auto: Boolean) {
+        val id = url.split("=", "/").last().split("?").first().toInt()
+        val illust = client.getIllust(id)
 
-        client.addBookmark(id, true)
-        autoRefreshIds += id
+        register(client, illust, auto)
     }
 
     private suspend fun fetchBookmark(client: PixivClient, private: Boolean) {
         for (bookmark in client.getBookmarks(private).illusts.reversed()) {
             val illust = client.getIllust(bookmark.id)
 
-            client.register(illust, bookmark.id in autoRefreshIds)
+            register(client, illust, false)
             client.deleteBookmark(bookmark.id)
         }
     }
 
-    private suspend fun PixivClient.register(illust: PixivModel.Illust, auto: Boolean) {
+    private suspend fun register(client: PixivClient, illust: PixivModel.Illust, auto: Boolean) {
         val tags = illust.tags.tags.map { it.tag }
         val media = when (illust.illustType) {
-            0, 2 ->  downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
+            0, 2 -> client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
 //            2 -> {
 //                listOf(
 //                    downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
