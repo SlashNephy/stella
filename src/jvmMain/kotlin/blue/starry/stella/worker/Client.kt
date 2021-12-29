@@ -22,10 +22,15 @@ import org.litote.kmongo.reactivestreams.KMongo
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 
+val StellaCookies by lazy { AcceptAllCookiesStorage() }
+
 @OptIn(ExperimentalSerializationApi::class)
 val StellaHttpClient by lazy {
     HttpClient(CIO) {
-        install(HttpCookies)
+        install(HttpCookies) {
+            storage = StellaCookies
+        }
+
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json {
                 ignoreUnknownKeys = true

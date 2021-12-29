@@ -1,11 +1,15 @@
 package blue.starry.stella.worker.platform
 
 import blue.starry.jsonkt.parseObject
+import blue.starry.stella.Env
 import blue.starry.stella.logger
+import blue.starry.stella.worker.StellaCookies
 import blue.starry.stella.worker.StellaHttpClient
+import io.ktor.client.features.cookies.addCookie
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.submitForm
+import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.userAgent
@@ -31,6 +35,23 @@ class PixivClient(private val refreshToken: String) {
     private suspend fun login() {
         if (isLoggedIn()) {
             return
+        }
+
+        if (Env.PIXIV_PHPSESSIONID != null) {
+            val cookie = Cookie(
+                name = "PHPSESSID",
+                value = Env.PIXIV_PHPSESSIONID!!,
+                domain = ".pixiv.net",
+                path = "/",
+                httpOnly = true,
+                secure = true,
+            )
+            StellaCookies.addCookie("https://www.pixiv.net", cookie)
+        }
+
+        // Refresh session
+        StellaHttpClient.get<Unit>("https://www.pixiv.net") {
+            setBrowserHeaders(null)
         }
 
         token = mutex.withLock {
@@ -85,19 +106,6 @@ class PixivClient(private val refreshToken: String) {
         }
     }
 
-    suspend fun addBookmark(id: Int, private: Boolean) {
-        login()
-
-        val parameters = Parameters.build {
-            append("restrict", if (private) "private" else "public")
-            append("illust_id", id.toString())
-        }
-
-        StellaHttpClient.submitForm<Unit>("https://app-api.pixiv.net/v2/illust/bookmark/add", parameters) {
-            setHeaders()
-        }
-    }
-
     suspend fun deleteBookmark(id: Int) {
         login()
 
@@ -107,6 +115,12 @@ class PixivClient(private val refreshToken: String) {
 
         StellaHttpClient.submitForm<Unit>("https://app-api.pixiv.net/v1/illust/bookmark/delete", parameters) {
             setHeaders()
+        }
+    }
+
+    suspend fun getArtworkPage(id: Int) {
+        StellaHttpClient.get<Unit>("https://www.pixiv.net/artworks/$id") {
+            setBrowserHeaders(null)
         }
     }
 
@@ -120,12 +134,6 @@ class PixivClient(private val refreshToken: String) {
         }
 
         return response.body
-    }
-
-    suspend fun getArtworkPage(id: Int) {
-        StellaHttpClient.get<Unit>("https://www.pixiv.net/artworks/$id") {
-            setBrowserHeaders(null)
-        }
     }
 
     suspend fun getIllust(id: Int) = callAjax<PixivModel.Illust>("https://www.pixiv.net/ajax/illust/$id", "https://www.pixiv.net/artworks/$id")
@@ -156,10 +164,12 @@ class PixivClient(private val refreshToken: String) {
     private fun HttpRequestBuilder.setBrowserHeaders(referer: String?) {
         header(HttpHeaders.AcceptLanguage, "ja,und;q=0.9")
         header(HttpHeaders.CacheControl, "no-cache")
+        header(HttpHeaders.Pragma, "no-cache")
+        header(HttpHeaders.Accept, "application/json")
+        userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4692.56 Safari/537.36")
 
+        header("Authority", "${url.protocol.name}://${url.host}")
         header(HttpHeaders.Origin, "${url.protocol.name}://${url.host}")
         header(HttpHeaders.Referrer, referer ?: "${url.protocol.name}://${url.host}/")
-        userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4692.56 Safari/537.36")
-        header("X-Requested-With", "XMLHttpRequest")
     }
 }

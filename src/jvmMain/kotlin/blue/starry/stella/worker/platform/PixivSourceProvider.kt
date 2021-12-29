@@ -64,12 +64,20 @@ object PixivSourceProvider {
     private suspend fun register(client: PixivClient, illust: PixivModel.Illust, auto: Boolean) {
         val tags = illust.tags.tags.map { it.tag }
         val media = when (illust.illustType) {
-            0, 2 -> client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
-//            2 -> {
-//                listOf(
-//                    downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
-//                )
-//            }
+            0 -> client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
+            2 -> {
+                try {
+                    listOf(
+                        client.downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
+                    )
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (t: Throwable) {
+                    logger.error(t) { "Failed to download ugoira: (${illust.illustId})" }
+
+                    client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
+                }
+            }
             else -> TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
         }
 
