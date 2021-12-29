@@ -4,47 +4,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
-object Versions {
-    const val Ktor = "1.6.5"
-    const val Penicillin = "6.2.1"
-    const val KMongo = "4.2.3"
-    const val Jsoup = "1.14.3"
-
-    const val KotlinLogging = "2.0.11"
-    const val Logback = "1.2.3"
-}
-
-object Libraries {
-    const val KtorServerCIO = "io.ktor:ktor-server-cio:${Versions.Ktor}"
-    const val KtorLocations = "io.ktor:ktor-locations:${Versions.Ktor}"
-    const val KtorSerialization = "io.ktor:ktor-serialization:${Versions.Ktor}"
-    const val KtorClientCIO = "io.ktor:ktor-client-cio:${Versions.Ktor}"
-    const val KtorClientSerialization = "io.ktor:ktor-client-serialization:${Versions.Ktor}"
-    const val KtorClientLogging = "io.ktor:ktor-client-logging:${Versions.Ktor}"
-
-    const val KMongoCoroutineSerialization = "org.litote.kmongo:kmongo-coroutine-serialization:${Versions.KMongo}"
-    const val KMongoIdSerialization = "org.litote.kmongo:kmongo-id-serialization:${Versions.KMongo}"
-    const val Penicillin = "blue.starry:penicillin:${Versions.Penicillin}"
-    const val Jsoup = "org.jsoup:jsoup:${Versions.Jsoup}"
-
-    const val KotlinLogging = "io.github.microutils:kotlin-logging:${Versions.KotlinLogging}"
-    const val LogbackCore = "ch.qos.logback:logback-core:${Versions.Logback}"
-    const val LogbackClassic = "ch.qos.logback:logback-classic:${Versions.Logback}"
-
-    const val KtorClientJs = "io.ktor:ktor-client-js:${Versions.Ktor}"
-
-    val ExperimentalAnnotations = setOf(
-        "kotlin.Experimental",
-        "kotlin.ExperimentalStdlibApi",
-        "kotlin.time.ExperimentalTime",
-        "kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "kotlinx.coroutines.DelicateCoroutinesApi",
-        "io.ktor.locations.KtorExperimentalLocationsAPI",
-        "kotlinx.coroutines.FlowPreview",
-        "io.ktor.util.InternalAPI"
-    )
-}
-
 repositories {
     mavenCentral()
 }
@@ -62,8 +21,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(Libraries.Penicillin)
-                implementation(Libraries.KotlinLogging)
+                implementation("blue.starry:penicillin:6.2.2")
+                implementation("io.github.microutils:kotlin-logging:2.1.21")
             }
         }
         commonTest {
@@ -75,20 +34,20 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
-                implementation(Libraries.KtorServerCIO)
-                implementation(Libraries.KtorLocations)
-                implementation(Libraries.KtorSerialization)
-                implementation(Libraries.KtorClientCIO)
-                implementation(Libraries.KtorClientSerialization)
-                implementation(Libraries.KtorClientLogging)
+                implementation("io.ktor:ktor-server-cio:1.6.7")
+                implementation("io.ktor:ktor-locations:1.6.7")
+                implementation("io.ktor:ktor-serialization:1.6.7")
 
-                implementation(Libraries.KMongoCoroutineSerialization)
-                implementation(Libraries.KMongoIdSerialization)
-                implementation(Libraries.Jsoup)
+                implementation("io.ktor:ktor-client-cio:1.6.7")
+                implementation("io.ktor:ktor-client-serialization:1.6.7")
+                implementation("io.ktor:ktor-client-logging:1.6.7")
+
+                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
+                implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
+                implementation("org.jsoup:jsoup:1.14.3")
                 implementation("com.squareup:gifencoder:0.10.1")
 
-                implementation(Libraries.LogbackCore)
-                implementation(Libraries.LogbackClassic)
+                implementation("ch.qos.logback:logback-classic:1.3.0-alpha12")
             }
         }
         named("jvmTest") {
@@ -101,7 +60,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
 
-                implementation(Libraries.KtorClientJs)
+                implementation("io.ktor:ktor-client-js:1.6.7")
 
                 implementation(npm("bootstrap.native", "3.0.9"))
                 implementation(npm("twemoji", "13.0.1"))
@@ -129,10 +88,17 @@ kotlin {
     }
 
     sourceSets.all {
-        languageSettings.progressiveMode = true
+        languageSettings {
+            progressiveMode = true
 
-        Libraries.ExperimentalAnnotations.forEach {
-            languageSettings.optIn(it)
+            optIn("kotlin.Experimental")
+            optIn("kotlin.ExperimentalStdlibApi")
+            optIn("kotlin.time.ExperimentalTime")
+            optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+            optIn("io.ktor.locations.KtorExperimentalLocationsAPI")
+            optIn("kotlinx.coroutines.FlowPreview")
+            optIn("io.ktor.util.InternalAPI")
         }
     }
 }
