@@ -14,6 +14,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class RefreshEntryWorker: Worker(15.minutes) {
     override suspend fun run() {
+        if (!Env.ENABLE_REFRESH_ENTRY) {
+            return
+        }
+
         try {
             check()
         } catch (e: CancellationException) {

@@ -5,8 +5,6 @@ import blue.starry.penicillin.endpoints.common.TweetMode
 import blue.starry.penicillin.endpoints.favorites
 import blue.starry.penicillin.endpoints.favorites.destroy
 import blue.starry.penicillin.endpoints.favorites.list
-import blue.starry.penicillin.endpoints.friendships
-import blue.starry.penicillin.endpoints.friendships.createByUserId
 import blue.starry.penicillin.endpoints.statuses
 import blue.starry.penicillin.endpoints.statuses.delete
 import blue.starry.penicillin.endpoints.statuses.unretweet
@@ -70,10 +68,6 @@ class WatchTwitterWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
 
         for (status in favorites) {
             TwitterSourceProvider.register(status, false)
-
-            if (!status.user.following) {
-                client.friendships.createByUserId(userId = status.user.id).execute()
-            }
 
             client.favorites.destroy(id = status.id).execute()
         }

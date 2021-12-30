@@ -1,17 +1,21 @@
 package blue.starry.stella.platforms.twitter
 
 import blue.starry.penicillin.endpoints.common.TweetMode
+import blue.starry.penicillin.endpoints.friendships
+import blue.starry.penicillin.endpoints.friendships.createByUserId
 import blue.starry.penicillin.endpoints.statuses
 import blue.starry.penicillin.endpoints.statuses.show
 import blue.starry.penicillin.extensions.idObj
 import blue.starry.penicillin.extensions.models.text
 import blue.starry.penicillin.models.Status
+import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.platforms.SourceProvider
 import blue.starry.stella.register.MediaRegistory
 import blue.starry.stella.register.PicRegistration
 import io.ktor.client.request.get
+import io.ktor.client.utils.EmptyContent.status
 
 object TwitterSourceProvider: SourceProvider<Long, Status> {
     val TweetUrlPattern = "^(?:https?://)?(?:m\\.|mobile\\.)?twitter\\.com/(?:\\w|_)+?/status/(?<id>\\d+)".toRegex()
@@ -82,6 +86,12 @@ object TwitterSourceProvider: SourceProvider<Long, Status> {
         )
 
         MediaRegistory.register(entry, auto)
+
+        if (Env.TWITTER_FOLLOW_AFTER_REGISTER && !data.user.following) {
+            val client = Stella.Twitter ?: return true
+            client.friendships.createByUserId(userId = data.user.id).execute()
+        }
+
         return true
     }
 }

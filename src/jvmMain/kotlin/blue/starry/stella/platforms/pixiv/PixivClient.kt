@@ -74,6 +74,7 @@ class PixivClient(private val refreshToken: String) {
 
     suspend fun deleteBookmark(id: Int) {
         login()
+
         val form = Parameters.build {
             append("illust_id", id.toString())
         }
@@ -81,6 +82,16 @@ class PixivClient(private val refreshToken: String) {
         Stella.Http.post<Unit>("https://app-api.pixiv.net/v1/illust/bookmark/delete") {
             body = FormDataContent(form)
             setAppHeaders()
+        }
+    }
+
+    suspend fun addFollow(id: Int, private: Boolean) {
+        login()
+
+        Stella.Http.post<Unit>("https://app-api.pixiv.net/v1/user/follow/add") {
+            parameter("user_id", id)
+            parameter("restrict", if (private) "private" else "public")
+
         }
     }
 

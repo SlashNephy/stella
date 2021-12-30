@@ -1,5 +1,6 @@
 package blue.starry.stella.platforms.pixiv
 
+import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.platforms.SourceProvider
@@ -70,6 +71,11 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
         )
 
         MediaRegistory.register(entry, auto)
+
+        if (Env.PIXIV_FOLLOW_AFTER_REGISTER) {
+            client.addFollow(data.user.id, true)
+        }
+
         return true
     }
 }

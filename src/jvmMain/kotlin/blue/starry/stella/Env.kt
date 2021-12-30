@@ -15,6 +15,7 @@ object Env {
     val DB_NAME by string { "stella" }
 
     val ENABLE_MISSING_MEDIA_REFETCH by boolean { true }
+    val ENABLE_REFRESH_ENTRY by boolean { false }
     val AUTO_REFRESH_THRESHOLD by long { 6 * 60 * 60 * 1000L }
     val CHECK_INTERVAL_MINS by int { 1 }
     val DRYRUN by boolean { false }
@@ -23,8 +24,10 @@ object Env {
     val TWITTER_CS by stringOrNull
     val TWITTER_AT by stringOrNull
     val TWITTER_ATS by stringOrNull
+    val TWITTER_FOLLOW_AFTER_REGISTER by boolean { false }
 
     val PIXIV_REFRESH_TOKEN by stringOrNull
+    val PIXIV_FOLLOW_AFTER_REGISTER by boolean { false }
 
     val NIJIE_EMAIL by stringOrNull
     val NIJIE_PASSWORD by stringOrNull
