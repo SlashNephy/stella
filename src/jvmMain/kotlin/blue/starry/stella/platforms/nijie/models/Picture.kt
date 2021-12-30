@@ -1,5 +1,8 @@
 package blue.starry.stella.platforms.nijie.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Picture(
     val title: String,
     val authorName: String,
