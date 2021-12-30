@@ -1,4 +1,4 @@
-package blue.starry.stella.worker.platform
+package blue.starry.stella.worker.nijie
 
 import blue.starry.jsonkt.parseObject
 import blue.starry.jsonkt.toJsonObject
@@ -132,8 +132,11 @@ class NijieClient(private val email: String, private val password: String) {
         val reply = jsoup.getElementById("comment_list_js")!!.childNodeSize() / 2
         val view = viewCount(id)
 
-        return NijieModel.Picture(json.name, json.author.name, json.author.sameAs, LocalDateTime.parse(json.datePublished, formatter).atZone(
-            ZoneId.of("UTC")).toInstant().toEpochMilli(), images, json.description, "https://nijie.info/view.php?id=$id", id, tags, like, bookmark, reply, view)
+        return NijieModel.Picture(
+            json.name, json.author.name, json.author.sameAs, LocalDateTime.parse(json.datePublished, formatter).atZone(
+                ZoneId.of("UTC")
+            ).toInstant().toEpochMilli(), images, json.description, "https://nijie.info/view.php?id=$id", id, tags, like, bookmark, reply, view
+        )
     }
 
     private suspend fun viewCount(id: String): Int {

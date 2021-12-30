@@ -1,4 +1,4 @@
-package blue.starry.stella.worker.platform
+package blue.starry.stella.worker.nijie
 
 import blue.starry.stella.Env
 import blue.starry.stella.logger

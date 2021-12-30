@@ -7,9 +7,9 @@ import blue.starry.stella.worker.StellaMongoDBPicCollection
 import blue.starry.stella.worker.StellaNijieClient
 import blue.starry.stella.worker.StellaPixivClient
 import blue.starry.stella.worker.StellaTwitterClient
-import blue.starry.stella.worker.platform.NijieSourceProvider
-import blue.starry.stella.worker.platform.PixivSourceProvider
-import blue.starry.stella.worker.platform.TwitterSourceProvider
+import blue.starry.stella.worker.nijie.NijieSourceProvider
+import blue.starry.stella.worker.pixiv.PixivSourceProvider
+import blue.starry.stella.worker.twitter.TwitterSourceProvider
 import io.ktor.utils.io.CancellationException
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.eq

@@ -8,8 +8,8 @@ import blue.starry.penicillin.core.session.config.token
 import blue.starry.stella.Env
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.PicTagReplace
-import blue.starry.stella.worker.platform.NijieClient
-import blue.starry.stella.worker.platform.PixivClient
+import blue.starry.stella.worker.nijie.NijieClient
+import blue.starry.stella.worker.pixiv.PixivClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.cookies.*

@@ -1,9 +1,12 @@
 @file:Suppress("Unused")
 
-package blue.starry.stella.worker.platform
+package blue.starry.stella.worker.nijie
 
 import blue.starry.jsonkt.JsonObject
-import blue.starry.jsonkt.delegation.*
+import blue.starry.jsonkt.delegation.JsonModel
+import blue.starry.jsonkt.delegation.int
+import blue.starry.jsonkt.delegation.model
+import blue.starry.jsonkt.delegation.string
 
 object NijieModel {
     data class Bookmark(val title: String, val id: String)

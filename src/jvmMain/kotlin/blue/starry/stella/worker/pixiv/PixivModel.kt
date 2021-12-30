@@ -1,4 +1,4 @@
-package blue.starry.stella.worker.platform
+package blue.starry.stella.worker.pixiv
 
 import blue.starry.jsonkt.JsonObject
 import blue.starry.jsonkt.delegation.*

@@ -1,4 +1,4 @@
-package blue.starry.stella.worker.platform
+package blue.starry.stella.worker.twitter
 
 import blue.starry.penicillin.core.session.ApiClient
 import blue.starry.penicillin.endpoints.common.TweetMode
