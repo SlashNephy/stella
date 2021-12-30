@@ -64,13 +64,11 @@ class PixivClient(private val refreshToken: String) {
     suspend fun getBookmarks(private: Boolean): BookmarksResponse {
         login()
 
-        return Stella.Http.get<String>("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
+        return Stella.Http.get("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
             parameter("user_id", token?.response?.user?.id)
             parameter("restrict", if (private) "private" else "public")
 
             setAppHeaders()
-        }.parseObject {
-            BookmarksResponse(it)
         }
     }
 

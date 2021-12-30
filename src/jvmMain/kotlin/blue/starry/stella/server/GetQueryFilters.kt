@@ -6,7 +6,6 @@ import blue.starry.stella.models.internal.PlatformSerializer
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.flow
-import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import java.time.LocalDate
 
@@ -88,7 +87,7 @@ object GetQueryFilters {
         }
     }
 
-    fun created(since: String?, until: String?) = flow<Bson> {
+    fun created(since: String?, until: String?) = flow {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)
@@ -110,7 +109,7 @@ object GetQueryFilters {
         }
     }
 
-    fun added(since: String?, until: String?) = flow<Bson> {
+    fun added(since: String?, until: String?) = flow {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)
@@ -132,7 +131,7 @@ object GetQueryFilters {
         }
     }
 
-    fun updated(since: String?, until: String?) = flow<Bson> {
+    fun updated(since: String?, until: String?) = flow {
         if (since != null) {
             runCatching {
                 LocalDate.parse(since)
