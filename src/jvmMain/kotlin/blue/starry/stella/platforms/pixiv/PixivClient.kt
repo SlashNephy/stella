@@ -1,6 +1,5 @@
 package blue.starry.stella.platforms.pixiv
 
-import blue.starry.jsonkt.parseObject
 import blue.starry.stella.Stella
 import blue.starry.stella.platforms.pixiv.models.BookmarksResponse
 import blue.starry.stella.platforms.pixiv.models.IllustDetailResponse
@@ -34,7 +33,7 @@ class PixivClient(private val refreshToken: String) {
         }
 
         token = mutex.withLock {
-            Stella.Http.post<String> {
+            Stella.Http.post<Token> {
                 url("https://oauth.secure.pixiv.net/auth/token")
                 setAppHeaders(requireAuth = false)
                 val parameters = Parameters.build {
@@ -45,10 +44,6 @@ class PixivClient(private val refreshToken: String) {
                     append("refresh_token", token?.response?.refreshToken ?: refreshToken)
                 }
                 body = FormDataContent(parameters)
-            }.parseObject {
-                Stella.Logger.trace { it }
-
-                Token(it)
             }
         }
 
