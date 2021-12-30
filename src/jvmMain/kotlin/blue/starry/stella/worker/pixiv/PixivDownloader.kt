@@ -7,11 +7,11 @@ import com.squareup.gifencoder.GifEncoder
 import com.squareup.gifencoder.ImageOptions
 import com.squareup.gifencoder.KMeansQuantizer
 import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipInputStream
 import javax.imageio.ImageIO
 import kotlin.io.path.exists
-import kotlin.io.path.outputStream
 import kotlin.io.path.writeBytes
 
 class PixivDownloader(private val client: PixivClient) {
@@ -44,22 +44,23 @@ class PixivDownloader(private val client: PixivClient) {
             val zipUrl = meta.zipUrls.medium.replace("_ugoira600x600", "_ugoira1920x1080")
             val zip = loadRemoteZip(zipUrl)
 
-            path.outputStream().use { stream ->
-                val gif = GifEncoder(stream, width, height, 0)
+            val output = ByteArrayOutputStream()
+            val gif = GifEncoder(output, width, height, 0)
 
-                meta.frames.forEach {
-                    val entry = zip.getValue(it.file)
+            meta.frames.forEach {
+                val entry = zip.getValue(it.file)
 
-                    val image = ImageIO.read(entry.inputStream())
-                    val rgbs = image.toRGBArray()
-                    val options = ImageOptions()
-                        .setColorQuantizer(KMeansQuantizer.INSTANCE)
-                        .setDitherer(FloydSteinbergDitherer.INSTANCE)
-                        .setDelay(it.delay.toLong(), TimeUnit.MILLISECONDS)
-                    gif.addImage(rgbs, options)
-                }
-                gif.finishEncoding()
+                val image = ImageIO.read(entry.inputStream())
+                val rgbs = image.toRGBArray()
+                val options = ImageOptions()
+                    .setColorQuantizer(KMeansQuantizer.INSTANCE)
+                    .setDitherer(FloydSteinbergDitherer.INSTANCE)
+                    .setDelay(it.delay.toLong(), TimeUnit.MILLISECONDS)
+                gif.addImage(rgbs, options)
             }
+
+            gif.finishEncoding()
+            path.writeBytes(output.toByteArray())
         }
 
         return PicRegistration.Picture(0, filename, url, "gif")
