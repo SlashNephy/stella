@@ -5,7 +5,8 @@
         </encoder>
     </appender>
 
-    <logger name="stella" level="TRACE" />
+    <logger name="Stella" level="TRACE" />
+    <logger name="org.mongodb.driver" level="WARN" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

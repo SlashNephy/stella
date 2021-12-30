@@ -95,7 +95,7 @@ kotlin {
             optIn("kotlin.ExperimentalStdlibApi")
             optIn("kotlin.time.ExperimentalTime")
             optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-            optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+            optIn("kotlinx.coroutines.ObsoleteCoroutinesApi")
             optIn("io.ktor.locations.KtorExperimentalLocationsAPI")
             optIn("kotlinx.coroutines.FlowPreview")
             optIn("io.ktor.util.InternalAPI")
@@ -110,7 +110,7 @@ task<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
     dependsOn("jvmJar")
 
     manifest {
-        attributes("Main-Class" to "blue.starry.stella.AppKt")
+        attributes("Main-Class" to "blue.starry.stella.MainKt")
     }
     archiveClassifier.set("all")
 

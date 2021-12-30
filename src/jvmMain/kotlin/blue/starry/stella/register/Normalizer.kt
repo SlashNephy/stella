@@ -1,7 +1,7 @@
 package blue.starry.stella.register
 
+import blue.starry.stella.Stella
 import blue.starry.stella.models.PicTagReplace
-import blue.starry.stella.worker.StellaMongoDBPicTagReplaceTableCollection
 import org.litote.kmongo.eq
 
 object Normalizer {
@@ -17,6 +17,6 @@ object Normalizer {
     }
 
     suspend fun normalizeTag(tag: String): String {
-        return StellaMongoDBPicTagReplaceTableCollection.findOne(PicTagReplace::from eq tag)?.to ?: tag
+        return Stella.TagReplaceCollection.findOne(PicTagReplace::from eq tag)?.to ?: tag
     }
 }
