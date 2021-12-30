@@ -18,10 +18,12 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 import javax.imageio.ImageIO
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
+import kotlin.io.path.writeBytes
 import kotlin.time.Duration.Companion.minutes
 
 object PixivSourceProvider {
@@ -47,48 +49,42 @@ object PixivSourceProvider {
 
     suspend fun fetch(client: PixivClient, url: String, auto: Boolean) {
         val id = url.split("=", "/").last().split("?").first().toInt()
-        val illust = client.getIllust(id)
+        val response = client.getIllustDetail(id)
 
-        register(client, illust, auto)
+        register(client, response.illust, auto)
     }
 
     private suspend fun fetchBookmark(client: PixivClient, private: Boolean) {
         for (bookmark in client.getBookmarks(private).illusts.reversed()) {
-            val illust = client.getIllust(bookmark.id)
+            val response = client.getIllustDetail(bookmark.id)
 
-            register(client, illust, false)
+            register(client, response.illust, false)
             client.deleteBookmark(bookmark.id)
         }
     }
 
-    private suspend fun register(client: PixivClient, illust: PixivModel.Illust, auto: Boolean) {
-        val tags = illust.tags.tags.map { it.tag }
-        val media = when (illust.illustType) {
-            0 -> client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
-            2 -> {
-                try {
-                    listOf(
-                        client.downloadUgoira(illust.id, illust.urls.original, illust.width, illust.height)
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (t: Throwable) {
-                    logger.error(t) { "Failed to download ugoira: (${illust.illustId})" }
+    private suspend fun register(client: PixivClient, illust: PixivModel.IllustDetailResponse.Illust, auto: Boolean) {
+        logger.debug { illust }
 
-                    client.downloadIllusts(illust.id, illust.urls.original, illust.pageCount)
-                }
+        val tags = illust.tags.map { it.name }
+        val media = when (illust.type) {
+            "illust" -> client.downloadIllusts(illust.id, illust.metaSinglePage.originalImageUrl, illust.pageCount)
+            "ugoira" -> {
+                listOf(
+                    client.downloadUgoira(illust.id, illust.metaSinglePage.originalImageUrl, illust.width, illust.height)
+                )
             }
-            else -> TODO("Unsupported illistType: ${illust.illustType} from ${illust.illustId}")
+            else -> TODO("Unsupported illistType: ${illust.type} from ${illust.id}")
         }
 
         val entry = PicRegistration(
-            title = illust.illustTitle,
-            description = illust.illustComment,
-            url = "https://www.pixiv.net/artworks/${illust.illustId}",
+            title = illust.title,
+            description = illust.caption,
+            url = "https://www.pixiv.net/artworks/${illust.id}",
             author = PicRegistration.Author(
-                illust.userName,
-                "https://www.pixiv.net/users/${illust.userId}",
-                illust.userAccount
+                illust.user.name,
+                "https://www.pixiv.net/users/${illust.id}",
+                illust.user.account
             ),
 
             tags = tags,
@@ -99,50 +95,51 @@ object PixivSourceProvider {
                 "R-18G" in tags || illust.xRestrict == 2 -> PicEntry.SensitiveLevel.R18G
                 else -> PicEntry.SensitiveLevel.Safe
             },
-            created = ZonedDateTime.parse(illust.uploadDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant().toEpochMilli(),
+            created = ZonedDateTime.parse(illust.createDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant().toEpochMilli(),
 
             media = media,
             popularity = PicRegistration.Popularity(
-                like = illust.likeCount,
-                bookmark = illust.bookmarkCount,
-                reply = illust.commentCount + illust.responseCount + illust.imageResponseCount,
-                view = illust.viewCount
+                bookmark = illust.totalBookmarks,
+                reply = illust.totalComments,
+                view = illust.totalView
             )
         )
 
         MediaRegister.register(entry, auto)
     }
 
-    private suspend fun PixivClient.downloadIllust(id: String, base_url: String, index: Int): PicRegistration.Picture {
+    private suspend fun PixivClient.downloadIllust(id: Int, base_url: String, index: Int): PicRegistration.Picture {
         val extension = base_url.split(".").last().split("?").first()
         val filename = "pixiv_${id}_$index.$extension"
 
         val url = base_url.replace("_p0", "_p${index}")
         val path = mediaDirectory.resolve(filename)
         if (!path.exists()) {
-            download(url, path)
+            val image = download(url)
+            path.writeBytes(image)
         }
 
         return PicRegistration.Picture(index, filename, url, extension)
     }
 
-    private suspend fun PixivClient.downloadIllusts(id: String, url: String, pages: Int): List<PicRegistration.Picture> {
+    private suspend fun PixivClient.downloadIllusts(id: Int, url: String, pages: Int): List<PicRegistration.Picture> {
         return (0 until pages).map { index ->
             downloadIllust(id, url, index)
         }
     }
 
-    private suspend fun PixivClient.downloadUgoira(id: String, url: String, width: Int, height: Int): PicRegistration.Picture {
+    private suspend fun PixivClient.downloadUgoira(id: Int, url: String, width: Int, height: Int): PicRegistration.Picture {
         val filename = "pixiv_${id}_0.gif"
 
         val path = mediaDirectory.resolve(filename)
         if (!path.exists()) {
-            val meta = getIllustUgoiraMeta(id)
+            val meta = getUgoiraMetadata(id).ugoiraMetadata
             val tmp = withContext(Dispatchers.IO) {
                 Files.createTempFile("pixiv", "ugoira")
             }
-            download(meta.originalSrc, tmp)
+            download(meta.zipUrls.medium, tmp)
             val zipFile = withContext(Dispatchers.IO) {
+                ZipInputStream()
                 ZipFile(tmp.toFile())
             }
 

@@ -24,7 +24,6 @@ object Env {
     val TWITTER_AT by stringOrNull
     val TWITTER_ATS by stringOrNull
     val PIXIV_REFRESH_TOKEN by stringOrNull
-    val PIXIV_PHPSESSIONID by stringOrNull
     val NIJIE_EMAIL by stringOrNull
     val NIJIE_PASSWORD by stringOrNull
 }

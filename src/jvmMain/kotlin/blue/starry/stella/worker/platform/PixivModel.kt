@@ -103,202 +103,108 @@ object PixivModel {
     }
 
     @Serializable
-    data class AjaxResponse<T>(
-        val body: T,
-        val error: Boolean,
-        val message: String
-    )
-
-    @Serializable
-    data class Illust(
-        val alt: String,
-        // val bookStyle: Int,
-        val bookmarkCount: Int,
-        // val bookmarkData: Any?,
-        // val comicPromotion: Any?,
-        val commentCount: Int,
-        val commentOff: Int,
-        // val contestBanners: List<Any>,
-        // val contestData: Any?,
-        val createDate: String,
-        val description: String,
-        // val descriptionBoothId: Any?,
-        // val descriptionYoutubeId: Any?,
-        val extraData: ExtraData,
-        val fanboxPromotion: FanboxPromotion?,
-        val height: Int,
-        val id: String,
-        val illustComment: String,
-        val illustId: String,
-        val illustTitle: String,
-        val illustType: Int,
-        val imageResponseCount: Int,
-        // val imageResponseData: List<Any>,
-        // val imageResponseOutData: List<Any>,
-        val isBookmarkable: Boolean,
-        val isHowto: Boolean,
-        val isOriginal: Boolean,
-        val isUnlisted: Boolean,
-        val likeCount: Int,
-        val likeData: Boolean,
-        val pageCount: Int,
-        // val pollData: Any?,
-        // val request: Any?,
-        val responseCount: Int,
-        val restrict: Int,
-        // val seriesNavData: Any?,
-        val sl: Int,
-        val storableTags: List<String>,
-        val tags: Tags,
-        val title: String,
-        val titleCaptionTranslation: TitleCaptionTranslation,
-        val uploadDate: String,
-        val urls: Urls,
-        val userAccount: String,
-        val userId: String,
-        val userIllusts: Map<String, UserIllust?>,
-        val userName: String,
-        val viewCount: Int,
-        val width: Int,
-        val xRestrict: Int,
-        val zoneConfig: Map<String, ZoneConfig>
+    data class IllustDetailResponse(
+        val illust: Illust
     ) {
         @Serializable
-        data class ExtraData(
-            val meta: Meta
+        data class Illust(
+            val caption: String,
+            @SerialName("create_date")
+            val createDate: String,
+            val height: Int,
+            val id: Int,
+            @SerialName("image_urls")
+            val imageUrls: ImageUrls,
+            @SerialName("is_bookmarked")
+            val isBookmarked: Boolean,
+            @SerialName("is_muted")
+            val isMuted: Boolean,
+            @SerialName("meta_pages")
+            val metaPages: List<ImageUrls>,
+            @SerialName("meta_single_page")
+            val metaSinglePage: MetaSinglePage,
+            @SerialName("page_count")
+            val pageCount: Int,
+            val restrict: Int,
+            @SerialName("sanity_level")
+            val sanityLevel: Int,
+            // val series: Any?,
+            val tags: List<Tag>,
+            val title: String,
+            val tools: List<String>,
+            @SerialName("total_bookmarks")
+            val totalBookmarks: Int,
+            @SerialName("total_comments")
+            val totalComments: Int,
+            @SerialName("total_view")
+            val totalView: Int,
+            val type: String,
+            val user: User,
+            val visible: Boolean,
+            val width: Int,
+            @SerialName("x_restrict")
+            val xRestrict: Int
         ) {
             @Serializable
-            data class Meta(
-                // val alternateLanguages: AlternateLanguages,
-                val canonical: String,
-                val description: String,
-                val descriptionHeader: String,
-                val ogp: Ogp,
-                val title: String,
-                val twitter: Twitter
+            data class ImageUrls(
+                val large: String,
+                val medium: String,
+                @SerialName("square_medium")
+                val squareMedium: String
+            )
+
+            @Serializable
+            data class MetaSinglePage(
+                @SerialName("original_image_url")
+                val originalImageUrl: String
+            )
+
+            @Serializable
+            data class Tag(
+                val name: String,
+                @SerialName("translated_name")
+                val translatedName: String?
+            )
+
+            @Serializable
+            data class User(
+                val account: String,
+                val id: Int,
+                @SerialName("is_followed")
+                val isFollowed: Boolean,
+                val name: String,
+                @SerialName("profile_image_urls")
+                val profileImageUrls: ProfileImageUrls
             ) {
                 @Serializable
-                data class Ogp(
-                    val description: String,
-                    val image: String,
-                    val title: String,
-                    val type: String
-                )
-
-                @Serializable
-                data class Twitter(
-                    val card: String,
-                    val description: String,
-                    val image: String,
-                    val title: String
+                data class ProfileImageUrls(
+                    val medium: String
                 )
             }
         }
+    }
 
+    @Serializable
+    data class UgoiraMetadataResponse(
+        @SerialName("ugoira_metadata")
+        val ugoiraMetadata: UgoiraMetadata
+    ) {
         @Serializable
-        data class FanboxPromotion(
-            val userName: String,
-            val userImageUrl: String,
-            val contentUrl: String,
-            val description: String,
-            val imageUrl: String?,
-            val imageUrlMobile: String?,
-            val hasAdultContent: Boolean
-        )
-
-        @Serializable
-        data class Tags(
-            val authorId: String,
-            val isLocked: Boolean,
-            val tags: List<Tag>,
-            val writable: Boolean
+        data class UgoiraMetadata(
+            val frames: List<Frame>,
+            @SerialName("zip_urls")
+            val zipUrls: ZipUrls
         ) {
             @Serializable
-            data class Tag(
-                val deletable: Boolean,
-                val locked: Boolean,
-                val tag: String,
-                val userId: String?,
-                val userName: String?
+            data class Frame(
+                val delay: Int,
+                val `file`: String
+            )
+
+            @Serializable
+            data class ZipUrls(
+                val medium: String
             )
         }
-
-        @Serializable
-        data class TitleCaptionTranslation(
-            val workCaption: String?,
-            val workTitle: String?
-        )
-
-        @Serializable
-        data class Urls(
-            val mini: String,
-            val original: String,
-            val regular: String,
-            val small: String,
-            val thumb: String
-        )
-
-        @Serializable
-        data class UserIllust(
-            val alt: String,
-            // val bookmarkData: Any?,
-            val createDate: String,
-            val description: String,
-            val height: Int,
-            val id: String,
-            val illustType: Int,
-            val isBookmarkable: Boolean,
-            val isMasked: Boolean,
-            val isUnlisted: Boolean,
-            val pageCount: Int,
-            val profileImageUrl: String?,
-            val restrict: Int,
-            val sl: Int,
-            val tags: List<String>,
-            val title: String,
-            val titleCaptionTranslation: TitleCaptionTranslation,
-            val updateDate: String,
-            val url: String,
-            val userId: String,
-            val userName: String,
-            val width: Int,
-            val xRestrict: Int
-        )
-
-        @Serializable
-        data class ZoneConfig(
-            val url: String
-        )
-    }
-
-    @Serializable
-    data class IllustPage(
-        val height: Int,
-        val urls: Urls,
-        val width: Int
-    ) {
-        @Serializable
-        data class Urls(
-            val original: String,
-            val regular: String,
-            val small: String,
-            @SerialName("thumb_mini")
-            val thumbMini: String
-        )
-    }
-
-    @Serializable
-    data class IllustUgoiraMeta(
-        val frames: List<Frame>,
-        @SerialName("mime_type")
-        val mimeType: String,
-        val originalSrc: String,
-        val src: String
-    ) {
-        @Serializable
-        data class Frame(
-            val delay: Int,
-            val file: String
-        )
     }
 }
