@@ -15,10 +15,9 @@ import blue.starry.stella.platforms.SourceProvider
 import blue.starry.stella.register.MediaRegistory
 import blue.starry.stella.register.PicRegistration
 import io.ktor.client.request.get
-import io.ktor.client.utils.EmptyContent.status
 
 object TwitterSourceProvider: SourceProvider<Long, Status> {
-    val TweetUrlPattern = "^(?:https?://)?(?:m\\.|mobile\\.)?twitter\\.com/(?:\\w|_)+?/status/(?<id>\\d+)".toRegex()
+    private val TweetUrlPattern = "^(?:https?://)?(?:m\\.|mobile\\.)?twitter\\.com/(?:\\w|_)+?/status/(?<id>\\d+)".toRegex()
     private val TcoUrlPattern = "https://t\\.co/[a-zA-Z0-9]+".toRegex()
 
     override suspend fun registerByUrl(url: String, auto: Boolean): Boolean {

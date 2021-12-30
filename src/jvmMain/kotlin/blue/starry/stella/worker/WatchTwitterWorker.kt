@@ -10,11 +10,14 @@ import blue.starry.penicillin.endpoints.statuses.delete
 import blue.starry.penicillin.endpoints.statuses.unretweet
 import blue.starry.penicillin.endpoints.timeline
 import blue.starry.penicillin.endpoints.timeline.userTimeline
+import blue.starry.penicillin.models.Status
 import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.platforms.twitter.TwitterSourceProvider
 import io.ktor.util.error
-import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 
 class WatchTwitterWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
@@ -22,8 +25,8 @@ class WatchTwitterWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
         val client = Stella.Twitter ?: return
 
         try {
-            fetchTimeline(client)
-            fetchFavorites(client)
+            checkTimeline(client)
+            checkFavorites(client)
         } catch (e: CancellationException) {
             throw e
         } catch (t: Throwable) {
@@ -31,45 +34,59 @@ class WatchTwitterWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
         }
     }
 
-    private suspend fun fetchTimeline(client: ApiClient) {
+    private suspend fun checkTimeline(client: ApiClient) {
         val timeline = client.timeline.userTimeline(
             tweetMode = TweetMode.Extended
         ).execute()
 
-        for (status in timeline) {
-            val retweet = status.retweetedStatus
+        val jobs = timeline.map { status ->
+            launch {
+                checkTimelineEach(client, status)
+            }
+        }
+        jobs.joinAll()
+    }
 
-            when {
-                // RT を処理
-                retweet != null -> {
-                    TwitterSourceProvider.register(retweet, false)
+    private suspend fun checkTimelineEach(client: ApiClient, status: Status) {
+        val retweet = status.retweetedStatus
 
-                    client.statuses.unretweet(retweet.id).execute()
-                }
-                // ツイート URL を処理
-                status.entities.urls.isEmpty() -> {
-                    for (entity in status.entities.urls) {
-                        val match = TwitterSourceProvider.TweetUrlPattern.find(entity.expandedUrl) ?: continue
+        when {
+            // RT を処理
+            retweet != null -> {
+                TwitterSourceProvider.register(retweet, false)
 
-                        val id = match.groupValues[1].toLong()
-                        TwitterSourceProvider.registerById(id, false)
+                client.statuses.unretweet(retweet.id).execute()
+            }
+            // ツイート URL を処理
+            status.entities.urls.isEmpty() -> {
+                val jobs = status.entities.urls.map { entity ->
+                    launch {
+                        TwitterSourceProvider.registerByUrl(entity.expandedUrl, false)
                     }
-
-                    client.statuses.delete(status.id).execute()
                 }
+                jobs.joinAll()
+
+                client.statuses.delete(status.id).execute()
             }
         }
     }
 
-    private suspend fun fetchFavorites(client: ApiClient) {
+    private suspend fun checkFavorites(client: ApiClient) {
         val favorites = client.favorites.list(
             options = arrayOf("tweet_mode" to TweetMode.Extended)
         ).execute()
 
-        for (status in favorites) {
-            TwitterSourceProvider.register(status, false)
-
-            client.favorites.destroy(id = status.id).execute()
+        val jobs = favorites.map { status ->
+            launch {
+                checkFavoritesEach(client, status)
+            }
         }
+        jobs.joinAll()
+    }
+
+    private suspend fun checkFavoritesEach(client: ApiClient, status: Status) {
+        TwitterSourceProvider.register(status, false)
+
+        client.favorites.destroy(id = status.id).execute()
     }
 }

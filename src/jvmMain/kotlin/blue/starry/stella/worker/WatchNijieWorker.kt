@@ -4,8 +4,11 @@ import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.platforms.nijie.NijieClient
 import blue.starry.stella.platforms.nijie.NijieSourceProvider
+import blue.starry.stella.platforms.nijie.models.Bookmark
 import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 
 class WatchNijieWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
@@ -13,7 +16,7 @@ class WatchNijieWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
         val client = Stella.Nijie ?: return
 
         try {
-            fetchBookmark(client)
+            checkBookmarks(client)
         } catch (e: CancellationException) {
             throw e
         } catch (t: Throwable) {
@@ -22,10 +25,19 @@ class WatchNijieWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
         }
     }
 
-    private suspend fun fetchBookmark(client: NijieClient) {
-        for (bookmark in client.bookmarks().reversed()) {
-            NijieSourceProvider.registerById(bookmark.id, false)
-            client.deleteBookmark(bookmark.id)
+    private suspend fun checkBookmarks(client: NijieClient) {
+        val entries = client.bookmarks().reversed()
+
+        val jobs = entries.map { bookmark ->
+            launch {
+                checkBookmarksEach(client, bookmark)
+            }
         }
+        jobs.joinAll()
+    }
+
+    private suspend fun checkBookmarksEach(client: NijieClient, bookmark: Bookmark) {
+        NijieSourceProvider.registerById(bookmark.id, false)
+        client.deleteBookmark(bookmark.id)
     }
 }

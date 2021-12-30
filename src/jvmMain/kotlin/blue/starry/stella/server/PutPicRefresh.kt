@@ -9,7 +9,7 @@ import io.ktor.locations.Location
 import io.ktor.locations.put
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.CancellationException
 import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import org.litote.kmongo.id.toId

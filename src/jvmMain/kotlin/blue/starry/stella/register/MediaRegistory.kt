@@ -6,7 +6,7 @@ import blue.starry.stella.models.PicEntry
 import blue.starry.stella.platforms.nijie.NijieSourceProvider
 import blue.starry.stella.platforms.pixiv.PixivSourceProvider
 import blue.starry.stella.platforms.twitter.TwitterSourceProvider
-import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.CancellationException
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.eq
 import org.litote.kmongo.newId

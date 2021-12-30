@@ -4,9 +4,10 @@ import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
-import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import org.litote.kmongo.*
 import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
@@ -18,18 +19,10 @@ class RefreshEntryWorker: Worker(15.minutes) {
             return
         }
 
-        try {
-            check()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            logger.error(t)
-        }
+        check()
     }
 
     private suspend fun check() {
-        delay(15.seconds)
-
         val filter = and(
             PicEntry::timestamp / PicEntry.Timestamp::archived eq false,
             or(
@@ -37,16 +30,24 @@ class RefreshEntryWorker: Worker(15.minutes) {
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
             )
         )
+        val entries = Stella.PicCollection.find(filter).limit(200).toList()
 
-        for (pic in Stella.PicCollection.find(filter).limit(200).toList()) {
-            try {
-                MediaRegistory.registerByUrl(pic.url, true)
-                delay(3.seconds)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (t: Throwable) {
-                continue
+        val jobs = entries.map { entry ->
+            launch {
+                checkEach(entry)
             }
+        }
+        jobs.joinAll()
+    }
+
+    private suspend fun checkEach(entry: PicEntry) {
+        try {
+            delay(3.seconds)
+            MediaRegistory.registerByUrl(entry.url, true)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            return
         }
     }
 }
