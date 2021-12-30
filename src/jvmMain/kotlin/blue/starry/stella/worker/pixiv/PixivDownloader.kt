@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipInputStream
 import javax.imageio.ImageIO
-import kotlin.io.path.exists
 import kotlin.io.path.writeBytes
 
 class PixivDownloader(private val client: PixivClient) {
@@ -26,11 +25,10 @@ class PixivDownloader(private val client: PixivClient) {
         val filename = "pixiv_${id}_$index.$extension"
 
         val url = base_url.replace("_p0", "_p${index}")
+        val image = client.download(url)
+
         val path = mediaDirectory.resolve(filename)
-        if (!path.exists()) {
-            val image = client.download(url)
-            path.writeBytes(image)
-        }
+        path.writeBytes(image)
 
         return PicRegistration.Picture(index, filename, url, extension)
     }
@@ -38,30 +36,29 @@ class PixivDownloader(private val client: PixivClient) {
     suspend fun downloadUgoira(id: Int, url: String, width: Int, height: Int): PicRegistration.Picture {
         val filename = "pixiv_${id}_0.gif"
 
-        val path = mediaDirectory.resolve(filename)
-        if (!path.exists()) {
-            val meta = client.getUgoiraMetadata(id).ugoiraMetadata
-            val zipUrl = meta.zipUrls.medium.replace("_ugoira600x600", "_ugoira1920x1080")
-            val zip = loadRemoteZip(zipUrl)
+        val meta = client.getUgoiraMetadata(id).ugoiraMetadata
+        val zipUrl = meta.zipUrls.medium.replace("_ugoira600x600", "_ugoira1920x1080")
+        val zip = loadRemoteZip(zipUrl)
 
-            val output = ByteArrayOutputStream()
-            val gif = GifEncoder(output, width, height, 0)
+        val output = ByteArrayOutputStream()
+        val gif = GifEncoder(output, width, height, 0)
 
-            meta.frames.forEach {
-                val entry = zip.getValue(it.file)
+        meta.frames.forEach {
+            val entry = zip.getValue(it.file)
 
-                val image = ImageIO.read(entry.inputStream())
-                val rgbs = image.toRGBArray()
-                val options = ImageOptions()
-                    .setColorQuantizer(KMeansQuantizer.INSTANCE)
-                    .setDitherer(FloydSteinbergDitherer.INSTANCE)
-                    .setDelay(it.delay.toLong(), TimeUnit.MILLISECONDS)
-                gif.addImage(rgbs, options)
-            }
-
-            gif.finishEncoding()
-            path.writeBytes(output.toByteArray())
+            val image = ImageIO.read(entry.inputStream())
+            val rgbs = image.toRGBArray()
+            val options = ImageOptions()
+                .setColorQuantizer(KMeansQuantizer.INSTANCE)
+                .setDitherer(FloydSteinbergDitherer.INSTANCE)
+                .setDelay(it.delay.toLong(), TimeUnit.MILLISECONDS)
+            gif.addImage(rgbs, options)
         }
+
+        gif.finishEncoding()
+
+        val path = mediaDirectory.resolve(filename)
+        path.writeBytes(output.toByteArray())
 
         return PicRegistration.Picture(0, filename, url, "gif")
     }
