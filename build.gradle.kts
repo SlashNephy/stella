@@ -42,8 +42,8 @@ kotlin {
                 implementation("io.ktor:ktor-client-serialization:1.6.7")
                 implementation("io.ktor:ktor-client-logging:1.6.7")
 
-                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
-                implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
+                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.3")
+                implementation("org.litote.kmongo:kmongo-id-serialization:4.2.3")
                 implementation("org.jsoup:jsoup:1.14.3")
                 implementation("com.squareup:gifencoder:0.10.1")
 
