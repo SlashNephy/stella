@@ -12,55 +12,55 @@ import io.ktor.http.Parameters
 import io.ktor.http.userAgent
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.security.MessageDigest
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration.Companion.seconds
 
 class PixivClient(private val refreshToken: String) {
     private val mutex = Mutex()
+    private var session: Token? = null
+    private var expiresAt: Instant? = null
 
-    private var token: Token? = null
-    private suspend fun isLoggedIn(): Boolean {
-        return mutex.withLock {
-            token != null
-        }
-    }
-
-    private suspend fun login() {
-        if (isLoggedIn()) {
+    private suspend fun login() = mutex.withLock {
+        // session alive
+        if (session != null && expiresAt != null && Clock.System.now() < expiresAt!!) {
             return
         }
 
-        token = mutex.withLock {
-            Stella.Http.post<Token> {
-                url("https://oauth.secure.pixiv.net/auth/token")
-                setAppHeaders(requireAuth = false)
-                val parameters = Parameters.build {
-                    append("get_secure_url", "1")
-                    append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
-                    append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
-                    append("grant_type", "refresh_token")
-                    append("refresh_token", token?.response?.refreshToken ?: refreshToken)
-                }
-                body = FormDataContent(parameters)
+        val token = Stella.Http.post<Token>("https://oauth.secure.pixiv.net/auth/token") {
+            setAppHeaders(requireAuth = false)
+
+            val parameters = Parameters.build {
+                append("get_secure_url", "1")
+                append("client_id", "MOBrBDS8blbauoSck0ZfDbtuzpyT")
+                append("client_secret", "lsACyCD94FhDUtGTXi3QzcFE2uU1hqtDaKeqrdwj")
+                append("grant_type", "refresh_token")
+                append("refresh_token", session?.response?.refreshToken ?: refreshToken)
             }
+            body = FormDataContent(parameters)
         }
+
+        val now = Clock.System.now()
+        val expiresIn = token.expiresIn.seconds
+        expiresAt = now + expiresIn - 30.seconds
+        session = token
 
         Stella.Logger.info { "Pixiv にログインしました。" }
     }
 
-    suspend fun logout() {
-        mutex.withLock {
-            token = null
-        }
+    suspend fun logout() = mutex.withLock {
+        session = null
     }
 
     suspend fun getBookmarks(private: Boolean): BookmarksResponse {
         login()
 
         return Stella.Http.get("https://app-api.pixiv.net/v1/user/bookmarks/illust") {
-            parameter("user_id", token?.response?.user?.id)
+            parameter("user_id", session?.response?.user?.id)
             parameter("restrict", if (private) "private" else "public")
 
             setAppHeaders()
@@ -118,7 +118,7 @@ class PixivClient(private val refreshToken: String) {
 
     private fun HttpRequestBuilder.setAppHeaders(requireAuth: Boolean = true) {
         if (requireAuth) {
-            val token = token?.response?.accessToken ?: error("Login required.")
+            val token = session?.response?.accessToken ?: error("Login required.")
             header(HttpHeaders.Authorization, "Bearer $token")
         }
 
