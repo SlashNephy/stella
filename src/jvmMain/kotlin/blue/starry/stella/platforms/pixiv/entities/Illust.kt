@@ -32,7 +32,7 @@ data class Illust(
     @SerialName("total_bookmarks")
     val totalBookmarks: Int,
     @SerialName("total_comments")
-    val totalComments: Int,
+    val totalComments: Int?,
     @SerialName("total_view")
     val totalView: Int,
     val type: String,
