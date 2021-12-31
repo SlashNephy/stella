@@ -83,10 +83,14 @@ class PixivClient(private val refreshToken: String) {
     suspend fun addFollow(id: Int, private: Boolean) {
         login()
 
-        Stella.Http.post<Unit>("https://app-api.pixiv.net/v1/user/follow/add") {
-            parameter("user_id", id)
-            parameter("restrict", if (private) "private" else "public")
+        val form = Parameters.build {
+            append("user_id", id.toString())
+            append("restrict", if (private) "private" else "public")
+        }
 
+        Stella.Http.post<Unit>("https://app-api.pixiv.net/v1/user/follow/add") {
+            body = FormDataContent(form)
+            setAppHeaders()
         }
     }
 

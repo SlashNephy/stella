@@ -11,7 +11,7 @@ fun main() {
     if (!Files.exists(Stella.MediaDirectory)) {
         Files.createDirectory(Stella.MediaDirectory)
     }
-    
+
     val workers = listOf(
         RefreshEntryWorker(),
         RefetchMissingMediaWorker(),
