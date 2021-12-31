@@ -1,5 +1,6 @@
 package blue.starry.stella.models
 
+import blue.starry.stella.models.internal.MediaExtensionSerializer
 import blue.starry.stella.models.internal.PlatformSerializer
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import kotlinx.serialization.Contextual
@@ -53,7 +54,7 @@ data class PicEntry(
         val index: Int,
         val filename: String,
         val original: String,
-        val ext: String
+        val ext: MediaExtension
     )
 
     @Serializable
@@ -72,7 +73,6 @@ data class PicEntry(
     )
 
     @Serializable(PlatformSerializer::class)
-    @Suppress("unused")
     enum class Platform {
         Twitter,
         Pixiv,
@@ -80,11 +80,19 @@ data class PicEntry(
     }
 
     @Serializable(SensitiveLevelSerializer::class)
-    @Suppress("unused")
     enum class SensitiveLevel {
         Safe,
         R15,
         R18,
         R18G
+    }
+
+    @Serializable(MediaExtensionSerializer::class)
+    @Suppress("EnumEntryName")
+    enum class MediaExtension {
+        jpg, jpeg,
+        png,
+        gif,
+        mp4
     }
 }

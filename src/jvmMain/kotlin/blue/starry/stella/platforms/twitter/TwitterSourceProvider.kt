@@ -11,10 +11,12 @@ import blue.starry.penicillin.models.Status
 import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.internal.MediaExtensionSerializer
 import blue.starry.stella.platforms.SourceProvider
 import blue.starry.stella.register.MediaRegistory
 import blue.starry.stella.register.PicRegistration
 import io.ktor.client.request.get
+import io.ktor.http.ContentType
 
 object TwitterSourceProvider: SourceProvider<Long, Status> {
     private val TweetUrlPattern = "^(?:https?://)?(?:m\\.|mobile\\.)?twitter\\.com/(?:\\w|_)+?/status/(?<id>\\d+)".toRegex()
@@ -57,18 +59,18 @@ object TwitterSourceProvider: SourceProvider<Long, Status> {
                 else -> PicEntry.SensitiveLevel.Safe
             },
             created = data.idObj.epochTimeMillis,
-            author = PicRegistration.Author(
+            author = PicEntry.Author(
                 name = data.user.name,
                 url = "https://twitter.com/${data.user.screenName}",
                 username = data.user.screenName
             ),
             media = media.mapIndexed { i, it ->
                 val url = it.videoInfo?.variants?.filter {
-                    it.contentType == "video/mp4"
+                    it.contentType == ContentType.Video.MP4.toString()
                 }?.maxByOrNull { it.bitrate ?: 0 }?.url
                     ?: it.videoInfo?.variants?.firstOrNull()?.url
                     ?: it.mediaUrlHttps
-                val ext = url.split(".").last().split("?").first()
+                val ext = MediaExtensionSerializer.deserializeFromUrl(url)
 
                 val file = Stella.MediaDirectory.resolve("twitter_${data.idStr}_$i.$ext").toFile()
                 if (!file.exists()) {
@@ -76,11 +78,14 @@ object TwitterSourceProvider: SourceProvider<Long, Status> {
                     file.writeBytes(response)
                 }
 
-                PicRegistration.Picture(i, "twitter_${data.idStr}_$i.$ext", url, ext)
+                PicEntry.Media(i, "twitter_${data.idStr}_$i.$ext", url, ext)
             },
-            popularity = PicRegistration.Popularity(
+            popularity = PicEntry.Popularity(
                 like = data.favoriteCount,
-                retweet = data.retweetCount
+                retweet = data.retweetCount,
+                view = null,
+                bookmark = null,
+                reply = data.replyCount
             )
         )
 

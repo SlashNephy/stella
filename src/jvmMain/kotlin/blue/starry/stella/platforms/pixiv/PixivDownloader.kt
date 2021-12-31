@@ -1,7 +1,8 @@
 package blue.starry.stella.platforms.pixiv
 
 import blue.starry.stella.Stella
-import blue.starry.stella.register.PicRegistration
+import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.internal.MediaExtensionSerializer
 import com.squareup.gifencoder.FloydSteinbergDitherer
 import com.squareup.gifencoder.GifEncoder
 import com.squareup.gifencoder.ImageOptions
@@ -14,24 +15,25 @@ import javax.imageio.ImageIO
 import kotlin.io.path.writeBytes
 
 class PixivDownloader(private val client: PixivClient) {
-    suspend fun downloadIllusts(id: Int, url: String, pages: Int): List<PicRegistration.Picture> {
+    suspend fun downloadIllusts(id: Int, url: String, pages: Int): List<PicEntry.Media> {
         return (0 until pages).map { index ->
             downloadIllust(id, url, index)
         }
     }
 
-    private suspend fun downloadIllust(id: Int, base_url: String, index: Int): PicRegistration.Picture {
-        val extension = base_url.split(".").last().split("?").first()
+    private suspend fun downloadIllust(id: Int, base_url: String, index: Int): PicEntry.Media {
+        val extension = MediaExtensionSerializer.deserializeFromUrl(base_url)
+
         val filename = "pixiv_${id}_$index.$extension"
         val url = base_url.replace("_p0", "_p${index}")
         val image = client.download(url)
         val path = Stella.MediaDirectory.resolve(filename)
         path.writeBytes(image)
 
-        return PicRegistration.Picture(index, filename, url, extension)
+        return PicEntry.Media(index, filename, url, extension)
     }
 
-    suspend fun downloadUgoira(id: Int, url: String, width: Int, height: Int): PicRegistration.Picture {
+    suspend fun downloadUgoira(id: Int, url: String, width: Int, height: Int): PicEntry.Media {
         val filename = "pixiv_${id}_0.gif"
         val meta = client.getUgoiraMetadata(id).ugoiraMetadata
         val zipUrl = meta.zipUrls.medium.replace("_ugoira600x600", "_ugoira1920x1080")
@@ -51,7 +53,7 @@ class PixivDownloader(private val client: PixivClient) {
         val path = Stella.MediaDirectory.resolve(filename)
         path.writeBytes(output.toByteArray())
 
-        return PicRegistration.Picture(0, filename, url, "gif")
+        return PicEntry.Media(0, filename, url, PicEntry.MediaExtension.gif)
     }
 
     private suspend fun loadRemoteZip(url: String): Map<String, ByteArray> {

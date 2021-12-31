@@ -46,10 +46,10 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
             title = data.title,
             description = data.caption,
             url = "https://www.pixiv.net/artworks/${data.id}",
-            author = PicRegistration.Author(
+            author = PicEntry.Author(
                 data.user.name,
-                "https://www.pixiv.net/users/${data.id}",
-                data.user.account
+                data.user.account,
+                "https://www.pixiv.net/users/${data.id}"
             ),
 
             tags = tags,
@@ -63,10 +63,12 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
             created = ZonedDateTime.parse(data.createDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant().toEpochMilli(),
 
             media = media,
-            popularity = PicRegistration.Popularity(
+            popularity = PicEntry.Popularity(
                 bookmark = data.totalBookmarks,
                 reply = data.totalComments,
-                view = data.totalView
+                view = data.totalView,
+                retweet = null,
+                like = null
             )
         )
 

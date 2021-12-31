@@ -2,6 +2,7 @@ package blue.starry.stella.platforms.nijie
 
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.internal.MediaExtensionSerializer
 import blue.starry.stella.platforms.SourceProvider
 import blue.starry.stella.platforms.nijie.models.IllustMeta
 import blue.starry.stella.register.MediaRegistory
@@ -41,22 +42,23 @@ object NijieSourceProvider: SourceProvider<String, IllustMeta> {
             platform = PicEntry.Platform.Nijie,
             sensitiveLevel = PicEntry.SensitiveLevel.R18,
             created = createdAt,
-            author = PicRegistration.Author(data.illust.author.name, data.illust.author.sameAs, null),
+            author = PicEntry.Author(data.illust.author.name, null, data.illust.author.sameAs),
             media = data.mediaUrls.mapIndexed { index, url ->
-                val ext = url.split(".").last().split("?").first()
+                val ext = MediaExtensionSerializer.deserializeFromUrl(url)
                 val path = Stella.MediaDirectory.resolve("nijie_${data.id}_$index.$ext")
 
                 val client = Stella.Nijie ?: return false
                 val image = client.download(url)
                 path.writeBytes(image)
 
-                PicRegistration.Picture(index, "nijie_${data.id}_$index.$ext", url, ext)
+                PicEntry.Media(index, "nijie_${data.id}_$index.$ext", url, ext)
             },
-            popularity = PicRegistration.Popularity(
+            popularity = PicEntry.Popularity(
                 like = data.like,
                 bookmark = data.bookmark,
                 reply = data.reply,
-                view = data.view
+                view = data.view,
+                retweet = null
             )
         )
 

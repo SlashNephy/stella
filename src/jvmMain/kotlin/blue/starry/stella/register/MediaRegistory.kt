@@ -61,20 +61,12 @@ object MediaRegistory {
                 manual_updated = if (!auto) Instant.now().toEpochMilli() else (old?.timestamp?.manual_updated ?: Instant.now().toEpochMilli()),
                 archived = false
             ),
-            author = PicEntry.Author(
-                name = entry.author.name, url = entry.author.url, username = entry.author.username
-            ),
-            media = entry.media.map {
-                PicEntry.Media(
-                    index = it.index, filename = it.filename, original = it.filename, ext = it.ext
-                )
-            },
+            author = entry.author,
+            media = entry.media,
             rating = PicEntry.Rating(
                 count = old?.rating?.count ?: 0, score = old?.rating?.score ?: 0
             ),
-            popularity = PicEntry.Popularity(
-                like = entry.popularity.like, bookmark = entry.popularity.bookmark, view = entry.popularity.view, retweet = entry.popularity.retweet, reply = entry.popularity.reply
-            )
+            popularity = entry.popularity
         )
 
         if (old != null) {

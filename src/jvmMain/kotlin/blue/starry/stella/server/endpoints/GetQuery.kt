@@ -1,12 +1,15 @@
-package blue.starry.stella.server
+package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
+import blue.starry.stella.db.GetQueryFilters
+import blue.starry.stella.db.GetQueryPipelines
 import blue.starry.stella.models.PicEntry
-import io.ktor.application.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.call
+import io.ktor.locations.Location
+import io.ktor.locations.get
+import io.ktor.request.header
+import io.ktor.response.respond
+import io.ktor.routing.Route
 import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList

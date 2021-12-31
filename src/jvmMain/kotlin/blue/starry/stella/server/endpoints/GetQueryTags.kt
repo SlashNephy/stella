@@ -1,6 +1,7 @@
-package blue.starry.stella.server
+package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
+import blue.starry.stella.db.GetQueryTagsFilters
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.PicTags
 import blue.starry.stella.models.internal.SensitiveLevelSerializer

@@ -1,6 +1,7 @@
 package blue.starry.stella.server
 
 import blue.starry.stella.Env
+import blue.starry.stella.server.endpoints.*
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*

@@ -1,8 +1,9 @@
-package blue.starry.stella.server
+package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
+import blue.starry.stella.server.respondApiError
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location

@@ -1,4 +1,4 @@
-package blue.starry.stella.models
+package blue.starry.stella.db
 
 enum class SortOrder(internal val text: String) {
     AddedDescending("added_descending"), AddedAscending("added_ascending"),

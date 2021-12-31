@@ -1,13 +1,16 @@
-package blue.starry.stella.server
+package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
+import blue.starry.stella.server.respondApiError
+import io.ktor.application.call
+import io.ktor.features.origin
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.Location
+import io.ktor.locations.delete
+import io.ktor.locations.put
+import io.ktor.request.receiveParameters
+import io.ktor.response.respond
 import io.ktor.routing.Route
 import org.bson.types.ObjectId
 import org.litote.kmongo.*

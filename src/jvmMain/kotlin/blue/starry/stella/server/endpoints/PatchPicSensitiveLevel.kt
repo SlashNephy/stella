@@ -1,8 +1,9 @@
-package blue.starry.stella.server
+package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
+import blue.starry.stella.server.respondApiError
 import com.mongodb.client.model.Updates
 import io.ktor.application.call
 import io.ktor.features.origin

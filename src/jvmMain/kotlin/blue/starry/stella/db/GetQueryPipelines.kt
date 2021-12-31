@@ -1,7 +1,6 @@
-package blue.starry.stella.server
+package blue.starry.stella.db
 
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.models.SortOrder
 import kotlinx.coroutines.flow.flow
 import org.bson.conversions.Bson
 import org.litote.kmongo.*

@@ -1,8 +1,6 @@
-package blue.starry.stella.server
+package blue.starry.stella.db
 
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.models.internal.SensitiveLevelSerializer
-import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.litote.kmongo.*
@@ -33,7 +31,7 @@ object GetQueryTagsFilters {
     fun sensitiveLevel(value: PicEntry.SensitiveLevel?) = flow {
         if (value != null) {
             emit(
-                Filters.lte(PicEntry::sensitive_level.name, SensitiveLevelSerializer.serialize(value))
+                PicEntry::sensitive_level.lte(value)
             )
         }
     }
