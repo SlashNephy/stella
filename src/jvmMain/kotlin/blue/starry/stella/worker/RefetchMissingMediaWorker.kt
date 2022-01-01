@@ -11,6 +11,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
+import org.litote.kmongo.ne
 import kotlin.io.path.exists
 import kotlin.time.Duration.Companion.minutes
 
@@ -24,7 +25,7 @@ class RefetchMissingMediaWorker: Worker(15.minutes) {
     }
 
     private suspend fun check() {
-        val filter = PicEntry::timestamp / PicEntry.Timestamp::archived eq false
+        val filter = PicEntry::timestamp / PicEntry.Timestamp::archived ne true
         val entries = Stella.PicCollection.find(filter).toList()
 
         val jobs = entries.map { entry ->

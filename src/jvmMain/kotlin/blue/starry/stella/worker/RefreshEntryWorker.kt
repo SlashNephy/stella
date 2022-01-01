@@ -24,7 +24,7 @@ class RefreshEntryWorker: Worker(15.minutes) {
 
     private suspend fun check() {
         val filter = and(
-            PicEntry::timestamp / PicEntry.Timestamp::archived eq false,
+            PicEntry::timestamp / PicEntry.Timestamp::archived ne true,
             or(
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated eq null,
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
