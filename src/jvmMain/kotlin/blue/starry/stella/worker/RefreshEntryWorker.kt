@@ -6,6 +6,8 @@ import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
+import io.ktor.client.features.ResponseException
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,7 @@ class RefreshEntryWorker: Worker(15.minutes) {
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
             )
         )
-        val entries = Stella.PicCollection.find(filter).toFlow()
+        val entries = Stella.PicCollection.find(filter).limit(200).toFlow()
 
         val jobs = entries.map { entry ->
             launch {
@@ -51,6 +53,15 @@ class RefreshEntryWorker: Worker(15.minutes) {
         } catch (e: PenicillinTwitterApiException) {
             when (e.error) {
                 TwitterApiError.NoStatusFound -> {
+                    Stella.PicCollection.updateOne(
+                        PicEntry::url eq entry.url,
+                        setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, true)
+                    )
+                }
+            }
+        } catch (e: ResponseException) {
+            when (e.response.status) {
+                HttpStatusCode.NotFound -> {
                     Stella.PicCollection.updateOne(
                         PicEntry::url eq entry.url,
                         setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, true)
