@@ -19,17 +19,20 @@ import org.litote.kmongo.id.toId
 data class PutPicRefresh(val id: String)
 
 fun Route.putPicRefresh() {
-    put<PutPicRefresh> { (id) ->
-        val entry = Stella.PicCollection.findOne(PicEntry::_id eq ObjectId(id).toId()) ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
-            "Specified entry is not found."
-        }
+    put<PutPicRefresh> { param ->
+        val filter = PicEntry::_id eq ObjectId(param.id).toId()
+        val entry = Stella.PicCollection.findOne(filter)
+            ?: return@put call.respondApiError(HttpStatusCode.NotFound) {
+                "Specified entry was not found."
+            }
 
         try {
             MediaRegistory.registerByUrl(entry.url, false)
-            val newEntry = Stella.PicCollection.findOne(PicEntry::_id eq ObjectId(id).toId())!!
+
+            val newEntry = Stella.PicCollection.findOne(filter)!!
             call.respond(newEntry)
         } catch (e: CancellationException) {
-            return@put
+            throw e
         } catch (t: Throwable) {
             call.respondApiError {
                 "Unknown error occurred."

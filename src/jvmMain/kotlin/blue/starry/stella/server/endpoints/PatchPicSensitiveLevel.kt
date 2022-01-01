@@ -4,7 +4,6 @@ import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import blue.starry.stella.server.respondApiError
-import com.mongodb.client.model.Updates
 import io.ktor.application.call
 import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
@@ -28,22 +27,25 @@ fun Route.patchPicSensitiveLevel() {
     patch<PatchPicSensitiveLevel> { param ->
         val sensitiveLevel =
             call.receiveParameters()["sensitive_level"]?.toIntOrNull()?.let { SensitiveLevelSerializer.deserializeOrNull(it) } ?: return@patch call.respondApiError(HttpStatusCode.BadRequest) {
-                "Essential \"sensitive_level\" is invalid."
+                "Essential \"sensitive_level\" was invalid."
             }
 
-        if (Stella.PicCollection.countDocuments(PicEntry::_id eq ObjectId(param.id).toId()) == 0L) {
+        val filter = PicEntry::_id eq ObjectId(param.id).toId()
+        if (Stella.PicCollection.countDocuments(filter) == 0L) {
             return@patch call.respondApiError(HttpStatusCode.NotFound) {
-                "Specified entry is not found."
+                "Specified entry was not found."
             }
         }
 
         Stella.PicCollection.updateOne(
-            PicEntry::_id eq ObjectId(param.id).toId(), combine(
-                Updates.set(PicEntry::sensitive_level.name, SensitiveLevelSerializer.serialize(sensitiveLevel)),
+            filter,
+            combine(
+                setValue(PicEntry::sensitive_level, sensitiveLevel),
                 setValue(PicEntry::timestamp / PicEntry.Timestamp::manual_updated, Instant.now().toEpochMilli())
             )
         )
-        val entry = Stella.PicCollection.findOne(PicEntry::_id eq ObjectId(param.id).toId())!!
+
+        val entry = Stella.PicCollection.findOne(filter)!!
         call.respond(entry)
 
         Stella.Logger.info {

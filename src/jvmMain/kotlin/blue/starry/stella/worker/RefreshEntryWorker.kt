@@ -1,5 +1,7 @@
 package blue.starry.stella.worker
 
+import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
+import blue.starry.penicillin.core.exceptions.TwitterApiError
 import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
@@ -44,6 +46,15 @@ class RefreshEntryWorker: Worker(15.minutes) {
         try {
             delay(3.seconds)
             MediaRegistory.registerByUrl(entry.url, true)
+        } catch (e: PenicillinTwitterApiException) {
+            when (e.error) {
+                TwitterApiError.NoStatusFound -> {
+                    Stella.PicCollection.updateOne(
+                        PicEntry::url eq entry.url,
+                        setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, true)
+                    )
+                }
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (t: Throwable) {
