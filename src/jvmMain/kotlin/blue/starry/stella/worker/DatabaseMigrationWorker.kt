@@ -16,12 +16,12 @@ class DatabaseMigrationWorker: Worker(null) {
         check()
     }
 
-    private data class Migration(val filter: Bson, val update: Bson)
+    private data class Migration(val name: String, val filter: Bson, val update: Bson)
 
     private suspend fun check() {
         val migrations = listOf(
-            // timestamp.archived
             Migration(
+                name = "timestamp.archived",
                 filter = (PicEntry::timestamp / PicEntry.Timestamp::archived) eq null,
                 update = setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, false)
             )
@@ -51,5 +51,7 @@ class DatabaseMigrationWorker: Worker(null) {
             PicEntry::url eq url,
             migration.update
         )
+
+        logger.debug { "エントリー: \"$url\" のマイグレーション \"${migration.name}\" が完了しました。" }
     }
 }
