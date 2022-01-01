@@ -7,6 +7,8 @@ import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.litote.kmongo.div
@@ -26,13 +28,13 @@ class RefetchMissingMediaWorker: Worker(15.minutes) {
 
     private suspend fun check() {
         val filter = PicEntry::timestamp / PicEntry.Timestamp::archived ne true
-        val entries = Stella.PicCollection.find(filter).toList()
+        val entries = Stella.PicCollection.find(filter).toFlow()
 
         val jobs = entries.map { entry ->
             launch {
                 checkEach(entry)
             }
-        }
+        }.toList()
         jobs.joinAll()
     }
 

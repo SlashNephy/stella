@@ -8,6 +8,8 @@ import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
@@ -32,13 +34,13 @@ class RefreshEntryWorker: Worker(15.minutes) {
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.AUTO_REFRESH_THRESHOLD
             )
         )
-        val entries = Stella.PicCollection.find(filter).limit(200).toList()
+        val entries = Stella.PicCollection.find(filter).toFlow()
 
         val jobs = entries.map { entry ->
             launch {
                 checkEach(entry)
             }
-        }
+        }.toList()
         jobs.joinAll()
     }
 
