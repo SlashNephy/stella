@@ -40,7 +40,7 @@ object Stella {
     val MediaDirectory: Path = Paths.get("media")
 
     val Dispatcher: CoroutineDispatcher = newFixedThreadPoolContext(
-        Runtime.getRuntime().availableProcessors(),
+        Runtime.getRuntime().availableProcessors() * 2,
         "StellaDispatcher"
     )
 
