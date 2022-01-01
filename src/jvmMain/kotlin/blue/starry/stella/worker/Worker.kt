@@ -8,7 +8,7 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class Worker(private val interval: Duration): CoroutineScope {
+abstract class Worker(private val interval: Duration?): CoroutineScope {
     val logger by lazy {
         KotlinLogging.logger("Stella.${this::class.simpleName}")
     }
@@ -23,6 +23,11 @@ abstract class Worker(private val interval: Duration): CoroutineScope {
             try {
                 while (isActive) {
                     run()
+
+                    if (interval == null) {
+                        break
+                    }
+
                     delay(interval + Random.nextInt(0, 30).seconds)
                 }
             } catch (e: CancellationException){

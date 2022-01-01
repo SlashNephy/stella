@@ -13,6 +13,7 @@ fun main() {
     }
 
     val workers = listOf(
+        DatabaseMigrationWorker(),
         RefreshEntryWorker(),
         RefetchMissingMediaWorker(),
         WatchTwitterWorker(),
