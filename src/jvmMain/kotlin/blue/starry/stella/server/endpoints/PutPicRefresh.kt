@@ -34,6 +34,8 @@ fun Route.putPicRefresh() {
         } catch (e: CancellationException) {
             throw e
         } catch (t: Throwable) {
+            Stella.Logger.error(t) { "Failed to refresh entry." }
+
             call.respondApiError {
                 "Unknown error occurred."
             }

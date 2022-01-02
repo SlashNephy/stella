@@ -6,7 +6,6 @@ import blue.starry.stella.models.PicEntry
 import blue.starry.stella.platforms.nijie.NijieSourceProvider
 import blue.starry.stella.platforms.pixiv.PixivSourceProvider
 import blue.starry.stella.platforms.twitter.TwitterSourceProvider
-import kotlinx.coroutines.CancellationException
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.eq
 import org.litote.kmongo.newId
@@ -19,20 +18,14 @@ object MediaRegistory {
         NijieSourceProvider
     )
 
-    suspend fun registerByUrl(url: String, auto: Boolean) {
+    suspend fun registerByUrl(url: String, auto: Boolean): Boolean {
         for (provider in providers) {
-            try {
-                if (provider.registerByUrl(url, auto)) {
-                    Stella.Logger.debug { "エントリー: $url を取得しました。" }
-                    break
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (t: Throwable) {
-                Stella.Logger.error(t) { "エントリー: $url の取得に失敗しました。" }
-                throw t
+            if (provider.registerByUrl(url, auto)) {
+                return true
             }
         }
+
+        return false
     }
 
     suspend fun register(entry: PicRegistration, auto: Boolean) {
