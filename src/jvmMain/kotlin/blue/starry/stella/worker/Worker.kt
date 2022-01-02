@@ -1,6 +1,7 @@
 package blue.starry.stella.worker
 
 import blue.starry.stella.Stella
+import blue.starry.stella.create
 import kotlinx.coroutines.*
 import mu.KotlinLogging
 import kotlin.coroutines.CoroutineContext
@@ -10,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class Worker(private val interval: Duration?): CoroutineScope {
     val logger by lazy {
-        KotlinLogging.logger("Stella.${this::class.simpleName}")
+        KotlinLogging.create("Stella.${this::class.simpleName}")
     }
 
     final override val coroutineContext: CoroutineContext

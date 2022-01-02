@@ -1,6 +1,7 @@
 package blue.starry.stella.server
 
 import blue.starry.stella.Env
+import blue.starry.stella.create
 import blue.starry.stella.server.endpoints.*
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -72,7 +73,7 @@ fun Application.entrypoint() {
     }
 
     install(CallLogging) {
-        logger = KotlinLogging.logger("Stella.Server")
+        logger = KotlinLogging.create("Stella.Server")
         format { call ->
             when (val status = call.response.status()) {
                 HttpStatusCode.Found -> "$status: ${call.request.toLogString()} -> ${call.response.headers[HttpHeaders.Location]}"

@@ -4,6 +4,7 @@ import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
 import blue.starry.penicillin.core.exceptions.TwitterApiError
 import blue.starry.penicillin.extensions.rateLimit
 import blue.starry.stella.Stella
+import blue.starry.stella.create
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
 import io.ktor.client.features.ResponseException
@@ -35,7 +36,7 @@ import kotlin.random.nextInt
 import kotlin.time.Duration.Companion.seconds
 
 object BatchUpdater {
-    private val logger = KotlinLogging.logger("Stella.BatchUpdater")
+    private val logger = KotlinLogging.create("Stella.BatchUpdater")
 
     private val rateLimitsMutex = Mutex()
     private val rateLimits = mutableMapOf<PicEntry.Platform, Instant?>()

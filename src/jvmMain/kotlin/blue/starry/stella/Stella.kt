@@ -40,7 +40,7 @@ import java.nio.file.Paths
 
 @OptIn(ObsoleteCoroutinesApi::class, ExperimentalSerializationApi::class)
 object Stella {
-    val Logger: KLogger = KotlinLogging.logger("Stella")
+    val Logger: KLogger = KotlinLogging.create("Stella")
     val MediaDirectory: Path = Paths.get("media")
 
     val Dispatcher: CoroutineDispatcher = newFixedThreadPoolContext(
@@ -70,7 +70,7 @@ object Stella {
         Logging {
             level = LogLevel.INFO
             logger = object : Logger {
-                private val logger = KotlinLogging.logger("Stella.Http")
+                private val logger = KotlinLogging.create("Stella.Http")
 
                 override fun log(message: String) {
                     logger.trace { message }
