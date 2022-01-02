@@ -5,11 +5,12 @@ import blue.starry.stella.worker.*
 import io.ktor.application.Application
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import java.nio.file.Files
+import kotlin.io.path.createDirectories
+import kotlin.io.path.notExists
 
 fun main() {
-    if (!Files.exists(Stella.MediaDirectory)) {
-        Files.createDirectory(Stella.MediaDirectory)
+    if (Stella.MediaDirectory.notExists()) {
+        Stella.MediaDirectory.createDirectories()
     }
 
     val workers = listOf(
