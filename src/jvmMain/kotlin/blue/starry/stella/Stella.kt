@@ -19,6 +19,7 @@ import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
+import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -55,6 +56,8 @@ object Stella {
                 coerceInputValues = true
                 explicitNulls = false
             })
+
+            acceptContentTypes += ContentType.Text.Html
         }
 
         Logging {
