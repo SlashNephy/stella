@@ -123,10 +123,10 @@ class NijieClient(private val email: String, private val password: String) {
             it.select("span[class=tag_name]").text()
         }
 
-        val like = jsoup.getElementById("good_cnt")!!.text().toInt()
-        val bookmark = jsoup.getElementById("nuita_cnt")!!.text().toInt()
-        val reply = jsoup.getElementById("comment_list_js")!!.childNodeSize() / 2
-        val isFollowing = jsoup.select(".bookmark-user").size > 0
+        val like = jsoup.getElementById("good_cnt")?.text()?.toIntOrNull() ?: 0
+        val bookmark = jsoup.getElementById("nuita_cnt")?.text()?.toIntOrNull() ?: 0
+        val reply = jsoup.getElementById("comment_list_js")?.childNodeSize()?.div(2) ?: 0
+        val isFollowing = !jsoup.select(".bookmark-user").isNullOrEmpty()
 
         val jsoup2 = Stella.Http.get<String>("https://nijie.info/view_popup.php?id=$id") {
             setHeaders()
