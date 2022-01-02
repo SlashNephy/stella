@@ -32,11 +32,16 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
         val downloader = PixivDownloader(client)
 
         val tags = data.tags.map { it.name }
+        val firstImageUrl = data.metaSinglePage.originalImageUrl
+            ?: data.metaPages.firstOrNull()?.original
+            ?: data.metaPages.firstOrNull()?.imageUrls?.original
+            ?: error("Illust (ID: ${data.id}) has no images.")
+
         val media = when (data.type) {
-            "illust" -> downloader.downloadIllusts(data.id, data.metaSinglePage.originalImageUrl, data.pageCount)
+            "illust" -> downloader.downloadIllusts(data.id, firstImageUrl, data.pageCount)
             "ugoira" -> {
                 listOf(
-                    downloader.downloadUgoira(data.id, data.metaSinglePage.originalImageUrl, data.width, data.height)
+                    downloader.downloadUgoira(data.id, firstImageUrl, data.width, data.height)
                 )
             }
             else -> TODO("Unsupported illistType: ${data.type} from ${data.id}")

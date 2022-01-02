@@ -44,16 +44,19 @@ data class Illust(
 ) {
     @Serializable
     data class ImageUrls(
-        val large: String,
-        val medium: String,
+        val large: String?,
+        val medium: String?,
         @SerialName("square_medium")
-        val squareMedium: String
+        val squareMedium: String?,
+        val original: String?,
+        @SerialName("image_urls")
+        val imageUrls: ImageUrls?
     )
 
     @Serializable
     data class MetaSinglePage(
         @SerialName("original_image_url")
-        val originalImageUrl: String
+        val originalImageUrl: String?
     )
 
     @Serializable
