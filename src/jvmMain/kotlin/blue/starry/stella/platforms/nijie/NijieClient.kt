@@ -126,7 +126,7 @@ class NijieClient(private val email: String, private val password: String) {
         val like = jsoup.getElementById("good_cnt")!!.text().toInt()
         val bookmark = jsoup.getElementById("nuita_cnt")!!.text().toInt()
         val reply = jsoup.getElementById("comment_list_js")!!.childNodeSize() / 2
-        val isFollowing = jsoup.selectXpath(".bookmark-user").size > 0
+        val isFollowing = jsoup.select(".bookmark-user").size > 0
 
         val jsoup2 = Stella.Http.get<String>("https://nijie.info/view_popup.php?id=$id") {
             setHeaders()
