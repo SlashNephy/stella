@@ -1,6 +1,9 @@
 package blue.starry.stella
 
 import kotlin.properties.ReadOnlyProperty
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Env {
     val HOST by stringOrNull
@@ -14,23 +17,34 @@ object Env {
     val DB_PASSWORD by stringOrNull
     val DB_NAME by string { "stella" }
 
-    val ENABLE_MISSING_MEDIA_REFETCH by boolean { true }
-    val ENABLE_REFRESH_ENTRY by boolean { false }
-    val AUTO_REFRESH_THRESHOLD by long { 6 * 60 * 60 * 1000L }
-    val CHECK_INTERVAL_MINS by int { 1 }
-    val DRYRUN by boolean { false }
-
     val TWITTER_CK by stringOrNull
     val TWITTER_CS by stringOrNull
     val TWITTER_AT by stringOrNull
     val TWITTER_ATS by stringOrNull
-    val TWITTER_FOLLOW_AFTER_REGISTER by boolean { false }
 
     val PIXIV_REFRESH_TOKEN by stringOrNull
-    val PIXIV_FOLLOW_AFTER_REGISTER by boolean { false }
 
     val NIJIE_EMAIL by stringOrNull
     val NIJIE_PASSWORD by stringOrNull
+
+    val ENABLE_DATABASE_MIGRATION by boolean { false }
+    val ENABLE_REFETCH_MISSING_MEDIA by boolean { false }
+    val REFETCH_MISSING_MEDIA_INTERVAL_MINUTES by long { 15.minutes.inWholeMinutes }
+
+    val ENABLE_REFRESH_ENTRY by boolean { false }
+    val REFRESH_ENTRY_INTERVAL_MINUTES by long { 15.minutes.inWholeMinutes }
+    val REFRESH_ENTRY_THRESHOLD_MINUTES by long { 7.days.inWholeMinutes }
+
+    val ENABLE_WATCH_TWITTER by boolean { false }
+    val ENABLE_WATCH_PIXIV by boolean { false }
+    val ENABLE_WATCH_NIJIE by boolean { false }
+    val WATCH_INTERVAL_SECONDS by long { 30.seconds.inWholeSeconds }
+    val WATCH_THEN_FOLLOW_TWITTER by boolean { false }
+    val WATCH_THEN_FOLLOW_PIXIV by boolean { false }
+
+    val USER_AGENT by string { "Stella/1.0 (+https://github.com/SlashNephy/Stella)" }
+    val LOG_LEVEL by string { "INFO" }
+    val DRYRUN by boolean { false }
 }
 
 private val stringOrNull: ReadOnlyProperty<Env, String?>

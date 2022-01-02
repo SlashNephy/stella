@@ -1,5 +1,6 @@
 package blue.starry.stella.worker
 
+import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import kotlinx.coroutines.flow.map
@@ -13,6 +14,10 @@ import org.litote.kmongo.setValue
 
 class DatabaseMigrationWorker: Worker(null) {
     override suspend fun run() {
+        if (!Env.ENABLE_DATABASE_MIGRATION) {
+            return
+        }
+
         check()
     }
 

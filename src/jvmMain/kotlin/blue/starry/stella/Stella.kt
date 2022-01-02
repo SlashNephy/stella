@@ -12,14 +12,17 @@ import blue.starry.stella.platforms.nijie.NijieClient
 import blue.starry.stella.platforms.pixiv.PixivClient
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.features.DefaultRequest
 import io.ktor.client.features.cookies.AcceptAllCookiesStorage
 import io.ktor.client.features.cookies.HttpCookies
+import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.http.ContentType
+import io.ktor.http.userAgent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -46,6 +49,10 @@ object Stella {
     )
 
     val Http: HttpClient = HttpClient(CIO) {
+        defaultRequest {
+            userAgent(Env.USER_AGENT)
+        }
+
         install(HttpCookies) {
             storage = AcceptAllCookiesStorage()
         }

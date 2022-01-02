@@ -91,7 +91,7 @@ object TwitterSourceProvider: SourceProvider<Long, Status> {
 
         MediaRegistory.register(entry, auto)
 
-        if (Env.TWITTER_FOLLOW_AFTER_REGISTER && !data.user.following) {
+        if (Env.WATCH_THEN_FOLLOW_TWITTER && !data.user.following) {
             val client = Stella.Twitter ?: return true
             client.friendships.createByUserId(userId = data.user.id).execute()
         }

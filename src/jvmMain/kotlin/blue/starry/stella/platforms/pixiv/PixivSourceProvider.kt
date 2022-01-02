@@ -79,7 +79,7 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
 
         MediaRegistory.register(entry, auto)
 
-        if (Env.PIXIV_FOLLOW_AFTER_REGISTER) {
+        if (Env.WATCH_THEN_FOLLOW_PIXIV) {
             client.addFollow(data.user.id, true)
         }
 

@@ -9,10 +9,14 @@ import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class WatchNijieWorker: Worker(Env.CHECK_INTERVAL_MINS.minutes) {
+class WatchNijieWorker: Worker(Env.WATCH_INTERVAL_SECONDS.seconds) {
     override suspend fun run() {
+        if (!Env.ENABLE_WATCH_NIJIE) {
+            return
+        }
+
         val client = Stella.Nijie ?: return
 
         try {
