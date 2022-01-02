@@ -1,5 +1,6 @@
 package blue.starry.stella.platforms.nijie
 
+import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
 import blue.starry.stella.models.internal.MediaExtensionSerializer
@@ -63,6 +64,15 @@ object NijieSourceProvider: SourceProvider<String, IllustMeta> {
         )
 
         MediaRegistory.register(reg, auto)
+
+        if (Env.WATCH_THEN_FOLLOW_NIJIE && !data.isFollowing) {
+            val client = Stella.Nijie ?: return true
+            val userUrlPattern = "^(?:https?://)?nijie\\.info/members\\.php\\?id=(?<id>\\d+)".toRegex()
+
+            val id = userUrlPattern.find(data.illust.author.sameAs)?.groups?.get("id")?.value ?: return true
+            client.follow(id)
+        }
+
         return true
     }
 }

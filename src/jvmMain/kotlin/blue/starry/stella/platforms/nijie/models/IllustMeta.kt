@@ -11,5 +11,6 @@ data class IllustMeta(
     val like: Int,
     val bookmark: Int,
     val reply: Int,
-    val view: Int
+    val view: Int,
+    val isFollowing: Boolean
 )

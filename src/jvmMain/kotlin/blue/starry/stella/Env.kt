@@ -41,6 +41,7 @@ object Env {
     val WATCH_INTERVAL_SECONDS by long { 30.seconds.inWholeSeconds }
     val WATCH_THEN_FOLLOW_TWITTER by boolean { false }
     val WATCH_THEN_FOLLOW_PIXIV by boolean { false }
+    val WATCH_THEN_FOLLOW_NIJIE by boolean { false }
 
     val USER_AGENT by string { "Stella/1.0 (+https://github.com/SlashNephy/Stella)" }
     val LOG_LEVEL by string { "INFO" }

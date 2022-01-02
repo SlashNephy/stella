@@ -6,11 +6,8 @@ import blue.starry.stella.platforms.nijie.models.Bookmark
 import blue.starry.stella.platforms.nijie.models.IllustMeta
 import blue.starry.stella.platforms.nijie.models.ViewCount
 import io.ktor.client.features.expectSuccess
-import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.userAgent
@@ -129,6 +126,7 @@ class NijieClient(private val email: String, private val password: String) {
         val like = jsoup.getElementById("good_cnt")!!.text().toInt()
         val bookmark = jsoup.getElementById("nuita_cnt")!!.text().toInt()
         val reply = jsoup.getElementById("comment_list_js")!!.childNodeSize() / 2
+        val isFollowing = jsoup.selectXpath(".bookmark-user").size > 0
 
         val jsoup2 = Stella.Http.get<String>("https://nijie.info/view_popup.php?id=$id") {
             setHeaders()
@@ -147,7 +145,8 @@ class NijieClient(private val email: String, private val password: String) {
             like = like,
             bookmark = bookmark,
             reply = reply,
-            view = view.viewCount
+            view = view.viewCount,
+            isFollowing = isFollowing
         )
     }
 
@@ -164,6 +163,16 @@ class NijieClient(private val email: String, private val password: String) {
             setHeaders()
             header(HttpHeaders.Referrer, "https://nijie.info/view.php?id=$id")
             header("X-Requested-With", "XMLHttpRequest")
+        }
+    }
+
+    suspend fun follow(id: String) {
+        login()
+
+        Stella.Http.get<Unit>("https://nijie.info/like_user_tuika.php") {
+            parameter("id", id)
+
+            setHeaders()
         }
     }
 
