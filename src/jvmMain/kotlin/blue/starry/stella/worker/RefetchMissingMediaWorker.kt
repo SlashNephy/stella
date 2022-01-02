@@ -1,25 +1,16 @@
 package blue.starry.stella.worker
 
-import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
-import blue.starry.penicillin.core.exceptions.TwitterApiError
 import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.register.MediaRegistory
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import org.litote.kmongo.div
-import org.litote.kmongo.eq
 import org.litote.kmongo.ne
-import kotlin.io.path.exists
+import kotlin.io.path.notExists
 import kotlin.time.Duration.Companion.minutes
 
-class RefetchMissingMediaWorker: Worker(15.minutes) {
+class RefetchMissingMediaWorker: Worker(Env.REFETCH_MISSING_MEDIA_INTERVAL_MINUTES.minutes) {
     override suspend fun run() {
-        if (!Env.ENABLE_MISSING_MEDIA_REFETCH) {
+        if (!Env.ENABLE_REFETCH_MISSING_MEDIA) {
             return
         }
 
@@ -28,45 +19,9 @@ class RefetchMissingMediaWorker: Worker(15.minutes) {
 
     private suspend fun check() {
         val filter = PicEntry::timestamp / PicEntry.Timestamp::archived ne true
-        val entries = Stella.PicCollection.find(filter).toFlow()
 
-        val jobs = entries.map { entry ->
-            launch {
-                checkEach(entry)
-            }
-        }.toList()
-        jobs.joinAll()
-    }
-
-    private suspend fun checkEach(entry: PicEntry) {
-        if (entry.media.all { Stella.MediaDirectory.resolve(it.filename).exists() }) {
-            return
-        }
-
-        logger.info { "\"${entry.title}\" (${entry.url}) はキャッシュが存在しないため, 再取得します。" }
-
-        try {
-            MediaRegistory.registerByUrl(entry.url, true)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: PenicillinTwitterApiException) {
-            when (e.error) {
-                TwitterApiError.NoStatusFound, TwitterApiError.ResourceNotFound -> {
-                    Stella.PicCollection.deleteOne(PicEntry::url eq entry.url)
-                    logger.warn { "\"${entry.title}\" (${entry.url}) は削除されているため, エントリを削除しました。" }
-                }
-                TwitterApiError.SuspendedUser -> {
-                    logger.warn { "\"${entry.title}\" (${entry.url}) は作者が凍結されているため, スキップしました。" }
-                }
-                TwitterApiError.CannotSeeProtectedStatus -> {
-                    logger.warn { "\"${entry.title}\" (${entry.url}) は鍵垢のため, スキップしました。" }
-                }
-                TwitterApiError.RateLimitExceeded -> {
-                    logger.warn { "レートリミットに到達したため一時停止します。" }
-                }
-            }
-        } catch (t: Throwable) {
-            return
+        BatchUpdater.updateMany(filter) { entry ->
+            entry.media.any { Stella.MediaDirectory.resolve(it.filename).notExists() }
         }
     }
 }
