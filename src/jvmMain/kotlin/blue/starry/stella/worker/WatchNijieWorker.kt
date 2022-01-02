@@ -7,6 +7,7 @@ import blue.starry.stella.platforms.nijie.NijieSourceProvider
 import blue.starry.stella.platforms.nijie.models.Bookmark
 import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -29,7 +30,7 @@ class WatchNijieWorker: Worker(Env.WATCH_INTERVAL_SECONDS.seconds) {
         }
     }
 
-    private suspend fun checkBookmarks(client: NijieClient) {
+    private suspend fun checkBookmarks(client: NijieClient) = coroutineScope {
         val entries = client.bookmarks().reversed()
 
         val jobs = entries.map { bookmark ->

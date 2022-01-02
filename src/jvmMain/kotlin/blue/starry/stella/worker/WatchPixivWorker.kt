@@ -7,6 +7,7 @@ import blue.starry.stella.platforms.pixiv.PixivSourceProvider
 import blue.starry.stella.platforms.pixiv.entities.Illust
 import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -30,7 +31,7 @@ class WatchPixivWorker: Worker(Env.WATCH_INTERVAL_SECONDS.seconds) {
         }
     }
 
-    private suspend fun checkBookmarks(client: PixivClient, private: Boolean) {
+    private suspend fun checkBookmarks(client: PixivClient, private: Boolean) = coroutineScope {
         val entries = client.getBookmarks(private).illusts.reversed()
 
         val jobs = entries.map { bookmark ->

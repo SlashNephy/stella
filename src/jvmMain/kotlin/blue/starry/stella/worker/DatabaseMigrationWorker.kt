@@ -3,6 +3,7 @@ package blue.starry.stella.worker
 import blue.starry.stella.Env
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.joinAll
@@ -23,7 +24,7 @@ class DatabaseMigrationWorker: Worker(null) {
 
     private data class Migration(val name: String, val filter: Bson, val update: Bson)
 
-    private suspend fun check() {
+    private suspend fun check() = coroutineScope {
         val migrations = listOf(
             Migration(
                 name = "timestamp.archived",
@@ -40,7 +41,7 @@ class DatabaseMigrationWorker: Worker(null) {
         jobs.joinAll()
     }
 
-    private suspend fun migrate(migration: Migration) {
+    private suspend fun migrate(migration: Migration) = coroutineScope {
         val entries = Stella.PicCollection.find(migration.filter).toFlow()
         val jobs = entries.map { entry ->
             launch {

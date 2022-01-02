@@ -16,6 +16,7 @@ import blue.starry.stella.Stella
 import blue.starry.stella.platforms.twitter.TwitterSourceProvider
 import io.ktor.util.error
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +39,7 @@ class WatchTwitterWorker: Worker(Env.WATCH_INTERVAL_SECONDS.seconds) {
         }
     }
 
-    private suspend fun checkTimeline(client: ApiClient) {
+    private suspend fun checkTimeline(client: ApiClient) = coroutineScope {
         val timeline = client.timeline.userTimeline(
             tweetMode = TweetMode.Extended
         ).execute()
