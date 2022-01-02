@@ -73,7 +73,7 @@ fun Application.entrypoint() {
     }
 
     install(CallLogging) {
-        logger = KotlinLogging.create("Stella.Server")
+        logger = KotlinLogging.create("Stella.Http.Server")
         format { call ->
             when (val status = call.response.status()) {
                 HttpStatusCode.Found -> "$status: ${call.request.toLogString()} -> ${call.response.headers[HttpHeaders.Location]}"

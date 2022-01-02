@@ -70,7 +70,7 @@ object Stella {
         Logging {
             level = LogLevel.INFO
             logger = object : Logger {
-                private val logger = KotlinLogging.create("Stella.Http")
+                private val logger = KotlinLogging.create("Stella.Http.Client")
 
                 override fun log(message: String) {
                     logger.trace { message }
