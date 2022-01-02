@@ -3,7 +3,6 @@ package blue.starry.stella
 import kotlin.properties.ReadOnlyProperty
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 object Env {
     val HOST by stringOrNull
@@ -38,7 +37,7 @@ object Env {
     val ENABLE_WATCH_TWITTER by boolean { false }
     val ENABLE_WATCH_PIXIV by boolean { false }
     val ENABLE_WATCH_NIJIE by boolean { false }
-    val WATCH_INTERVAL_SECONDS by long { 30.seconds.inWholeSeconds }
+    val WATCH_INTERVAL_SECONDS by long { 5.minutes.inWholeSeconds }
     val WATCH_THEN_FOLLOW_TWITTER by boolean { false }
     val WATCH_THEN_FOLLOW_PIXIV by boolean { false }
     val WATCH_THEN_FOLLOW_NIJIE by boolean { false }
