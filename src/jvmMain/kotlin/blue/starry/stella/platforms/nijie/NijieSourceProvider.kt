@@ -32,7 +32,7 @@ object NijieSourceProvider: SourceProvider<String, IllustMeta> {
     }
 
     override suspend fun register(data: IllustMeta, auto: Boolean): Boolean {
-        val formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.ENGLISH)
+        val formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH)
         val createdAt = LocalDateTime.parse(data.illust.datePublished, formatter).atZone(ZoneId.of("UTC")).toInstant().toEpochMilli()
 
         val reg = PicRegistration(
