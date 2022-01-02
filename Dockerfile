@@ -22,6 +22,13 @@ RUN gradle -version > /dev/null \
 
 # Final Stage
 FROM adoptopenjdk:11-jre-hotspot
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get install -y tzdata \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 COPY docs/ /app/docs/
 
