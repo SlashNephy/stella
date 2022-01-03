@@ -2,6 +2,7 @@ package blue.starry.stella
 
 import kotlin.properties.ReadOnlyProperty
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 object Env {
@@ -28,10 +29,10 @@ object Env {
 
     val ENABLE_DATABASE_MIGRATION by boolean { false }
     val ENABLE_REFETCH_MISSING_MEDIA by boolean { false }
-    val REFETCH_MISSING_MEDIA_INTERVAL_MINUTES by long { 15.minutes.inWholeMinutes }
+    val REFETCH_MISSING_MEDIA_INTERVAL_MINUTES by long { 3.hours.inWholeMinutes }
 
     val ENABLE_REFRESH_ENTRY by boolean { false }
-    val REFRESH_ENTRY_INTERVAL_MINUTES by long { 15.minutes.inWholeMinutes }
+    val REFRESH_ENTRY_INTERVAL_MINUTES by long { 10.minutes.inWholeMinutes }
     val REFRESH_ENTRY_THRESHOLD_MINUTES by long { 7.days.inWholeMinutes }
 
     val ENABLE_WATCH_TWITTER by boolean { false }
