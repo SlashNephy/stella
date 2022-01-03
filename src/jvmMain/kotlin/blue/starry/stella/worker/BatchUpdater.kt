@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 object BatchUpdater {
     private val logger = KotlinLogging.create("Stella.BatchUpdater")
@@ -51,7 +51,9 @@ object BatchUpdater {
 
         val jobs = entries.map { entry ->
             launch {
+                delay(Random.nextInt(0..3000).milliseconds)
                 updateOne(entry, true)
+                delay(Random.nextInt(0..3000).milliseconds)
             }
         }.toList()
         jobs.joinAll()
@@ -105,8 +107,6 @@ object BatchUpdater {
     }
 
     private suspend fun update(entry: PicEntry, auto: Boolean): UpdateResult {
-        delay(Random.nextInt(0..10).seconds)
-
         rateLimitsMutex.withLock {
             val resetAt = rateLimits[entry.platform]
 
