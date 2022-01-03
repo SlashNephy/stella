@@ -45,52 +45,60 @@ object BatchUpdater {
 
         val jobs = entries.map { entry ->
             launch {
-                when (val result = updateOne(entry)) {
-                    UpdateResult.Successful -> {}
-
-                    UpdateResult.Missing -> {
-                        Stella.PicCollection.updateOne(
-                            PicEntry::url eq entry.url,
-                            combine(
-                                setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, true),
-                                setValue(PicEntry::timestamp / PicEntry.Timestamp::auto_updated, Instant.now().toEpochMilli())
-                            )
-                        )
-                        logger.warn { "\"${entry.title}\" (${entry.url}) は削除されているため, エントリーをアーカイブしました。" }
-                    }
-                    UpdateResult.TemporallyUnavailable -> {
-                        Stella.PicCollection.updateOne(
-                            PicEntry::url eq entry.url,
-                            setValue(PicEntry::timestamp / PicEntry.Timestamp::auto_updated, Instant.now().toEpochMilli())
-                        )
-                        logger.warn { "\"${entry.title}\" (${entry.url}) は一時的に利用できないため, スキップしました。" }
-                    }
-                    is UpdateResult.Failed -> {
-                        logger.warn(result.cause) { "\"${entry.title}\" (${entry.url}) の更新中に不明な例外が発生しました。" }
-                    }
-
-                    is UpdateResult.Canceled -> {
-                        logger.debug(result.cause) { "\"${entry.title}\" (${entry.url}) の更新中にキャンセルが要求されました。" }
-                        throw result.cause
-                    }
-                    is UpdateResult.Cooldown -> {
-                        rateLimitsMutex.withLock {
-                            rateLimits[result.platform] = result.resetAt
-                        }
-
-                        logger.warn {
-                            val instant = Instant.ofEpochMilli(result.resetAt)
-                            val resetAt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-                            "\"${entry.title}\" (${entry.url}) の更新中にレートリミットに到達しました。${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(resetAt)} に解除されます。"
-                        }
-                    }
-                }
+                updateOne(entry, true)
             }
         }.toList()
         jobs.joinAll()
     }
 
-    private suspend fun updateOne(entry: PicEntry): UpdateResult {
+    suspend fun updateOne(entry: PicEntry, auto: Boolean): Boolean {
+        when (val result = update(entry, auto)) {
+            UpdateResult.Successful -> {
+                return true
+            }
+
+            UpdateResult.Missing -> {
+                Stella.PicCollection.updateOne(
+                    PicEntry::url eq entry.url,
+                    combine(
+                        setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, true),
+                        setValue(PicEntry::timestamp / PicEntry.Timestamp::auto_updated, Instant.now().toEpochMilli())
+                    )
+                )
+                logger.warn { "\"${entry.title}\" (${entry.url}) は削除されているため, エントリーをアーカイブしました。" }
+            }
+            UpdateResult.TemporallyUnavailable -> {
+                Stella.PicCollection.updateOne(
+                    PicEntry::url eq entry.url,
+                    setValue(PicEntry::timestamp / PicEntry.Timestamp::auto_updated, Instant.now().toEpochMilli())
+                )
+                logger.warn { "\"${entry.title}\" (${entry.url}) は一時的に利用できないため, スキップしました。" }
+            }
+            is UpdateResult.Failed -> {
+                logger.warn(result.cause) { "\"${entry.title}\" (${entry.url}) の更新中に不明な例外が発生しました。" }
+            }
+
+            is UpdateResult.Canceled -> {
+                logger.debug(result.cause) { "\"${entry.title}\" (${entry.url}) の更新中にキャンセルが要求されました。" }
+                throw result.cause
+            }
+            is UpdateResult.Cooldown -> {
+                rateLimitsMutex.withLock {
+                    rateLimits[result.platform] = result.resetAt
+                }
+
+                logger.warn {
+                    val instant = Instant.ofEpochMilli(result.resetAt)
+                    val resetAt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+                    "\"${entry.title}\" (${entry.url}) の更新中にレートリミットに到達しました。${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(resetAt)} に解除されます。"
+                }
+            }
+        }
+
+        return false
+    }
+
+    private suspend fun update(entry: PicEntry, auto: Boolean): UpdateResult {
         delay(Random.nextInt(0..10).seconds)
 
         rateLimitsMutex.withLock {
@@ -102,7 +110,7 @@ object BatchUpdater {
         }
 
         return runCatching {
-            MediaRegistory.registerByUrl(entry.url, true)
+            MediaRegistory.registerByUrl(entry.url, auto)
         }.map {
             UpdateResult.Successful
         }.getOrElse { cause ->

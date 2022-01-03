@@ -2,15 +2,14 @@ package blue.starry.stella.server.endpoints
 
 import blue.starry.stella.Stella
 import blue.starry.stella.models.PicEntry
-import blue.starry.stella.register.MediaRegistory
 import blue.starry.stella.server.respondApiError
+import blue.starry.stella.worker.BatchUpdater
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
 import io.ktor.locations.put
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import kotlinx.coroutines.CancellationException
 import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import org.litote.kmongo.id.toId
@@ -26,16 +25,10 @@ fun Route.putPicRefresh() {
                 "Specified entry was not found."
             }
 
-        try {
-            MediaRegistory.registerByUrl(entry.url, false)
-
+        if (BatchUpdater.updateOne(entry, false)) {
             val newEntry = Stella.PicCollection.findOne(filter)!!
             call.respond(newEntry)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            Stella.Logger.error(t) { "Failed to refresh entry." }
-
+        } else {
             call.respondApiError {
                 "Unknown error occurred."
             }
