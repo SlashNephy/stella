@@ -9,7 +9,6 @@ import blue.starry.stella.models.PicEntry
 import blue.starry.stella.register.MediaRegistory
 import io.ktor.client.features.ResponseException
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.date.toJvmDate
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -26,20 +25,20 @@ import org.litote.kmongo.combine
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.setValue
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 import kotlin.random.nextInt
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 object BatchUpdater {
     private val logger = KotlinLogging.create("Stella.BatchUpdater")
 
     private val rateLimitsMutex = Mutex()
-    private val rateLimits = mutableMapOf<PicEntry.Platform, Instant?>()
+    private val rateLimits = mutableMapOf<PicEntry.Platform, Long?>()
 
     suspend fun updateMany(preFilter: Bson, postFilter: (PicEntry) -> Boolean) = coroutineScope {
         val entries = Stella.PicCollection.find(preFilter).limit(200).toFlow().filter(postFilter)
@@ -80,7 +79,8 @@ object BatchUpdater {
                         }
 
                         logger.warn {
-                            val resetAt = LocalDateTime.ofInstant(result.resetAt, ZoneId.systemDefault())
+                            val instant = Instant.ofEpochMilli(result.resetAt)
+                            val resetAt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                             "\"${entry.title}\" (${entry.url}) の更新中にレートリミットに到達しました。${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(resetAt)} に解除されます。"
                         }
                     }
@@ -91,17 +91,17 @@ object BatchUpdater {
     }
 
     private suspend fun updateOne(entry: PicEntry): UpdateResult {
+        delay(Random.nextInt(0..10).seconds)
+
         rateLimitsMutex.withLock {
             val resetAt = rateLimits[entry.platform]
 
-            if (resetAt != null && Instant.now() < resetAt) {
+            if (resetAt != null && Instant.now().toEpochMilli() < resetAt) {
                 return UpdateResult.Cooldown(entry.platform, resetAt)
             }
         }
 
         return runCatching {
-            delay(Random.nextInt(0..10).seconds)
-
             MediaRegistory.registerByUrl(entry.url, true)
         }.map {
             UpdateResult.Successful
@@ -117,7 +117,7 @@ object BatchUpdater {
                             UpdateResult.Missing
                         }
                         status == HttpStatusCode.TooManyRequests -> {
-                            UpdateResult.Cooldown(entry.platform, Instant.now() + Duration.ofHours(3))
+                            UpdateResult.Cooldown(entry.platform, Instant.now().toEpochMilli() + 3.hours.inWholeMilliseconds)
                         }
                         status.value in (500 until 600) -> {
                             UpdateResult.TemporallyUnavailable
@@ -136,7 +136,7 @@ object BatchUpdater {
                             UpdateResult.TemporallyUnavailable
                         }
                         TwitterApiError.RateLimitExceeded -> {
-                            UpdateResult.Cooldown(entry.platform, cause.rateLimit!!.resetAt.toJvmDate().toInstant())
+                            UpdateResult.Cooldown(entry.platform, cause.rateLimit!!.resetAt.timestamp)
                         }
                         else -> {
                             UpdateResult.Failed(cause)
@@ -158,6 +158,6 @@ object BatchUpdater {
         data class Failed(val cause: Throwable): UpdateResult()
 
         data class Canceled(val cause: CancellationException): UpdateResult()
-        data class Cooldown(val platform: PicEntry.Platform, val resetAt: Instant): UpdateResult()
+        data class Cooldown(val platform: PicEntry.Platform, val resetAt: Long): UpdateResult()
     }
 }
