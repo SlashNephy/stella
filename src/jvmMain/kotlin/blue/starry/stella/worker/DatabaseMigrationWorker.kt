@@ -9,9 +9,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.bson.conversions.Bson
-import org.litote.kmongo.div
-import org.litote.kmongo.eq
-import org.litote.kmongo.setValue
+import org.litote.kmongo.*
 
 class DatabaseMigrationWorker: Worker(null) {
     override suspend fun run() {
@@ -25,11 +23,17 @@ class DatabaseMigrationWorker: Worker(null) {
     private data class Migration(val name: String, val filter: Bson, val update: Bson)
 
     private suspend fun check() = coroutineScope {
+        @Suppress("DEPRECATION")
         val migrations = listOf(
             Migration(
                 name = "timestamp.archived",
                 filter = (PicEntry::timestamp / PicEntry.Timestamp::archived) eq null,
                 update = setValue(PicEntry::timestamp / PicEntry.Timestamp::archived, false)
+            ),
+            Migration(
+                name = "user",
+                filter = PicEntry::user ne null,
+                update = unset(PicEntry::user)
             )
         )
 
