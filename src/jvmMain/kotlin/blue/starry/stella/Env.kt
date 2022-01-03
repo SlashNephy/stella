@@ -45,6 +45,7 @@ object Env {
     val WATCH_THEN_FOLLOW_NIJIE by boolean { false }
 
     val USER_AGENT by string { "Stella/1.0 (+https://github.com/SlashNephy/Stella)" }
+    val VALID_REFERER_HOSTS by stringList { emptyList() }
     val LOG_LEVEL by string { "INFO" }
     val DRYRUN by boolean { false }
 }
@@ -56,6 +57,10 @@ private val stringOrNull: ReadOnlyProperty<Env, String?>
 
 private fun string(default: () -> String): ReadOnlyProperty<Env, String> = ReadOnlyProperty { _, property ->
     System.getenv(property.name) ?: default()
+}
+
+private fun stringList(default: () -> List<String>): ReadOnlyProperty<Env, List<String>> = ReadOnlyProperty { _, property ->
+    System.getenv(property.name)?.split(",") ?: default()
 }
 
 private fun int(default: () -> Int): ReadOnlyProperty<Env, Int> = ReadOnlyProperty { _, property ->
