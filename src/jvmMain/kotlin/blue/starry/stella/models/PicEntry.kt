@@ -14,7 +14,8 @@ data class PicEntry(
     val description: String,
     val url: String,
     val tags: List<Tag>,
-    val user: String?,
+    @Deprecated("Do not use this property anymore.")
+    val user: String? = null,
 
     val platform: Platform,
     val sensitive_level: SensitiveLevel,

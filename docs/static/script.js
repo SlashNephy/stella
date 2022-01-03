@@ -577,13 +577,6 @@ if (sessionStorage.fonts) {
                 author.innerHTML = `${this.pic.author.name} (<a href="${this.pic.author.url}" target="_blank">${this.pic.platform}</a>)`;
             }
 
-            if (this.pic.user !== null) {
-                author.setAttribute("title", `追加したユーザ: ${this.pic.user}`);
-                Utils.tooltip(author, {
-                    placement: "right",
-                    delay: 200
-                });
-            }
             return author;
         }
 

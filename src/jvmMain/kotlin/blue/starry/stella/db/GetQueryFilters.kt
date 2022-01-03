@@ -57,14 +57,6 @@ object GetQueryFilters {
         }
     }
 
-    fun user(value: String?) = flow {
-        if (!value.isNullOrBlank()) {
-            emit(
-                PicEntry::user.regex(value.trim(), "im")
-            )
-        }
-    }
-
     fun sensitiveLevel(value: String?, trusted: Boolean) = flow {
         if (trusted) {
             val levels = value?.split(",")

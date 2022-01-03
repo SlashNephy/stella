@@ -37,14 +37,15 @@ object MediaRegistory {
             url = entry.url,
             tags = (entry.tags.map {
                 PicEntry.Tag(
-                    value = Normalizer.normalizeTag(it), user = null, locked = true
+                    value = Normalizer.normalizeTag(it),
+                    user = null,
+                    locked = true
                 )
             } + old?.tags?.map {
                 it.copy(
                     value = Normalizer.normalizeTag(it.value)
                 )
             }.orEmpty()).distinctBy { it.value },
-            user = old?.user,
             platform = entry.platform,
             sensitive_level = maxOf(entry.sensitiveLevel, old?.sensitive_level ?: PicEntry.SensitiveLevel.Safe),
             timestamp = PicEntry.Timestamp(
@@ -57,7 +58,8 @@ object MediaRegistory {
             author = entry.author,
             media = entry.media,
             rating = PicEntry.Rating(
-                count = old?.rating?.count ?: 0, score = old?.rating?.score ?: 0
+                count = old?.rating?.count ?: 0,
+                score = old?.rating?.score ?: 0
             ),
             popularity = entry.popularity
         )
