@@ -37,11 +37,15 @@ object BatchUpdater {
     private val rateLimitsMutex = Mutex()
     private val rateLimits = mutableMapOf<PicEntry.Platform, Long?>()
 
-    suspend fun updateMany(preFilter: Bson, postFilter: (PicEntry) -> Boolean) = coroutineScope {
+    suspend fun updateMany(preFilter: Bson, limit: Int?, postFilter: (PicEntry) -> Boolean) = coroutineScope {
         val sort = ascending(PicEntry::timestamp / PicEntry.Timestamp::auto_updated)
         val entries = Stella.PicCollection.find(preFilter)
             .sort(sort)
-            .limit(200)
+            .apply {
+                if (limit != null) {
+                    limit(limit)
+                }
+            }
             .toFlow()
             .filter(postFilter)
 

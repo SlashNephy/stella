@@ -23,6 +23,6 @@ class RefreshEntryWorker: Worker(Env.REFRESH_ENTRY_INTERVAL_MINUTES.minutes) {
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.REFRESH_ENTRY_THRESHOLD_MINUTES.minutes.inWholeMilliseconds
             )
         )
-        BatchUpdater.updateMany(filter) { true }
+        BatchUpdater.updateMany(filter, Env.REFRESH_ENTRY_LIMIT) { true }
     }
 }

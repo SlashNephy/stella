@@ -20,8 +20,14 @@ class RefetchMissingMediaWorker: Worker(Env.REFETCH_MISSING_MEDIA_INTERVAL_MINUT
     private suspend fun check() {
         val filter = PicEntry::timestamp / PicEntry.Timestamp::archived ne true
 
-        BatchUpdater.updateMany(filter) { entry ->
-            entry.media.any { Stella.MediaDirectory.resolve(it.filename).notExists() }
+        BatchUpdater.updateMany(filter, null) { entry ->
+            entry.media.any {
+                Stella.MediaDirectory.resolve(it.filename).notExists()
+            }.also {
+                if (it) {
+                    logger.warn { "\"${entry.title}\" (${entry.url}) のメディアは削除されているため, 再取得を試みます。" }
+                }
+            }
         }
     }
 }

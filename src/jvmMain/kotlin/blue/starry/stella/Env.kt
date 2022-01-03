@@ -34,6 +34,7 @@ object Env {
     val ENABLE_REFRESH_ENTRY by boolean { false }
     val REFRESH_ENTRY_INTERVAL_MINUTES by long { 10.minutes.inWholeMinutes }
     val REFRESH_ENTRY_THRESHOLD_MINUTES by long { 7.days.inWholeMinutes }
+    val REFRESH_ENTRY_LIMIT by int { 50 }
 
     val ENABLE_WATCH_TWITTER by boolean { false }
     val ENABLE_WATCH_PIXIV by boolean { false }
