@@ -21,10 +21,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mu.KotlinLogging
 import org.bson.conversions.Bson
-import org.litote.kmongo.combine
-import org.litote.kmongo.div
-import org.litote.kmongo.eq
-import org.litote.kmongo.setValue
+import org.litote.kmongo.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -41,7 +38,12 @@ object BatchUpdater {
     private val rateLimits = mutableMapOf<PicEntry.Platform, Long?>()
 
     suspend fun updateMany(preFilter: Bson, postFilter: (PicEntry) -> Boolean) = coroutineScope {
-        val entries = Stella.PicCollection.find(preFilter).limit(200).toFlow().filter(postFilter)
+        val sort = ascending(PicEntry::timestamp / PicEntry.Timestamp::auto_updated)
+        val entries = Stella.PicCollection.find(preFilter)
+            .sort(sort)
+            .limit(200)
+            .toFlow()
+            .filter(postFilter)
 
         val jobs = entries.map { entry ->
             launch {
