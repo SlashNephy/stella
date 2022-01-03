@@ -52,9 +52,10 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
             description = data.caption,
             url = "https://www.pixiv.net/artworks/${data.id}",
             author = PicEntry.Author(
-                data.user.name,
-                data.user.account,
-                "https://www.pixiv.net/users/${data.id}"
+                name = data.user.name,
+                username = data.user.account,
+                url = "https://www.pixiv.net/users/${data.user.id}",
+                id = data.user.id.toString()
             ),
 
             tags = tags,

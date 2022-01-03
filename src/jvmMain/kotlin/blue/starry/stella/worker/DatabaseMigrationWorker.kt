@@ -39,6 +39,11 @@ class DatabaseMigrationWorker: Worker(null) {
                 name = "kind",
                 filter = PicEntry::kind eq null,
                 update = setValue(PicEntry::kind, PicEntry.Kind.Illust)
+            ),
+            Migration(
+                name = "author.id",
+                filter = PicEntry::author / PicEntry.Author::id eq null,
+                update = setValue(PicEntry::author / PicEntry.Author::id, null)
             )
         )
 

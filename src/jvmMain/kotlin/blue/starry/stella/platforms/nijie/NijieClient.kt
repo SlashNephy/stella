@@ -128,6 +128,9 @@ class NijieClient(private val email: String, private val password: String) {
         val reply = jsoup.getElementById("comment_list_js")?.childNodeSize()?.div(2) ?: 0
         val isFollowing = !jsoup.select(".bookmark-user").isNullOrEmpty()
 
+        val userUrlPattern = "^(?:https?://)?nijie\\.info/members\\.php\\?id=(?<id>\\d+)".toRegex()
+        val userId = userUrlPattern.find(json.author.sameAs)?.groups?.get("id")?.value
+
         val jsoup2 = Stella.Http.get<String>("https://nijie.info/view_popup.php?id=$id") {
             setHeaders()
         }.let {
@@ -146,7 +149,8 @@ class NijieClient(private val email: String, private val password: String) {
             bookmark = bookmark,
             reply = reply,
             view = view.viewCount,
-            isFollowing = isFollowing
+            isFollowing = isFollowing,
+            userId = userId
         )
     }
 

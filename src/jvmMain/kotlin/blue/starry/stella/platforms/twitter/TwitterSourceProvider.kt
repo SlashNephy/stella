@@ -62,7 +62,8 @@ object TwitterSourceProvider: SourceProvider<Long, Status> {
             author = PicEntry.Author(
                 name = data.user.name,
                 url = "https://twitter.com/${data.user.screenName}",
-                username = data.user.screenName
+                username = data.user.screenName,
+                id = data.user.idStr
             ),
             media = media.mapIndexed { i, it ->
                 val url = it.videoInfo?.variants?.filter {

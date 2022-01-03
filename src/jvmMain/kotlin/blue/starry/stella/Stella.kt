@@ -12,7 +12,6 @@ import blue.starry.stella.platforms.nijie.NijieClient
 import blue.starry.stella.platforms.pixiv.PixivClient
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.DefaultRequest
 import io.ktor.client.features.cookies.AcceptAllCookiesStorage
 import io.ktor.client.features.cookies.HttpCookies
 import io.ktor.client.features.defaultRequest

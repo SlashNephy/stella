@@ -12,5 +12,6 @@ data class IllustMeta(
     val bookmark: Int,
     val reply: Int,
     val view: Int,
-    val isFollowing: Boolean
+    val isFollowing: Boolean,
+    val userId: String?
 )

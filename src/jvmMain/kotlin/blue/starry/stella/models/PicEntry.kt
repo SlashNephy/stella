@@ -49,7 +49,8 @@ data class PicEntry(
     data class Author(
         val name: String,
         val username: String?,
-        val url: String
+        val url: String,
+        val id: String? = null
     )
 
     @Serializable

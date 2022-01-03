@@ -43,7 +43,12 @@ object NijieSourceProvider: SourceProvider<String, IllustMeta> {
             platform = PicEntry.Platform.Nijie,
             sensitiveLevel = PicEntry.SensitiveLevel.R18,
             created = createdAt,
-            author = PicEntry.Author(data.illust.author.name, null, data.illust.author.sameAs),
+            author = PicEntry.Author(
+                name = data.illust.author.name,
+                username = null,
+                url = data.illust.author.sameAs,
+                id = data.userId
+            ),
             media = data.mediaUrls.mapIndexed { index, url ->
                 val ext = MediaExtensionSerializer.deserializeFromUrl(url)
                 val path = Stella.MediaDirectory.resolve("nijie_${data.id}_$index.$ext")
@@ -67,9 +72,8 @@ object NijieSourceProvider: SourceProvider<String, IllustMeta> {
 
         if (Env.WATCH_THEN_FOLLOW_NIJIE && !data.isFollowing) {
             val client = Stella.Nijie ?: return true
-            val userUrlPattern = "^(?:https?://)?nijie\\.info/members\\.php\\?id=(?<id>\\d+)".toRegex()
+            val id = reg.author.id ?: return true
 
-            val id = userUrlPattern.find(data.illust.author.sameAs)?.groups?.get("id")?.value ?: return true
             client.follow(id)
         }
 
