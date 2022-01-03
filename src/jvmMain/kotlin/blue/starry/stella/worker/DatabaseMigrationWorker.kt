@@ -34,6 +34,11 @@ class DatabaseMigrationWorker: Worker(null) {
                 name = "user",
                 filter = PicEntry::user ne null,
                 update = unset(PicEntry::user)
+            ),
+            Migration(
+                name = "kind",
+                filter = PicEntry::kind eq null,
+                update = setValue(PicEntry::kind, PicEntry.Kind.Illust)
             )
         )
 

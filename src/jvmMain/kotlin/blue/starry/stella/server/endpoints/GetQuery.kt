@@ -23,6 +23,7 @@ data class GetQuery(
     val platform: String? = null,
     val user: String? = null,
     val sensitive_levels: String? = null,
+    val kinds: String? = null,
     val created_since: String? = null,
     val created_until: String? = null,
     val added_since: String? = null,
@@ -44,7 +45,7 @@ data class GetQuery(
     val max_reply: Int? = null,
     val sort: String? = null,
     val page: Int = 0,
-    val count: Int = 25
+    val count: Int = 50
 )
 
 fun Route.getQuery() {
@@ -56,6 +57,7 @@ fun Route.getQuery() {
             GetQueryFilters.platform(param.platform),
             GetQueryFilters.author(param.author),
             GetQueryFilters.sensitiveLevel(param.sensitive_levels, call.request.header("X-Local-Access") == "1"),
+            GetQueryFilters.kind(param.kinds),
             GetQueryFilters.created(param.created_since, param.created_until),
             GetQueryFilters.added(param.added_since, param.added_until),
             GetQueryFilters.updated(param.updated_since, param.updated_until),

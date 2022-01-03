@@ -1,5 +1,6 @@
 package blue.starry.stella.models
 
+import blue.starry.stella.models.internal.KindSerializer
 import blue.starry.stella.models.internal.MediaExtensionSerializer
 import blue.starry.stella.models.internal.PlatformSerializer
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
@@ -19,6 +20,7 @@ data class PicEntry(
 
     val platform: Platform,
     val sensitive_level: SensitiveLevel,
+    val kind: Kind = Kind.Illust,
 
     val timestamp: Timestamp,
     val author: Author,
@@ -95,5 +97,11 @@ data class PicEntry(
         png,
         gif,
         mp4
+    }
+
+    @Serializable(KindSerializer::class)
+    enum class Kind {
+        Illust,
+        Photo
     }
 }

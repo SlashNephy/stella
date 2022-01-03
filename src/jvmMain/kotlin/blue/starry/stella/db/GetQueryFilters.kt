@@ -1,6 +1,7 @@
 package blue.starry.stella.db
 
 import blue.starry.stella.models.PicEntry
+import blue.starry.stella.models.internal.KindSerializer
 import blue.starry.stella.models.internal.PlatformSerializer
 import blue.starry.stella.models.internal.SensitiveLevelSerializer
 import kotlinx.coroutines.flow.flow
@@ -71,6 +72,18 @@ object GetQueryFilters {
         } else {
             emit(
                 PicEntry::sensitive_level.eq(PicEntry.SensitiveLevel.Safe)
+            )
+        }
+    }
+
+    fun kind(value: String?) = flow {
+        val kinds = value?.split(",")
+            ?.mapNotNull { it.trim().toIntOrNull() }
+            ?.mapNotNull { KindSerializer.deserializeOrNull(it) }
+
+        if (!kinds.isNullOrEmpty()) {
+            emit(
+                PicEntry::kind.`in`(kinds)
             )
         }
     }
