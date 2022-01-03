@@ -136,7 +136,7 @@ class NijieClient(private val email: String, private val password: String) {
         }.let {
             Jsoup.parse(it)
         }
-        val mediaUrls = jsoup2.select("img[class=box-shadow999]").map { it.attr("src") }.map { "https:$it" }
+        val mediaUrls = jsoup2.select(".box-shadow999").map { it.attr("src") }.map { "https:$it" }
         val view = getViewCount(id)
 
         return IllustMeta(
