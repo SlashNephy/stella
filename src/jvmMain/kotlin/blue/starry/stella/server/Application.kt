@@ -22,6 +22,7 @@ import io.ktor.serialization.json
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.litote.kmongo.id.serialization.IdKotlinXSerializationModule
+import org.slf4j.event.Level
 import java.io.File
 
 fun Application.entrypoint() {
@@ -74,6 +75,8 @@ fun Application.entrypoint() {
 
     install(CallLogging) {
         logger = KotlinLogging.create("Stella.Http.Server")
+        level = Level.DEBUG
+
         format { call ->
             when (val status = call.response.status()) {
                 HttpStatusCode.Found -> "$status: ${call.request.toLogString()} -> ${call.response.headers[HttpHeaders.Location]}"
