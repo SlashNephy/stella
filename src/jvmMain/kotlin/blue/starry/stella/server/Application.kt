@@ -9,6 +9,7 @@ import io.ktor.features.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLProtocol
 import io.ktor.http.content.default
 import io.ktor.http.content.files
 import io.ktor.http.content.static
@@ -57,20 +58,37 @@ fun Application.entrypoint() {
         }
     }
 
-    install(XForwardedHeaderSupport)
+    if (Env.BEHIND_REVERSE_PROXY) {
+        install(XForwardedHeaderSupport)
+    }
 
-    install(CORS) {
-        method(HttpMethod.Options)
-        method(HttpMethod.Get)
-        method(HttpMethod.Post)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
-        method(HttpMethod.Patch)
-        allowNonSimpleContentTypes = true
-        header("x-requested-with")
+    if (Env.ENABLE_CORS) {
+        install(CORS) {
+            if (Env.CORS_HOSTS.isNotEmpty()) {
+                val schemes = if (Env.CORS_ACCEPT_HTTP) {
+                    listOf(URLProtocol.HTTP, URLProtocol.HTTPS)
+                } else {
+                    listOf(URLProtocol.HTTPS)
+                }.map { it.name }
 
-        val host = Env.HOST ?: return@install
-        host(host, schemes = listOf("http", "https"))
+                for (host in Env.CORS_HOSTS) {
+                    host(host, schemes = schemes)
+                }
+            } else {
+                anyHost()
+            }
+
+            header("x-requested-with")
+            for (header in Env.CORS_HEADERS) {
+                header(header)
+            }
+
+            methods += setOf(
+                HttpMethod.Get, HttpMethod.Post, HttpMethod.Patch, HttpMethod.Delete, HttpMethod.Put, HttpMethod.Options
+            )
+
+            allowNonSimpleContentTypes = true
+        }
     }
 
     install(CallLogging) {

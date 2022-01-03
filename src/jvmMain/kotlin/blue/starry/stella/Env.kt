@@ -6,8 +6,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 object Env {
-    val HOST by stringOrNull
-
     val HTTP_HOST by string { "0.0.0.0" }
     val HTTP_PORT by int { 6742 }
 
@@ -44,8 +42,14 @@ object Env {
     val WATCH_THEN_FOLLOW_PIXIV by boolean { false }
     val WATCH_THEN_FOLLOW_NIJIE by boolean { false }
 
+    val BEHIND_REVERSE_PROXY by boolean { false }
+
+    val ENABLE_CORS by boolean { true }
+    val CORS_HOSTS by stringList { emptyList() }
+    val CORS_HEADERS by stringList { emptyList() }
+    val CORS_ACCEPT_HTTP by boolean { false }
+
     val USER_AGENT by string { "Stella/1.0 (+https://github.com/SlashNephy/Stella)" }
-    val VALID_REFERER_HOSTS by stringList { emptyList() }
     val LOG_LEVEL by string { "INFO" }
     val DRYRUN by boolean { false }
 }

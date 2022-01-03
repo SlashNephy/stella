@@ -18,10 +18,10 @@ data class GetMedia(val filename: String)
 
 fun Route.getMediaByFilename() {
     get<GetMedia> { (filename) ->
-        if (Env.VALID_REFERER_HOSTS.isNotEmpty()) {
+        if (Env.CORS_HOSTS.isNotEmpty()) {
             val referer = call.request.header(HttpHeaders.Referrer) ?: return@get call.respond(HttpStatusCode.BadRequest)
             val refererUrl = Url(referer)
-            if (refererUrl.host !in Env.VALID_REFERER_HOSTS) {
+            if (refererUrl.host !in Env.CORS_HOSTS) {
                 return@get call.respond(HttpStatusCode.Forbidden)
             }
         }
