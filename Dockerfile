@@ -2,7 +2,7 @@
 # This stage caches plugin/project dependencies from *.gradle.kts and gradle.properties.
 # Gradle image erases GRADLE_USER_HOME each layer. So we need COPY GRADLE_USER_HOME.
 # Refer https://stackoverflow.com/a/59022743
-FROM gradle:jdk11 AS cache
+FROM gradle:jdk17 AS cache
 WORKDIR /app
 ENV GRADLE_USER_HOME /app/gradle
 COPY *.gradle.kts gradle.properties /app/
@@ -11,7 +11,7 @@ RUN gradle shadowJar --parallel --no-daemon --quiet
 
 # Gradle Build Stage
 # This stage builds and generates fat jar.
-FROM gradle:jdk11 AS build
+FROM gradle:jdk17 AS build
 WORKDIR /app
 COPY --from=cache /app/gradle /home/gradle/.gradle
 COPY *.gradle.kts gradle.properties /app/
@@ -21,7 +21,7 @@ RUN gradle -version > /dev/null \
     && gradle shadowJar --parallel --no-daemon
 
 # Final Stage
-FROM adoptopenjdk:11-jre-hotspot
+FROM adoptopenjdk:17-jre-hotspot
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \

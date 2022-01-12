@@ -11,7 +11,7 @@ repositories {
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
     js {
@@ -42,8 +42,8 @@ kotlin {
                 implementation("io.ktor:ktor-client-serialization:1.6.7")
                 implementation("io.ktor:ktor-client-logging:1.6.7")
 
-                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.2.3")
-                implementation("org.litote.kmongo:kmongo-id-serialization:4.2.3")
+                implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
+                implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
                 implementation("org.jsoup:jsoup:1.14.3")
                 implementation("com.squareup:gifencoder:0.10.1")
 
@@ -116,5 +116,5 @@ task<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
 
     val jvmMain = kotlin.jvm().compilations.getByName("main")
     from(jvmMain.output)
-    configurations.add(jvmMain.compileDependencyFiles as Configuration)
+    configurations.add(jvmMain.runtimeDependencyFiles)
 }
