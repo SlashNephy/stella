@@ -21,7 +21,7 @@ RUN gradle -version > /dev/null \
     && gradle shadowJar --parallel --no-daemon
 
 # Final Stage
-FROM adoptopenjdk:17-jre-hotspot
+FROM eclipse-temurin:17-jre
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
