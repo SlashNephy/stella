@@ -38,7 +38,7 @@ object PixivSourceProvider: SourceProvider<Int, Illust> {
             ?: error("Illust (ID: ${data.id}) has no images.")
 
         val media = when (data.type) {
-            "illust" -> downloader.downloadIllusts(data.id, firstImageUrl, data.pageCount)
+            "illust", "manga" -> downloader.downloadIllusts(data.id, firstImageUrl, data.pageCount)
             "ugoira" -> {
                 listOf(
                     downloader.downloadUgoira(data.id, firstImageUrl, data.width, data.height)
