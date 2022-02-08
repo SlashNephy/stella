@@ -8,6 +8,7 @@ import kotlin.time.Duration.Companion.minutes
 object Env {
     val HTTP_HOST by string { "0.0.0.0" }
     val HTTP_PORT by int { 6742 }
+    val HTTP_BASE_URI by string { "/" }
 
     val DB_HOST by string { "0.0.0.0" }
     val DB_PORT by int { 27017 }

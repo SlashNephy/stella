@@ -37,24 +37,26 @@ fun Application.entrypoint() {
     }
 
     routing {
-        static("/") {
-            staticRootFolder = File("docs")
+        route(Env.HTTP_BASE_URI) {
+            static {
+                staticRootFolder = File("docs")
 
-            static("static") {
-                files("static")
+                static("static") {
+                    files("static")
+                }
+                default("index.html")
             }
-            default("index.html")
-        }
 
-        route("/api") {
-            getQuery()
-            getQueryTags()
-            getSummary()
-            getMediaByFilename()
-            putPicRefresh()
-            putPicTag()
-            deletePicTag()
-            patchPicSensitiveLevel()
+            route("api") {
+                getQuery()
+                getQueryTags()
+                getSummary()
+                getMediaByFilename()
+                putPicRefresh()
+                putPicTag()
+                deletePicTag()
+                patchPicSensitiveLevel()
+            }
         }
     }
 
