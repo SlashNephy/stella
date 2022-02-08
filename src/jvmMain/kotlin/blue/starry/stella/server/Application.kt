@@ -37,16 +37,16 @@ fun Application.entrypoint() {
     }
 
     routing {
-        route(Env.HTTP_BASE_URI) {
-            static {
-                staticRootFolder = File("docs")
+        static(Env.HTTP_BASE_URI) {
+            staticRootFolder = File("docs")
 
-                static("static") {
-                    files("static")
-                }
-                default("index.html")
+            static("static") {
+                files("static")
             }
+            default("index.html")
+        }
 
+        route(Env.HTTP_BASE_URI) {
             route("api") {
                 getQuery()
                 getQueryTags()
