@@ -6,17 +6,15 @@ import org.litote.kmongo.eq
 
 object Normalizer {
     fun normalizeTitle(title: String): String {
-        return title.replace("\r\n", " ")
-            .replace("\n", " ")
-            .replace("<br>", " ")
+        return title.replace("(?:\\s|<br>)+".toRegex(), " ")
     }
 
     fun normalizeDescription(description: String): String {
-        return description.replace("\r\n", "<br>")
-            .replace("\n", "<br>")
+        return description.replace("[\r\n]+".toRegex(), "<br>").replace("\\s+".toRegex(), " ")
     }
 
     suspend fun normalizeTag(tag: String): String {
-        return Stella.TagReplaceCollection.findOne(PicTagReplace::from eq tag)?.to ?: tag
+        val filter = PicTagReplace::from eq tag
+        return Stella.TagReplaceCollection.findOne(filter)?.to ?: tag
     }
 }

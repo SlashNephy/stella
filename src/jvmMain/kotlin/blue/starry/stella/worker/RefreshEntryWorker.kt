@@ -16,13 +16,15 @@ class RefreshEntryWorker: Worker(Env.REFRESH_ENTRY_INTERVAL_MINUTES.minutes) {
     }
 
     private suspend fun check() {
+        val autoUpdatedThreshold = Instant.now().toEpochMilli() - Env.REFRESH_ENTRY_THRESHOLD_MINUTES.minutes.inWholeMilliseconds
         val filter = and(
-            PicEntry::timestamp / PicEntry.Timestamp::archived ne true,
+            PicEntry::timestamp / PicEntry.Timestamp::archived eq false,
             or(
                 PicEntry::timestamp / PicEntry.Timestamp::auto_updated eq null,
-                PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte Instant.now().toEpochMilli() - Env.REFRESH_ENTRY_THRESHOLD_MINUTES.minutes.inWholeMilliseconds
+                PicEntry::timestamp / PicEntry.Timestamp::auto_updated lte autoUpdatedThreshold,
             )
         )
+
         BatchUpdater.updateMany(filter, Env.REFRESH_ENTRY_LIMIT) { true }
     }
 }

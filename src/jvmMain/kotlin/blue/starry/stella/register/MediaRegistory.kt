@@ -35,19 +35,22 @@ object MediaRegistory {
             title = Normalizer.normalizeTitle(entry.title),
             description = Normalizer.normalizeDescription(entry.description),
             url = entry.url,
-            tags = (entry.tags.map {
+            tags = (entry.tags.map { tag ->
                 PicEntry.Tag(
-                    value = Normalizer.normalizeTag(it),
+                    value = Normalizer.normalizeTag(tag),
                     user = null,
                     locked = true
                 )
-            } + old?.tags?.map {
-                it.copy(
-                    value = Normalizer.normalizeTag(it.value)
+            } + old?.tags?.map { tag ->
+                tag.copy(
+                    value = Normalizer.normalizeTag(tag.value)
                 )
             }.orEmpty()).distinctBy { it.value },
             platform = entry.platform,
-            sensitive_level = maxOf(entry.sensitiveLevel, old?.sensitive_level ?: PicEntry.SensitiveLevel.Safe),
+            sensitive_level = maxOf(
+                entry.sensitiveLevel,
+                old?.sensitive_level ?: PicEntry.SensitiveLevel.Safe
+            ),
             timestamp = PicEntry.Timestamp(
                 created = entry.created,
                 added = old?.timestamp?.added ?: Instant.now().toEpochMilli(),
