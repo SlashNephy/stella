@@ -21,7 +21,7 @@ RUN gradle -version > /dev/null \
     && gradle shadowJar --parallel --no-daemon
 
 # Final Stage
-FROM openjdk:17-jdk-alpine
+FROM openjdk:19-jdk-alpine
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 COPY docs/ /app/docs/
 
