@@ -1,3 +1,24 @@
+WebFontConfig = {
+    google: {
+        families: ['Zen+Maru+Gothic:500&display=swap']
+    },
+    active: function() {
+        sessionStorage.fonts = true;
+    },
+    timeout: 3000
+};
+
+if (sessionStorage.fonts) {
+    document.documentElement.classList.add("wf-active");
+}
+
+(function(d) {
+    const s = d.createElement('script');
+    s.async = true;
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js';
+    d.body.appendChild(s);
+})(document);
+
 !function() {
     const Utils = {
         parseTwemoji: e => twemoji.parse(e),
@@ -89,8 +110,7 @@
     };
 
     const App = {
-        mediaBaseUrl: "/api/media/",
-        mobileWarningArea: document.getElementById("mobile-warning"),
+        mediaBaseUrl: "api/media/",
         isMobile: navigator.userAgent.includes("iPhone OS") || navigator.userAgent.includes("Android") || navigator.userAgent.includes("Mobile"),
         countEntriesArea: document.getElementById("count-entries"),
         editorModal: document.getElementById("editor"),
@@ -104,7 +124,7 @@
                     parameters.count = 10;
                     const query = API.buildParameterString(parameters);
 
-                    return `/api/query${query !== null ? "?" + query : ""}`;
+                    return `api/query${query !== null ? "?" + query : ""}`;
                 },
                 responseType: "text",
                 status: ".page-load-status",
@@ -532,7 +552,7 @@
                 title.innerText += ` #${this.media.index + 1}`;
             }
             if (this.pic.sensitive_level > 0) {
-                title.innerHTML = `<i class="fas fa-exclamation-circle" title="NSFW"></i> ${title.innerText}`;
+                title.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:exclamation-circle" title="NSFW"></span> ${title.innerText}`;
             }
             return title;
         }
@@ -544,7 +564,7 @@
             closeButton.onclick = () => {
                 this.overlayDiv.parentElement.className = this.overlayDiv.parentElement.className.replace("--in", "--out");
             };
-            closeButton.innerHTML += '<i class="far fa-times-circle"></i>';
+            closeButton.innerHTML += '<span class="iconify-inline" data-icon="fa-regular:times-circle"></span>';
             return closeButton;
         }
 
@@ -557,13 +577,6 @@
                 author.innerHTML = `${this.pic.author.name} (<a href="${this.pic.author.url}" target="_blank">${this.pic.platform}</a>)`;
             }
 
-            if (this.pic.user !== null) {
-                author.setAttribute("title", `追加したユーザ: ${this.pic.user}`);
-                Utils.tooltip(author, {
-                    placement: "right",
-                    delay: 200
-                });
-            }
             return author;
         }
 
@@ -575,31 +588,31 @@
                 const reply = document.createElement("span");
                 rate.appendChild(reply);
                 reply.classList.add("badge", "badge-pill", "badge-light", "overlay-rate-badge");
-                reply.innerHTML = `<i class="fas fa-reply"></i> ${this.pic.popularity.reply}`;
+                reply.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:reply"></span> ${this.pic.popularity.reply}`;
             }
             if (this.pic.popularity.retweet !== null) {
                 const retweet = document.createElement("span");
                 rate.appendChild(retweet);
                 retweet.classList.add("badge", "badge-pill", "badge-light", "overlay-rate-badge");
-                retweet.innerHTML = `<i class="fas fa-retweet"></i> ${this.pic.popularity.retweet}`;
+                retweet.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:retweet"></span> ${this.pic.popularity.retweet}`;
             }
             if (this.pic.popularity.like !== null) {
                 const like = document.createElement("span");
                 rate.appendChild(like);
                 like.classList.add("badge", "badge-pill", "badge-light", "overlay-rate-badge");
-                like.innerHTML = `<i class="fas fa-heart"></i> ${this.pic.popularity.like}`;
+                like.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:heart"></span> ${this.pic.popularity.like}`;
             }
             if (this.pic.popularity.bookmark !== null) {
                 const bookmark = document.createElement("span");
                 rate.appendChild(bookmark);
                 bookmark.classList.add("badge", "badge-pill", "badge-light", "overlay-rate-badge");
-                bookmark.innerHTML = `<i class="fas fa-bookmark"></i> ${this.pic.popularity.bookmark}`;
+                bookmark.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:bookmark"></span> ${this.pic.popularity.bookmark}`;
             }
             if (this.pic.popularity.view !== null) {
                 const view = document.createElement("span");
                 rate.appendChild(view);
                 view.classList.add("badge", "badge-pill", "badge-light", "overlay-rate-badge");
-                view.innerHTML = `<i class="far fa-eye"></i> ${this.pic.popularity.view}`;
+                view.innerHTML = `<span class="iconify-inline" data-icon="fa-regular:eye"></span> ${this.pic.popularity.view}`;
             }
 
             return rate;
@@ -625,9 +638,9 @@
             };
             tagElement.setAttribute("data-tag", tag.value);
             if (tag.locked) {
-                tagElement.innerHTML = `<span class="badge badge-primary overlay-badge-tag"><i class="fas fa-lock"></i> ${tag.value}</span>`;
+                tagElement.innerHTML = `<span class="badge badge-primary overlay-badge-tag"><span class="iconify-inline" data-icon="fa-solid:lock"></span> ${tag.value}</span>`;
             } else {
-                tagElement.innerHTML = `<span class="badge badge-info overlay-badge-tag"><i class="fas fa-tag"></i> ${tag.value}</span>`;
+                tagElement.innerHTML = `<span class="badge badge-info overlay-badge-tag"><span class="iconify-inline" data-icon="fa-solid:tag"></span> ${tag.value}</span>`;
             }
             return tagElement;
         }
@@ -636,7 +649,7 @@
             const edit = document.createElement("a");
             edit.classList.add("overlay-tag");
             edit.href = "javascript:void(0);";
-            edit.innerHTML = `<span class="badge badge-secondary overlay-badge-edit-tag"><i class="fas fa-pencil-alt"></i> 編集</span>`;
+            edit.innerHTML = `<span class="badge badge-secondary overlay-badge-edit-tag"><span class="iconify-inline" data-icon="fa-solid:pencil-alt"></span> 編集</span>`;
             edit.onclick = () => {
                 const modal = new PicEditorModalBuilder(this.pic, this.media);
                 modal.build();
@@ -715,7 +728,7 @@
             originalLinkButton.classList.add("btn", "btn-info", "btn-sm", "overlay-button");
             originalLinkButton.setAttribute("type", "button");
             originalLinkButton.onclick = () => window.open(this.pic.url);
-            originalLinkButton.innerHTML += `<i class="fas fa-external-link-alt"></i> ${this.pic.platform} で見る`;
+            originalLinkButton.innerHTML += `<span class="iconify-inline" data-icon="fa-solid:external-link-alt"></span> ${this.pic.platform} で見る`;
             return originalLinkButton;
         }
 
@@ -724,7 +737,7 @@
             rawMediaButton.classList.add("btn", "btn-success", "btn-sm", "overlay-button");
             rawMediaButton.setAttribute("type", "button");
             rawMediaButton.onclick = () => window.open(`${App.mediaBaseUrl}${this.media.filename}`);
-            rawMediaButton.innerHTML += '<i class="far fa-file-image"></i> 新しいタブで開く';
+            rawMediaButton.innerHTML += '<span class="iconify-inline" data-icon="fa-regular:file-image"></span> 新しいタブで開く';
             return rawMediaButton;
         }
 
@@ -737,7 +750,7 @@
                     App.resetInfiniteScroll();
                 });
             };
-            refreshButton.innerHTML += '<i class="fas fa-database"></i> データを再取得する';
+            refreshButton.innerHTML += '<span class="iconify-inline" data-icon="fa-solid:database"></span> データを再取得する';
             return refreshButton;
         }
 
@@ -809,11 +822,11 @@
             const title = document.createElement("h5");
             div.appendChild(title);
             title.classList.add("editor-modal-title");
-            title.innerHTML = '<i class="fas fa-tags"></i>タグ追加';
+            title.innerHTML = '<span class="iconify-inline" data-icon="fa-solid:tags"></span>タグ追加';
 
             const wrapper = document.createElement("div");
             div.appendChild(wrapper);
-            wrapper.innerHTML = '<p><i class="fas fa-search"></i> 既存のタグを検索</p>';
+            wrapper.innerHTML = '<p><span class="iconify-inline" data-icon="fa-solid:search"></span> 既存のタグを検索</p>';
             const input2 = document.createElement("div");
             wrapper.appendChild(input2);
             input2.classList.add("input-group", "mb-3");
@@ -824,7 +837,7 @@
 
             const wrapper2 = document.createElement("div");
             div.appendChild(wrapper2);
-            wrapper2.innerHTML = '<p><i class="fas fa-random"></i> 関連タグから追加<span class="controls"><a class="btn btn-outline-success btn-sm tag-random-refresh-button">更新</a></span></p>';
+            wrapper2.innerHTML = '<p><span class="iconify-inline" data-icon="fa-solid:random"></span> 関連タグから追加<span class="controls"><a class="btn btn-outline-success btn-sm tag-random-refresh-button">更新</a></span></p>';
             const randomResult = document.createElement("div");
             wrapper2.appendChild(randomResult);
             randomResult.classList.add("tag-random-result");
@@ -841,7 +854,7 @@
             a.appendChild(badge);
             badge.classList.add("badge", "badge-success", "overlay-badge-tag", "add-tag");
             badge.setAttribute("data-tag", tagValue);
-            badge.innerHTML = `<i class="fas fa-tag"></i> ${tagValue}`;
+            badge.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:tag"></span> ${tagValue}`;
             return a;
         }
 
@@ -854,7 +867,7 @@
             a.appendChild(badge);
             badge.classList.add("badge", "badge-info", "overlay-badge-tag", "add-tag");
             badge.setAttribute("data-tag", tagValue);
-            badge.innerHTML = `<i class="fas fa-pencil-alt"></i> "${tagValue}" を新しく追加する`;
+            badge.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:pencil-alt"></span> "${tagValue}" を新しく追加する`;
             return a;
         }
 
@@ -865,7 +878,7 @@
             const title = document.createElement("h5");
             div.appendChild(title);
             title.classList.add("editor-modal-title");
-            title.innerHTML = '<i class="fas fa-eraser"></i>タグ削除';
+            title.innerHTML = '<span class="iconify-inline" data-icon="fa-solid:eraser"></span>タグ削除';
 
             const result = document.createElement("div");
             div.appendChild(result);
@@ -883,10 +896,10 @@
             a.appendChild(badge);
             if (tag.locked) {
                 badge.classList.add("badge", "badge-secondary", "overlay-badge-tag", "locked-tag");
-                badge.innerHTML = `<i class="fas fa-lock"></i> ${tag.value}`;
+                badge.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:lock"></span> ${tag.value}`;
             } else {
                 badge.classList.add("badge", "badge-danger", "overlay-badge-tag", "delete-tag");
-                badge.innerHTML = `<i class="fas fa-tag"></i> ${tag.value}`;
+                badge.innerHTML = `<span class="iconify-inline" data-icon="fa-solid:tag"></span> ${tag.value}`;
             }
             badge.setAttribute("data-tag", tag.value);
             return a;
@@ -899,7 +912,7 @@
             const title = document.createElement("h5");
             div.appendChild(title);
             title.classList.add("editor-modal-title");
-            title.innerHTML = '<i class="fas fa-wrench"></i>コンテンツレベル 変更';
+            title.innerHTML = '<span class="iconify-inline" data-icon="fa-solid:wrench"></span>コンテンツレベル 変更';
 
             const inputGroup = document.createElement("div");
             div.appendChild(inputGroup);
@@ -1215,7 +1228,7 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 const query = API.buildParameterString(params);
-                xhr.open(method, `/api${path}${query !== null ? "?" + query : ""}`, true);
+                xhr.open(method, `api${path}${query !== null ? "?" + query : ""}`, true);
                 xhr.onload = () => {
                     try {
                         const json = JSON.parse(xhr.responseText);
@@ -1255,10 +1268,6 @@
         relationalTags: pic => API.asyncRequest("GET", "/query/tags", {id: pic._id, sensitive_level: pic.sensitive_level, count: 20}, null),
         searchTags: (pic, name) => API.asyncRequest("GET", "/query/tags", {id: pic._id, name: name, sensitive_level: pic.sensitive_level, count: 30}, null)
     };
-
-    if (App.isMobile) {
-        App.mobileWarningArea.style = "";
-    }
 
     window.addEventListener("load", () => {
         quicklink();
