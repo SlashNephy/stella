@@ -17,6 +17,9 @@ on:
 env:
   DOCKER_BASE_NAME: ghcr.io/slashnephy/stella
 
+permissions:
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
