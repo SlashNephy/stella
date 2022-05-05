@@ -21,7 +21,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("blue.starry:penicillin:6.2.2")
+                implementation("blue.starry:penicillin:6.2.3")
                 implementation("io.github.microutils:kotlin-logging:2.1.21")
             }
         }
