@@ -13,12 +13,6 @@ RUN gradle shadowJar --parallel --console=verbose
 
 FROM amazoncorretto:18.0.1 as runtime
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
-    && apt-get install -y tzdata \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 COPY docs/ /app/docs/
 
