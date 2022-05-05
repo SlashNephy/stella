@@ -30,6 +30,7 @@ import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 object BatchUpdater {
     private val logger = KotlinLogging.create("Stella.BatchUpdater")
@@ -37,6 +38,7 @@ object BatchUpdater {
     private val rateLimitsMutex = Mutex()
     private val rateLimits = mutableMapOf<PicEntry.Platform, Long?>()
 
+    @OptIn(ExperimentalTime::class)
     suspend fun updateMany(preFilter: Bson, limit: Int?, postFilter: (PicEntry) -> Boolean) = coroutineScope {
         val sort = ascending(PicEntry::timestamp / PicEntry.Timestamp::auto_updated)
         val entries = Stella.PicCollection.find(preFilter)

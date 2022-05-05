@@ -8,6 +8,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 abstract class Worker(private val interval: Duration?): CoroutineScope {
     val logger by lazy {
@@ -19,6 +20,7 @@ abstract class Worker(private val interval: Duration?): CoroutineScope {
 
     abstract suspend fun run()
 
+    @OptIn(ExperimentalTime::class)
     fun start() {
         launch {
             try {

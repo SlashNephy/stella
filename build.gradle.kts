@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
@@ -34,20 +34,20 @@ kotlin {
 
         named("jvmMain") {
             dependencies {
-                implementation("io.ktor:ktor-server-cio:1.6.7")
-                implementation("io.ktor:ktor-locations:1.6.7")
-                implementation("io.ktor:ktor-serialization:1.6.7")
+                implementation("io.ktor:ktor-server-cio:1.6.8")
+                implementation("io.ktor:ktor-locations:1.6.8")
+                implementation("io.ktor:ktor-serialization:1.6.8")
 
-                implementation("io.ktor:ktor-client-cio:1.6.7")
-                implementation("io.ktor:ktor-client-serialization:1.6.7")
-                implementation("io.ktor:ktor-client-logging:1.6.7")
+                implementation("io.ktor:ktor-client-cio:1.6.8")
+                implementation("io.ktor:ktor-client-serialization:1.6.8")
+                implementation("io.ktor:ktor-client-logging:1.6.8")
 
                 implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
                 implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
                 implementation("org.jsoup:jsoup:1.14.3")
                 implementation("com.squareup:gifencoder:0.10.1")
 
-                implementation("ch.qos.logback:logback-classic:1.3.0-alpha12")
+                implementation("ch.qos.logback:logback-classic:1.2.11")
             }
         }
         named("jvmTest") {
@@ -60,7 +60,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
 
-                implementation("io.ktor:ktor-client-js:1.6.7")
+                implementation("io.ktor:ktor-client-js:1.6.8")
 
                 implementation(npm("bootstrap.native", "3.0.9"))
                 implementation(npm("twemoji", "13.0.1"))
@@ -81,7 +81,6 @@ kotlin {
             kotlinOptions {
                 apiVersion = "1.6"
                 languageVersion = "1.6"
-                allWarningsAsErrors = true
                 verbose = true
             }
         }
@@ -91,14 +90,7 @@ kotlin {
         languageSettings {
             progressiveMode = true
 
-            optIn("kotlin.Experimental")
-            optIn("kotlin.ExperimentalStdlibApi")
-            optIn("kotlin.time.ExperimentalTime")
-            optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-            optIn("kotlinx.coroutines.ObsoleteCoroutinesApi")
-            optIn("io.ktor.locations.KtorExperimentalLocationsAPI")
-            optIn("kotlinx.coroutines.FlowPreview")
-            optIn("io.ktor.util.InternalAPI")
+            optIn("kotlin.RequiresOptIn")
         }
     }
 }
