@@ -60,7 +60,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
 
-                implementation("io.ktor:ktor-client-js:1.6.8")
+                implementation("io.ktor:ktor-client-js:2.0.1")
 
                 implementation(npm("bootstrap.native", "3.0.9"))
                 implementation(npm("twemoji", "13.0.1"))
