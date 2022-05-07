@@ -14,26 +14,13 @@ kotlin {
             kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
-    js {
-        browser()
-    }
 
     sourceSets {
-        commonMain {
+        named("jvmMain") {
             dependencies {
                 implementation("blue.starry:penicillin:6.2.3")
                 implementation("io.github.microutils:kotlin-logging:2.1.21")
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
 
-        named("jvmMain") {
-            dependencies {
                 implementation("io.ktor:ktor-server-cio:1.6.8")
                 implementation("io.ktor:ktor-locations:1.6.8")
                 implementation("io.ktor:ktor-serialization:1.6.8")
@@ -53,25 +40,6 @@ kotlin {
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
-            }
-        }
-
-        named("jsMain") {
-            dependencies {
-                implementation(kotlin("stdlib-js"))
-
-                implementation("io.ktor:ktor-client-js:1.6.8")
-
-                implementation(npm("bootstrap.native", "3.0.9"))
-                implementation(npm("twemoji", "13.0.1"))
-                implementation(npm("infinite-scroll", "3.0.6"))
-                implementation(npm("js-cookie", "2"))
-                implementation(npm("quicklink", "0.1.2"))
-            }
-        }
-        named("jsTest") {
-            dependencies {
-                implementation(kotlin("test-js"))
             }
         }
     }
