@@ -1,11 +1,11 @@
-FROM gradle:7.4.2-jdk17 AS cache-server
+FROM gradle:7.4.2-jdk18 AS cache-server
 WORKDIR /app
 ENV GRADLE_USER_HOME /app/gradle
 
 COPY *.gradle.kts gradle.properties /app/
 RUN gradle shadowJar --parallel --console=verbose
 
-FROM gradle:7.4.2-jdk17 AS build-server
+FROM gradle:7.4.2-jdk18 AS build-server
 WORKDIR /app
 
 COPY --from=cache-server /app/gradle /home/gradle/.gradle
