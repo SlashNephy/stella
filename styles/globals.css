@@ -1,0 +1,22 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+* {
+  font-family: 'Zen Maru Gothic', 'Noto Sans CJK JP', 'Noto Sans JP', apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", メイリオ, Meiryo, Osaka, Verdana, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  margin-top: 30px;
+  margin-bottom: 50px;
+}

@@ -1,0 +1,9 @@
+.controls {
+  right: 20px;
+  position: absolute;
+}
+
+.control-button {
+  color: #fff !important;
+  margin-right: 5px;
+}
