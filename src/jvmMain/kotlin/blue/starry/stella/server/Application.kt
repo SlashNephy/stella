@@ -38,11 +38,9 @@ fun Application.entrypoint() {
 
     routing {
         static(Env.HTTP_BASE_URI) {
-            staticRootFolder = File("docs")
+            staticRootFolder = File(Env.STATIC_DIRECTORY)
 
-            static("static") {
-                files("static")
-            }
+            files(".")
             default("index.html")
         }
 

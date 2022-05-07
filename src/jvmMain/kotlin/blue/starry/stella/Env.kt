@@ -44,6 +44,7 @@ object Env {
     val WATCH_THEN_FOLLOW_NIJIE by boolean { false }
 
     val BEHIND_REVERSE_PROXY by boolean { false }
+    val STATIC_DIRECTORY by string { "out" }
 
     val ENABLE_CORS by boolean { true }
     val CORS_HOSTS by stringList { emptyList() }
