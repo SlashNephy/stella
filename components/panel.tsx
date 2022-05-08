@@ -1,25 +1,28 @@
 import React from 'react'
-import { Alert } from 'react-bootstrap'
+import { Alert, Collapse } from 'react-bootstrap'
 
+import packageJson from '../package.json'
+import { AppProps } from '../pages'
 import styles from '../styles/TopPanel.module.css'
 import Controls from './controls'
 import SearchBox from './search/box'
 import Summary from './summary'
 
-const TopPanel: React.FC = () => {
-  const [isOpeningSearchBox, setOpeningSearchBox] = React.useState(false)
-  const handleToggleSearchBox = () => setOpeningSearchBox(!isOpeningSearchBox)
-
+const TopPanel: React.FC<AppProps> = ({ settings, setSettings }) => {
   return (
     <Alert variant="dark" className={styles.topPanel}>
-      <Alert.Heading>stella</Alert.Heading>
+      <Alert.Heading>{packageJson.name}</Alert.Heading>
 
-      <Controls isOpeningSearchBox={isOpeningSearchBox} handleToggleSearchBox={handleToggleSearchBox} />
-      <p>各メディアの著作権はそれぞれのプレースホルダーに帰属します。</p>
+      <Controls settings={settings} setSettings={setSettings} />
       <hr />
       <Summary />
 
-      {isOpeningSearchBox && <hr /> && <SearchBox />}
+      <Collapse in={settings.isOpeningSearchBox}>
+        <div>
+          <hr />
+          <SearchBox settings={settings} setSettings={setSettings} />
+        </div>
+      </Collapse>
     </Alert>
   )
 }

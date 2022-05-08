@@ -5,6 +5,7 @@
   "extends": [
     "eslint:recommended",
     "next/core-web-vitals",
+    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "prettier"
@@ -13,11 +14,7 @@
   "parserOptions": {
     "ecmaVersion": "latest"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "promise",
-    "unused-imports"
-  ],
+  "plugins": ["@typescript-eslint", "promise", "unused-imports"],
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
@@ -26,21 +23,9 @@
     "import/order": [
       "warn",
       {
-        "groups": [
-          "builtin",
-          "external",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ],
-          "object",
-          "type"
-        ],
+        "groups": ["builtin", "external", ["parent", "sibling", "index"], "object", "type"],
         "newlines-between": "always",
-        "pathGroupsExcludedImportTypes": [
-          "builtin"
-        ],
+        "pathGroupsExcludedImportTypes": ["builtin"],
         "alphabetize": {
           "order": "asc",
           "caseInsensitive": true

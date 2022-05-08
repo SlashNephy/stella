@@ -1,3 +1,6 @@
+.next
 .yarn/
-dist/
+build
+docs
+out
 node_modules/

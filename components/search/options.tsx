@@ -1,24 +1,25 @@
 import React from 'react'
 import { Col, Row } from 'react-bootstrap'
 
+import { AppProps } from '../../pages'
 import ContentsFilterFormGroup from './contentsFilter'
 import DisplayFormGroup from './display'
-import ExtensionFormGroup from './extension'
+import MediaTypeFormGroup from './mediaType'
 import PlatformFormGroup from './platform'
 import SortFormGroup from './sort'
 
-const OptionsFormGroup: React.FC = () => {
+const OptionsFormGroup: React.FC<AppProps> = ({ setSettings, settings }) => {
   return (
     <div>
       <Row>
         <Col>
-          <PlatformFormGroup />
+          <PlatformFormGroup settings={settings} setSettings={setSettings} />
         </Col>
         <Col>
-          <ExtensionFormGroup />
+          <MediaTypeFormGroup settings={settings} setSettings={setSettings} />
         </Col>
         <Col>
-          <SortFormGroup />
+          <SortFormGroup settings={settings} setSettings={setSettings} />
         </Col>
       </Row>
 
@@ -26,10 +27,10 @@ const OptionsFormGroup: React.FC = () => {
 
       <Row>
         <Col>
-          <ContentsFilterFormGroup />
+          <ContentsFilterFormGroup settings={settings} setSettings={setSettings} />
         </Col>
         <Col>
-          <DisplayFormGroup />
+          <DisplayFormGroup settings={settings} setSettings={setSettings} />
         </Col>
       </Row>
     </div>

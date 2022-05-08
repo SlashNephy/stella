@@ -8,46 +8,65 @@ import sun from '@iconify/icons-fa6-solid/sun'
 import trash from '@iconify/icons-fa6-solid/trash'
 import { Icon } from '@iconify/react'
 
+import { DEFAULT_SEARCH_SETTINGS } from '../lib/settings'
+import { AppProps } from '../pages'
 import styles from '../styles/Controls.module.css'
 
-type ControlsProps = {
-  readonly isOpeningSearchBox: boolean
-  readonly handleToggleSearchBox: () => void
-}
-
-const Controls: React.FC<ControlsProps> = ({ isOpeningSearchBox, handleToggleSearchBox }) => {
-  const [isDarkTheme, setDarkTheme] = React.useState(false)
-  const handleToggleTheme = () => setDarkTheme(!isDarkTheme)
+const Controls: React.FC<AppProps> = ({ settings, setSettings }) => {
+  const handleToggleTheme = () => {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      isDarkTheme: !previousSettings.isDarkTheme,
+    }))
+    console.log('[handleToggleTheme]')
+  }
+  const handleResetConditions = () => {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      search: DEFAULT_SEARCH_SETTINGS,
+    }))
+    console.log('[handleResetConditions]')
+  }
+  const handleRefresh = () => {
+    console.log('[handleRefresh]')
+  }
+  const handleToggleSearchBox = () => {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      isOpeningSearchBox: !previousSettings.isOpeningSearchBox,
+    }))
+    console.log('[handleToggleSearchBox]')
+  }
 
   return (
     <div>
       <OverlayTrigger
         placement="top"
-        overlay={<Tooltip>{isDarkTheme ? 'ライトテーマに切り替える' : 'ダークテーマに切り替える'}</Tooltip>}
+        overlay={<Tooltip>{settings.isDarkTheme ? 'ライトテーマに切り替える' : 'ダークテーマに切り替える'}</Tooltip>}
       >
         <Button variant="secondary" size="sm" className={styles.controlButton} onClick={handleToggleTheme}>
-          <Icon icon={isDarkTheme ? sun : moon}></Icon>
+          <Icon icon={settings.isDarkTheme ? sun : moon} />
         </Button>
       </OverlayTrigger>
 
       <OverlayTrigger placement="top" overlay={<Tooltip>検索条件をリセットする</Tooltip>}>
-        <Button variant="secondary" size="sm" className={styles.controlButton}>
-          <Icon icon={trash}></Icon>
+        <Button variant="secondary" size="sm" className={styles.controlButton} onClick={handleResetConditions}>
+          <Icon icon={trash} />
         </Button>
       </OverlayTrigger>
 
       <OverlayTrigger placement="top" overlay={<Tooltip>データを更新する</Tooltip>}>
-        <Button variant="secondary" size="sm" className={styles.controlButton}>
-          <Icon icon={arrowsRotate}></Icon>
+        <Button variant="secondary" size="sm" className={styles.controlButton} onClick={handleRefresh}>
+          <Icon icon={arrowsRotate} />
         </Button>
       </OverlayTrigger>
 
       <OverlayTrigger
         placement="top"
-        overlay={<Tooltip>{isOpeningSearchBox ? '検索パネルを折りたたむ' : '検索パネルを表示する'}</Tooltip>}
+        overlay={<Tooltip>{settings.isOpeningSearchBox ? '検索パネルを折りたたむ' : '検索パネルを表示する'}</Tooltip>}
       >
         <Button variant="secondary" size="sm" className={styles.controlButton} onClick={handleToggleSearchBox}>
-          <Icon icon={sliders}></Icon>
+          <Icon icon={sliders} />
         </Button>
       </OverlayTrigger>
     </div>

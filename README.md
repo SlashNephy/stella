@@ -14,10 +14,12 @@
 ---
 
 ## これはなに
+
 各プラットフォームでお気に入り / ブックマークした画像を一元管理できる Web アプリケーションです。  
 個人利用を想定しています。
 
 対応プラットフォーム
+
 - [Twitter](https://twitter.com)
 - [Pixiv](https://pixiv.net)
 - [Nijie](https://nijie.info)
@@ -105,4 +107,5 @@ docker-compose down
 - Kotlin/JS で書き直す
 
 ## License
+
 stella is provided under the MIT license.
