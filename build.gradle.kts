@@ -31,7 +31,7 @@ kotlin {
 
                 implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
                 implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
-                implementation("org.jsoup:jsoup:1.14.3")
+                implementation("org.jsoup:jsoup:1.15.1")
                 implementation("com.squareup:gifencoder:0.10.1")
 
                 implementation("ch.qos.logback:logback-classic:1.2.11")
