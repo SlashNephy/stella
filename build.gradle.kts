@@ -23,7 +23,7 @@ kotlin {
 
                 implementation("io.ktor:ktor-server-cio:1.6.8")
                 implementation("io.ktor:ktor-locations:1.6.8")
-                implementation("io.ktor:ktor-serialization:1.6.8")
+                implementation("io.ktor:ktor-serialization:2.0.2")
 
                 implementation("io.ktor:ktor-client-cio:1.6.8")
                 implementation("io.ktor:ktor-client-serialization:1.6.8")
