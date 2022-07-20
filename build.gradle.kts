@@ -30,7 +30,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-logging:1.6.8")
 
                 implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.6.1")
-                implementation("org.litote.kmongo:kmongo-id-serialization:4.6.1")
+                implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
                 implementation("org.jsoup:jsoup:1.15.2")
                 implementation("com.squareup:gifencoder:0.10.1")
 
