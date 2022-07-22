@@ -11,7 +11,7 @@ COPY *.gradle.kts gradle.properties /app/
 COPY src/jvmMain/ /app/src/jvmMain/
 RUN gradle shadowJar --parallel --console=verbose
 
-FROM amazoncorretto:18.0.1 as runtime
+FROM amazoncorretto:18.0.2 as runtime
 
 COPY --from=build /app/build/libs/stella-all.jar /app/stella.jar
 COPY docs/ /app/docs/
