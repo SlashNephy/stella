@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0.4-jammy
+    ports:
+      - "27017:27017/tcp"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: stella
+
+  mongo-express:
+    image: mongo-express:1.0.0-20
+    ports:
+      - "8081:8081/tcp"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017
+
+  backend:
+    image: golang:1.21.5-bookworm
+    working_dir: /app/backend
+    command: make dev
+    ports:
+      - "8080:8080/tcp"
+    volumes:
+      - source: .
+        target: /app
+        type: bind
+    environment:
+      MONGO_URI: mongodb://root:password@mongo:27017/stella
