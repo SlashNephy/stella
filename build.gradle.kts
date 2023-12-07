@@ -21,13 +21,13 @@ kotlin {
                 implementation("blue.starry:penicillin:6.2.3")
                 implementation("io.github.microutils:kotlin-logging:2.1.23")
 
-                implementation("io.ktor:ktor-server-cio:1.6.8")
+                implementation("io.ktor:ktor-server-cio:2.3.7")
                 implementation("io.ktor:ktor-locations:1.6.8")
-                implementation("io.ktor:ktor-serialization:1.6.8")
+                implementation("io.ktor:ktor-serialization:2.3.7")
 
-                implementation("io.ktor:ktor-client-cio:1.6.8")
-                implementation("io.ktor:ktor-client-serialization:1.6.8")
-                implementation("io.ktor:ktor-client-logging:1.6.8")
+                implementation("io.ktor:ktor-client-cio:2.3.7")
+                implementation("io.ktor:ktor-client-serialization:2.3.7")
+                implementation("io.ktor:ktor-client-logging:2.3.7")
 
                 implementation("org.litote.kmongo:kmongo-coroutine-serialization:4.4.0")
                 implementation("org.litote.kmongo:kmongo-id-serialization:4.4.0")
