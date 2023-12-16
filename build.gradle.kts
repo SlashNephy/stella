@@ -34,7 +34,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.15.2")
                 implementation("com.squareup:gifencoder:0.10.1")
 
-                implementation("ch.qos.logback:logback-classic:1.2.11")
+                implementation("ch.qos.logback:logback-classic:1.2.13")
             }
         }
         named("jvmTest") {
