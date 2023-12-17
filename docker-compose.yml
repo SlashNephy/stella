@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mongo:
-    image: mongo:7.0.4-jammy@sha256:c8c45af5a1105bb57fb11ce12867c7af94c30e1a652b168e50b71b6feaaf4a3c
+    image: mongo:7.0.4-jammy@sha256:8c2d2f7fe8738b97c9836c9c004d70862abe665baedbcd6cd1f74c7ce89a9cc4
     ports:
       - "27017:27017/tcp"
     environment:
