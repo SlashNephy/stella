@@ -19,7 +19,7 @@ kotlin {
         named("jvmMain") {
             dependencies {
                 implementation("blue.starry:penicillin:6.2.3")
-                implementation("io.github.microutils:kotlin-logging:2.1.23")
+                implementation("io.github.microutils:kotlin-logging:3.0.5")
 
                 implementation("io.ktor:ktor-server-cio:1.6.8")
                 implementation("io.ktor:ktor-locations:1.6.8")
