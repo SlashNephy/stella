@@ -46,7 +46,7 @@ jobs:
         run: echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
 
       - name: Build & Push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         env:
           DOCKER_BUILDKIT: 1
         with:
