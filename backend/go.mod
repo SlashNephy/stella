@@ -12,7 +12,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/utgwkk/bulkmockgen v0.2.2
 	go.mongodb.org/mongo-driver v1.13.1
-	go.uber.org/mock v0.3.0
+	go.uber.org/mock v0.4.0
 )
 
 require (
