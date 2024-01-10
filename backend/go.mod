@@ -24,7 +24,7 @@ require (
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/creack/pty v1.1.21 // indirect
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/getsentry/sentry-go v0.18.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gohugoio/hugo v0.111.3 // indirect
