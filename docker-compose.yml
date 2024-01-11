@@ -18,7 +18,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017
 
   backend:
-    image: golang:1.21.6-bookworm@sha256:688ad7f282ce711cc28676531f45d5b840790e28a689fbd4e8e4ac181e23e9c4
+    image: golang:1.21.6-bookworm@sha256:d26cc6bb9b582095098ef54c115ec9ff43647fa3cf157330c57f5aafb97de842
     working_dir: /app/backend
     command: make dev
     ports:
