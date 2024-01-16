@@ -11,7 +11,7 @@ services:
       MONGO_INITDB_DATABASE: stella
 
   mongo-express:
-    image: mongo-express:1.0.2-20@sha256:c73b583771bd09a05398266a411422a889d7da185d8a36329eb4401c2e7d8c48
+    image: mongo-express:1.0.2-20@sha256:f7326dae3fccd7fb5070f0a662462c64e01edb16bb9306d9e740ea7ba6151508
     ports:
       - "8081:8081/tcp"
     environment:
